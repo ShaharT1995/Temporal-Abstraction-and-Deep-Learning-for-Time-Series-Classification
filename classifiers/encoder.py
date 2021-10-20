@@ -4,9 +4,28 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 import numpy as np
 import time
+import os
+import random as rn
 
 from utils.utils import save_logs
 from utils.utils import calculate_metrics
+from tensorflow.python.keras import backend as K
+
+os.environ['PYTHONHASHSEED'] = '0'
+os.environ['TF_DETERMINISTIC_OPS'] = '1'
+
+# Setting the seed for numpy-generated random numbers
+np.random.seed(37)
+
+# Setting the seed for python random numbers
+rn.seed(1254)
+
+# Setting the graph-level random seed.
+tf.random.set_seed(89)
+
+session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
+sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
+K.set_session(sess)
 
 class Classifier_ENCODER:
 

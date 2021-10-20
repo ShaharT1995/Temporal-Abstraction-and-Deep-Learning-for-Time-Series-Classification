@@ -28,6 +28,14 @@ from sklearn.preprocessing import LabelEncoder
 from scipy.interpolate import interp1d
 from scipy.io import loadmat
 
+import random as rn
+
+os.environ['PYTHONHASHSEED'] = '0'
+os.environ['TF_DETERMINISTIC_OPS'] = '1'
+
+np.random.seed(37)
+rn.seed(1254)
+
 
 def readucr(filename):
     data = np.loadtxt(filename, delimiter=',')
@@ -134,7 +142,10 @@ def read_all_datasets(root_dir, archive_name, split_val=False):
             df_train = pd.read_csv(root_dir_dataset + '/' + dataset_name + '_TRAIN.tsv', sep='\t', header=None)
 
             df_test = pd.read_csv(root_dir_dataset + '/' + dataset_name + '_TEST.tsv', sep='\t', header=None)
-
+          
+            df_train = df_train.fillna(0)
+            df_test = df_test.fillna(0)
+              
             y_train = df_train.values[:, 0]
             y_test = df_test.values[:, 0]
 
@@ -178,7 +189,7 @@ def read_all_datasets(root_dir, archive_name, split_val=False):
 
     return datasets_dict
 
-# TODO
+
 def get_func_length(x_train, x_test, func):
     if func == min:
         func_length = np.inf
@@ -305,7 +316,7 @@ def generate_results_csv(output_file_name, root_dir):
             for it in range(ITERATIONS):
                 curr_archive_name = archive_name
                 if it != 0:
-                    curr_archive_name = curr_archive_name + '_itr_' + str(it)
+                    curr_archive_name = curr_archive_name + 'itr' + str(it)
                 for dataset_name in datasets_dict.keys():
                     output_dir = root_dir + '/results/' + classifier_name + '/' \
                                  + curr_archive_name + '/' + dataset_name + '/' + 'df_metrics.csv'
@@ -315,6 +326,7 @@ def generate_results_csv(output_file_name, root_dir):
                     df_metrics['classifier_name'] = classifier_name
                     df_metrics['archive_name'] = archive_name
                     df_metrics['dataset_name'] = dataset_name
+                    df_metrics['iteration'] = it
                     res = pd.concat((res, df_metrics), axis=0, sort=False)
 
     res.to_csv(root_dir + output_file_name, index=False)
@@ -326,7 +338,7 @@ def generate_results_csv(output_file_name, root_dir):
 
     return res
 
-# TODO
+
 def plot_epochs_metric(hist, file_name, metric='loss'):
     plt.figure()
     plt.plot(hist.history[metric])

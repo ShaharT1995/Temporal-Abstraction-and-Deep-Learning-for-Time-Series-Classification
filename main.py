@@ -14,18 +14,23 @@ from utils.constants import CLASSIFIERS
 from utils.constants import ARCHIVE_NAMES
 from utils.constants import ITERATIONS
 from utils.utils import read_all_datasets
+import random as rn
 
+os.environ['PYTHONHASHSEED'] = '0'
+os.environ['TF_DETERMINISTIC_OPS'] = '1'
 
-def fit_classifier():
+np.random.seed(37)
+rn.seed(1254)
+
+def fit_classifier(iter):
     x_train = datasets_dict[dataset_name][0]
     y_train = datasets_dict[dataset_name][1]
     x_test = datasets_dict[dataset_name][2]
     y_test = datasets_dict[dataset_name][3]
 
-    # nb_classes - count how many option for the classification
     nb_classes = len(np.unique(np.concatenate((y_train, y_test), axis=0)))
 
-    # transform the labels from integers to one hot vectors (dummy vectors)
+    # transform the labels from integers to one hot vectors
     enc = sklearn.preprocessing.OneHotEncoder(categories='auto')
     enc.fit(np.concatenate((y_train, y_test), axis=0).reshape(-1, 1))
     y_train = enc.transform(y_train.reshape(-1, 1)).toarray()
@@ -42,7 +47,7 @@ def fit_classifier():
     input_shape = x_train.shape[1:]
     classifier = create_classifier(classifier_name, input_shape, nb_classes, output_directory)
 
-    classifier.fit(x_train, y_train, x_test, y_test, y_true)
+    classifier.fit(x_train, y_train, x_test, y_test, y_true, iter)
 
 
 def create_classifier(classifier_name, input_shape, nb_classes, output_directory, verbose=False):
@@ -81,9 +86,8 @@ def create_classifier(classifier_name, input_shape, nb_classes, output_directory
 ############################################### main
 
 # change this directory for your machine
-root_dir = "C:/Users/Shaha/Desktop/UCRArchive_2018"
-# root_dir =  "C:/Users/Shaha/Desktop/Univariate_ts"
-# root_dir = "C:/Users/Shaha/Desktop/Univariate2018_arff/Univariate_arff"
+#root_dir = '/b/home/uha/hfawaz-datas/dl-tsc-temp/'
+root_dir = "/home/shaharap/UCRArchive_2018"
 
 if sys.argv[1] == 'run_all':
     for classifier_name in CLASSIFIERS:
@@ -99,7 +103,7 @@ if sys.argv[1] == 'run_all':
 
                 trr = ''
                 if iter != 0:
-                    trr = '_itr_' + str(iter)
+                    trr = 'itr' + str(iter)
 
                 tmp_output_directory = root_dir + '/results/' + classifier_name + '/' + archive_name + trr + '/'
 
@@ -107,10 +111,13 @@ if sys.argv[1] == 'run_all':
                     print('\t\t\tdataset_name: ', dataset_name)
 
                     output_directory = tmp_output_directory + dataset_name + '/'
+                    if os.path.exists(output_directory + "/DONE"):
+                        print("Already Done")
+                        continue
 
                     create_directory(output_directory)
 
-                    fit_classifier()
+                    fit_classifier(iter)
 
                     print('\t\t\t\tDONE')
 
@@ -137,24 +144,3 @@ else:
 
     if itr == '_itr_0':
         itr = ''
-
-    output_directory = root_dir + '/results/' + classifier_name + '/' + archive_name + itr + '/' + \
-                       dataset_name + '/'
-
-    test_dir_df_metrics = output_directory + 'df_metrics.csv'
-
-    print('Method: ', archive_name, dataset_name, classifier_name, itr)
-
-    if os.path.exists(test_dir_df_metrics):
-        print('Already done')
-    else:
-
-        create_directory(output_directory)
-        datasets_dict = read_dataset(root_dir, archive_name, dataset_name)
-
-        fit_classifier()
-
-        print('DONE')
-
-        # the creation of this directory means
-        create_directory(output_directory + '/DONE')

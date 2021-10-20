@@ -1,15 +1,36 @@
 # FCN model
 # when tuning start with learning rate->mini_batch_size ->
 # momentum-> #hidden_units -> # learning_rate_decay -> #layers
+
 import tensorflow.keras as keras
 import numpy as np
 from sklearn.model_selection import train_test_split
 import time
-import tensorflow as tf
+
+from tensorflow.python.keras import backend as K
 from utils.utils import save_logs
 from utils.utils import calculate_metrics
+import os
+import tensorflow as tf
+import random as rn
 
+os.environ['PYTHONHASHSEED'] = '0'
+os.environ['TF_DETERMINISTIC_OPS'] = '1'
 
+# os.environ['CUDA_VISIBLE_DEVICES'] = ''
+
+# Setting the seed for numpy-generated random numbers
+np.random.seed(37)
+
+# Setting the seed for python random numbers
+rn.seed(1254)
+
+# Setting the graph-level random seed.
+tf.random.set_seed(89)
+
+session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
+sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
+K.set_session(sess)
 class Classifier_MCDCNN:
 
     def __init__(self, output_directory, input_shape, nb_classes, verbose=False,build=True):
@@ -27,7 +48,6 @@ class Classifier_MCDCNN:
         n_vars = input_shape[1]
 
         padding = 'valid'
-
         if n_t < 60: # for ItalyPowerOndemand
             padding = 'same'
 
@@ -53,6 +73,9 @@ class Classifier_MCDCNN:
         else:
             concat_layer = keras.layers.Concatenate(axis=-1)(conv2_layers)
 
+        # #TODO:
+        # init = tf.keras.initializers.GlorotNormal(seed=123)
+        # kernel_initializer = init
         fully_connected = keras.layers.Dense(units=732,activation='relu')(concat_layer)
 
         output_layer = keras.layers.Dense(nb_classes, activation='softmax')(fully_connected)
@@ -81,7 +104,7 @@ class Classifier_MCDCNN:
 
         return  new_x
 
-    def fit(self, x, y, x_test, y_test, y_true):
+    def fit(self, x, y, x_test, y_test, y_true , iteration):
         if not tf.test.is_gpu_available:
             print('error')
             exit()
@@ -89,7 +112,7 @@ class Classifier_MCDCNN:
         nb_epochs = 120
 
         x_train, x_val, y_train, y_val = \
-            train_test_split(x, y, test_size=0.33)
+            train_test_split(x, y, test_size=0.33,random_state= (42 + iteration))
 
         x_test = self.prepare_input(x_test)
         x_train = self.prepare_input(x_train)
@@ -125,3 +148,5 @@ class Classifier_MCDCNN:
             return df_metrics
         else:
             return y_pred
+
+
