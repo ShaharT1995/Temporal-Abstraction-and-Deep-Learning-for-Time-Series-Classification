@@ -1,26 +1,43 @@
 import pandas as pd
-from utils.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018
+#from utils.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018
 
 
 def input_to_csv(path, file_type, property_id):
-    input_data_frame = pd.DataFrame(columns=["EntityID", "TemporalPropertyID", "TimeStamp", "TemporalPropertyValue"])
-    df = pd.read_csv(path + file_type + ".tsv", sep='\t', header=None)
+    # Reading the tsv file
+    tsv_data = pd.read_csv(path + file_type + ".tsv", sep='\t', header=None)
 
-    for entity_id, row in df.iterrows():
-        for index_column in range(1, len(df.columns)):
-            time_stamp_value = df[index_column].iloc[entity_id]
-            new_row = pd.Series(data={"EntityID": entity_id, "TemporalPropertyID": property_id, "TimeStamp": index_column,
-                                     "TemporalPropertyValue": time_stamp_value})
-            input_data_frame = input_data_frame.append(new_row, ignore_index=True)
+    # Drop the classifier column
+    df = tsv_data.drop([0], axis=1)
 
-    input_data_frame.to_csv(path + '_TA' + file_type + '.csv', index=False)
+    # Create the new DF with numpy
+    df = pd.DataFrame(df).reset_index().melt('index')
+    df.columns = ["EntityID", "TimeStamp", "TemporalPropertyValue"]
+
+    # Adding the TemporalPropertyID with fix value
+    df["TemporalPropertyID"] = property_id
+
+    # Drop all columns except classifier column
+    classifier_data = tsv_data.values[:, 0]
+
+    df_classifier = pd.DataFrame(classifier_data).reset_index().melt('index')
+    df_classifier.columns = ["EntityID", "TimeStamp", "TemporalPropertyValue"]
+
+    # Adding the TemporalPropertyID with fix value
+    df_classifier["TemporalPropertyID"] = -1
+
+    # Create classifier DF with numpy
+    merged = pd.concat([df, df_classifier])
+    merged = merged[['EntityID', 'TemporalPropertyID', 'TimeStamp', 'TemporalPropertyValue']]
+
+    merged.to_csv(path + '_TA' + file_type + '.csv', index=False)
 
 
 def convert_all_df(cur_root_dir):
+    DATASET_NAMES_2018 = ["Coffee"]
     for index, dataset_name in enumerate(DATASET_NAMES_2018):
         root_dir_dataset = cur_root_dir + '/archives/UCRArchive_2018/' + dataset_name + '/' + dataset_name
         input_to_csv(root_dir_dataset, "_TRAIN", index)
         input_to_csv(root_dir_dataset, "_TEST", index)
 
-convert_all_df("C:\\Users\\Shaha\\Desktop\\UCRArchive_2018")
 
+convert_all_df("C:\\Users\\Shaha\\Desktop\\UCRArchive_2018")
