@@ -3,19 +3,34 @@ import re
 import pandas as pd
 import numpy as np
 
+def main (cur_root_dir):
+    DATASET_NAMES_2018 = ["Coffee"]
 
-def transformation_1(path, file_type):
-    read_me_path = path + "\\README.md"
+    files_type = ["Train", "Test"]
 
-    # Read MD file
-    read_me = markdown.markdown(open(read_me_path).read())
+    for index, dataset_name in enumerate(DATASET_NAMES_2018):
+        root_dir_dataset = cur_root_dir + '/archives/UCRArchive_2018/' + dataset_name
 
-    # Get from the read me file the number of rows, number of columns and number of classes
-    number_of_columns = int(re.search('Time series length: (.*)</p>', read_me).group(1)) + 1
-    search_string = file_type + " size: "
-    number_of_rows = int(re.search(search_string + '(.*)</p>', read_me).group(1))
-    number_of_classes = int(re.search('Number of classses: (.*)</p>', read_me).group(1))
+        transformation_dict = {"1": transformation_1, "2": transformation_2, "4": transformation_4}
 
+        for file_type in files_type:
+            read_me_path = root_dir_dataset + "\\README.md"
+            # Read MD file
+            read_me = markdown.markdown(open(read_me_path).read())
+
+            # Get from the read me file the number of rows, number of columns and number of classes
+            search_string = file_type + " size: "
+            number_of_rows = int(re.search(search_string + '(.*)</p>', read_me).group(1))
+            number_of_columns = int(re.search('Time series length: (.*)</p>', read_me).group(1)) + 1
+            number_of_classes = int(re.search('Number of classses: (.*)</p>', read_me).group(1))
+
+            # Run the three transformation on the Train and Test files
+            for key in transformation_dict.keys():
+                transformation_dict[key](root_dir_dataset, "Train", number_of_rows, number_of_columns, number_of_classes)
+                transformation_dict[key](root_dir_dataset, "Test", number_of_rows, number_of_columns, number_of_classes)
+
+
+def transformation_1(path, file_type, number_of_rows, number_of_columns, number_of_classes):
     # Create empty numpy array
     arr = np.zeros((number_of_rows, number_of_columns), int)
 
@@ -41,21 +56,11 @@ def transformation_1(path, file_type):
                     arr[int(entity_id), int(parse_data[0]): int(parse_data[1])] = parse_data[2]
 
     # Save the file
-    pd.DataFrame(arr).to_csv(path + '\\after_TA_' + file_type + '.csv', index=False, header=None)
+    pd.DataFrame(arr).to_csv(path + '\\after_TA-1_' + file_type + '.csv', index=False, header=None)
 
 
-def transformation_2(path, file_type):
-    read_me_path = path + "\\README.md"
+def transformation_2(path, file_type, number_of_rows, number_of_columns, number_of_classes):
     states_path = path + "\\output\\states.csv"
-
-    # Read MD file
-    read_me = markdown.markdown(open(read_me_path).read())
-
-    # Get from the read me file the number of rows, number of columns and number of classes
-    number_of_columns = int(re.search('Time series length: (.*)</p>', read_me).group(1)) + 1
-    search_string = file_type + " size: "
-    number_of_rows = int(re.search(search_string + '(.*)</p>', read_me).group(1))
-    number_of_classes = int(re.search('Number of classses: (.*)</p>', read_me).group(1))
 
     # Get the number of state from state.csv file
     states_df = pd.read_csv(states_path, header=0)
@@ -101,24 +106,29 @@ def transformation_2(path, file_type):
     df.iloc[:, 0] = df.iloc[:, 0].astype(int)
 
     # Save the file
-    df.to_csv(path + '\\after_boolean_TA_' + file_type + '.csv', index=False, header=None)
+    df.to_csv(path + '\\after_TA-2_' + file_type + '.csv', index=False, header=None)
 
 
-def transformation_3(path, file_type):
-    read_me_path = path + "\\README.md"
+def transformation_4(path, file_type, number_of_rows, number_of_columns, number_of_classes):
+    states_path = path + "\\output\\states.csv"
 
-    # Read MD file
-    read_me = markdown.markdown(open(read_me_path).read())
+    # Get the number of state from state.csv file
+    states_df = pd.read_csv(states_path, header=0)
+    number_of_states = states_df.shape[0]
+    states = states_df.iloc[:, 0]
 
-    # Get from the read me file the number of rows, number of columns and number of classes
-    number_of_columns = int(re.search('Time series length: (.*)</p>', read_me).group(1)) + 1
-    search_string = file_type + " size: "
-    number_of_rows = int(re.search(search_string + '(.*)</p>', read_me).group(1))
-    number_of_classes = int(re.search('Number of classses: (.*)</p>', read_me).group(1))
+    rows_dict = {}
+    index = 0
 
-    # Create empty df (one more to classifier and one to entity id)
-    # df = pd.DataFrame(columns=[np.arange(number_of_columns), "EntityID", "Classifier"])
-    df = pd.DataFrame(columns=np.arange(number_of_columns + 2), dtype=bool)
+    # Create key value for the output table -> key: (entity, state), value: row in table
+    for entity in range(number_of_rows):
+        for state in states:
+            rows_dict[(entity, state, '+')] = index
+            rows_dict[(entity, state, '-')] = index + 1
+            index += 2
+
+    # Create empty numpy array
+    arr = np.full((number_of_rows * number_of_states * 2, number_of_columns), False, dtype=bool)
 
     for class_id in range(number_of_classes):
         # Read the hugobot output file for class_id
@@ -135,16 +145,23 @@ def transformation_3(path, file_type):
                 for info in range(len(data) - 1):
                     # Extract the start time, end time and state id
                     parse_data = data[info].split(',')
+                    # For each entity, put the state id in the range of start_time to end_time columns
 
-                    row_1 = pd.Series(data={number_of_columns: (entity_id, info), number_of_columns + 1: class_id,
-                                            int(parse_data[0]): True})
-                    row_2 = pd.Series(data={number_of_columns: (entity_id, info), number_of_columns + 1: class_id,
-                                            int(parse_data[1]): True})
+                    dict_value_1 = rows_dict[(int(entity_id), int(parse_data[2]), '+')]
+                    dict_value_2 = rows_dict[(int(entity_id), int(parse_data[2]), '-')]
 
-                    df = df.append(row_1, ignore_index=True)
-                    df = df.append(row_2, ignore_index=True)
+                    arr[dict_value_1, int(parse_data[0])] = True
+                    arr[dict_value_2, int(parse_data[0])] = True
+
+                    # Add the classifier column
+                    arr[dict_value_1, 0] = int(class_id)
+                    arr[dict_value_2, 0] = int(class_id)
+
+    df = pd.DataFrame(arr)
+    df.iloc[:, 0] = df.iloc[:, 0].astype(int)
+
     # Save the file
-    df.to_csv(path + '\\after_3_TA_' + file_type + '.csv', index=False, header=None)
+    df.to_csv(path + '\\after_TA-4_' + file_type + '.csv', index=False, header=None)
 
 
-transformation_3("C:\\Users\\Shaha\\Desktop\\UCRArchive_2018\\archives\\UCRArchive_2018\\Coffee", "Train")
+main("C:\\Users\\Shaha\\Desktop\\UCRArchive_2018")
