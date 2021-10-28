@@ -7,13 +7,13 @@ import numpy as np
 import time
 
 import matplotlib
-from utils.utils import save_test_duration
+from utils_folder.utils import save_test_duration
 
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
-from utils.utils import save_logs
-from utils.utils import calculate_metrics
+from utils_folder.utils import save_logs
+from utils_folder.utils import calculate_metrics
 
 
 class Classifier_RESNET:

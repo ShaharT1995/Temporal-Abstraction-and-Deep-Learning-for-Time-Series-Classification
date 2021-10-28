@@ -8,8 +8,8 @@ from sklearn.model_selection import train_test_split
 import time
 
 from tensorflow.python.keras import backend as K
-from utils.utils import save_logs
-from utils.utils import calculate_metrics
+from utils_folder.utils import save_logs
+from utils_folder.utils import calculate_metrics
 import os
 import tensorflow as tf
 import random as rn

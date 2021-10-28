@@ -3,16 +3,22 @@ import re
 import pandas as pd
 import numpy as np
 
+from utils_folder.utils import open_pickle
+
 
 def new_uts_files(cur_root_dir):
     DATASET_NAMES_2018 = ["Coffee"]
 
     files_type = ["Train", "Test"]
 
+    classes_dict = open_pickle("univariate_classes_dict")
+
     for index, dataset_name in enumerate(DATASET_NAMES_2018):
         root_dir_dataset = cur_root_dir + '/archives/UCRArchive_2018/' + dataset_name
 
-        transformation_dict = {"1": transformation_1, "2": transformation_2, "4": transformation_4}
+        transformation_dict = {"1": transformation_1, "2": transformation_2, "3": transformation_3}
+
+        classes = classes_dict[dataset_name]
 
         for file_type in files_type:
             read_me_path = root_dir_dataset + "\\README.md"
@@ -23,19 +29,18 @@ def new_uts_files(cur_root_dir):
             search_string = file_type + " size: "
             number_of_rows = int(re.search(search_string + '(.*)</p>', read_me).group(1))
             number_of_columns = int(re.search('Time series length: (.*)</p>', read_me).group(1)) + 1
-            number_of_classes = int(re.search('Number of classses: (.*)</p>', read_me).group(1))
 
             # Run the three transformation on the Train and Test files
             for key in transformation_dict.keys():
-                transformation_dict[key](root_dir_dataset, "Train", number_of_rows, number_of_columns, number_of_classes)
-                transformation_dict[key](root_dir_dataset, "Test", number_of_rows, number_of_columns, number_of_classes)
+                transformation_dict[key](root_dir_dataset, "Train", number_of_rows, number_of_columns, classes)
+                transformation_dict[key](root_dir_dataset, "Test", number_of_rows, number_of_columns, classes)
 
 
-def transformation_1(path, file_type, number_of_rows, number_of_columns, number_of_classes):
+def transformation_1(path, file_type, number_of_rows, number_of_columns, classes):
     # Create empty numpy array
     arr = np.zeros((number_of_rows, number_of_columns), int)
 
-    for class_id in range(number_of_classes):
+    for class_id in classes:
         # Read the hugobot output file for class_id
         ta_output = path + "\\output\\KL-class-" + str(float(class_id)) + ".txt"
 
@@ -57,10 +62,10 @@ def transformation_1(path, file_type, number_of_rows, number_of_columns, number_
                     arr[int(entity_id), int(parse_data[0]): int(parse_data[1])] = parse_data[2]
 
     # Save the file
-    pd.DataFrame(arr).to_csv(path + '\\after_TA-1_' + file_type + '.csv', index=False, header=None)
+    pd.DataFrame(arr).to_csv(path + '\\U-transformation2_type1_' + file_type + '.csv', index=False, header=None)
 
 
-def transformation_2(path, file_type, number_of_rows, number_of_columns, number_of_classes):
+def transformation_2(path, file_type, number_of_rows, number_of_columns, classes):
     states_path = path + "\\output\\states.csv"
 
     # Get the number of state from state.csv file
@@ -80,7 +85,7 @@ def transformation_2(path, file_type, number_of_rows, number_of_columns, number_
     # Create empty numpy array
     arr = np.full((number_of_rows * number_of_states, number_of_columns), False, dtype=bool)
 
-    for class_id in range(number_of_classes):
+    for class_id in classes:
         # Read the hugobot output file for class_id
         ta_output = path + "\\output\\KL-class-" + str(float(class_id)) + ".txt"
 
@@ -107,10 +112,10 @@ def transformation_2(path, file_type, number_of_rows, number_of_columns, number_
     df.iloc[:, 0] = df.iloc[:, 0].astype(int)
 
     # Save the file
-    df.to_csv(path + '\\after_TA-2_' + file_type + '.csv', index=False, header=None)
+    df.to_csv(path + '\\transformation2_type2_' + file_type + '.csv', index=False, header=None)
 
 
-def transformation_4(path, file_type, number_of_rows, number_of_columns, number_of_classes):
+def transformation_3(path, file_type, number_of_rows, number_of_columns, classes):
     states_path = path + "\\output\\states.csv"
 
     # Get the number of state from state.csv file
@@ -131,7 +136,7 @@ def transformation_4(path, file_type, number_of_rows, number_of_columns, number_
     # Create empty numpy array
     arr = np.full((number_of_rows * number_of_states * 2, number_of_columns), False, dtype=bool)
 
-    for class_id in range(number_of_classes):
+    for class_id in classes:
         # Read the hugobot output file for class_id
         ta_output = path + "\\output\\KL-class-" + str(float(class_id)) + ".txt"
 
@@ -162,7 +167,4 @@ def transformation_4(path, file_type, number_of_rows, number_of_columns, number_
     df.iloc[:, 0] = df.iloc[:, 0].astype(int)
 
     # Save the file
-    df.to_csv(path + '\\after_TA-4_' + file_type + '.csv', index=False, header=None)
-
-
-new_uts_files("C:\\Users\\Shaha\\Desktop\\UCRArchive_2018")
+    df.to_csv(path + '\\transformation2_type3_' + file_type + '.csv', index=False, header=None)

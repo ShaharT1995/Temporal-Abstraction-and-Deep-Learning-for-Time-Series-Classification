@@ -1,15 +1,10 @@
 import numpy as np
 import pandas as pd
-from pandas.io import pickle
 
-from utils.constants import MTS_DATASET_NAMES
-from utils.constants import NEXT_ATTRIBUTE_ID
-next_attribute = NEXT_ATTRIBUTE_ID
+from utils_folder.constants import MTS_DATASET_NAMES
 
 
-def input_to_csv(path, file_type):
-    global next_attribute
-
+def input_to_csv(path, file_type, next_attribute):
     # Reading the npy files
     x = np.load(path + 'x_' + file_type + '.npy')
     y = np.load(path + 'y_' + file_type + '.npy')
@@ -45,22 +40,20 @@ def input_to_csv(path, file_type):
     # Merging between the two data frames
     merged = pd.concat([df, df_classifier])
 
-    merged.to_csv(path + '2' + file_type + '.csv', index=False)
+    merged.to_csv(path + 'M-transformation1_' + file_type + '.csv', index=False)
+    return next_attribute
 
 
-def convert_all_MTS(cur_root_dir):
+def convert_all_MTS(cur_root_dir, next_attribute):
     MTS_DATASET_NAMES = ["ECG"]
 
-    file_types = ["train", "test"]
-
     for dataset_name in MTS_DATASET_NAMES:
-        for file_type in file_types:
-            root_dir_dataset = cur_root_dir + '/archives/mts_archive/' + dataset_name + '/'
-            input_to_csv(root_dir_dataset, file_type)
+        root_dir_dataset = cur_root_dir + '/archives/mts_archive/' + dataset_name + '/'
+        input_to_csv(root_dir_dataset, "train", next_attribute)
+        next_attribute = input_to_csv(root_dir_dataset, "test", next_attribute)
 
-    file = open("next_property_index.pkl", "wb")
-    pickle.dump({"ID": next_attribute}, file)
-    file.close()
+    return next_attribute
+
 
 
 #convert_all_MTS("C:\\Users\\Shaha\\Desktop\\mtsdata")

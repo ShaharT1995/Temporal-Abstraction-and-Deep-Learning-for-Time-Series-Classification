@@ -1,25 +1,20 @@
 import pickle
+import sys
 from builtins import print
 import numpy as np
 import pandas as pd
 import matplotlib
-
-matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
-matplotlib.rcParams['font.family'] = 'sans-serif'
-matplotlib.rcParams['font.sans-serif'] = 'Arial'
 import os
 import operator
 
-from utils.constants import UNIVARIATE_DATASET_NAMES as DATASET_NAMES
-from utils.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018
-from utils.constants import ARCHIVE_NAMES  as ARCHIVE_NAMES
-from utils.constants import CLASSIFIERS
-from utils.constants import ITERATIONS
-from utils.constants import MTS_DATASET_NAMES
-from utils.constants import MTS_DICT
-
+from constants import UNIVARIATE_DATASET_NAMES as DATASET_NAMES
+from constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018
+from constants import ARCHIVE_NAMES as ARCHIVE_NAMES
+from constants import CLASSIFIERS
+from constants import ITERATIONS
+from constants import MTS_DATASET_NAMES
 
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score
@@ -31,11 +26,28 @@ from scipy.io import loadmat
 
 import random as rn
 
+matplotlib.use('agg')
+
+matplotlib.rcParams['font.family'] = 'sans-serif'
+matplotlib.rcParams['font.sans-serif'] = 'Arial'
+
 os.environ['PYTHONHASHSEED'] = '0'
 os.environ['TF_DETERMINISTIC_OPS'] = '1'
 
 np.random.seed(37)
 rn.seed(1254)
+
+
+def open_pickle(name):
+    file = open(name + ".pkl", "rb")
+    date = pickle.load(file)
+    return date
+
+
+def write_pickle(name, data):
+    file = open(name + ".pkl", "wb")
+    pickle.dump(data, file)
+    file.close()
 
 
 def readucr(filename):
@@ -143,10 +155,10 @@ def read_all_datasets(root_dir, archive_name, split_val=False):
             df_train = pd.read_csv(root_dir_dataset + '/' + dataset_name + '_TRAIN.tsv', sep='\t', header=None)
 
             df_test = pd.read_csv(root_dir_dataset + '/' + dataset_name + '_TEST.tsv', sep='\t', header=None)
-          
+
             df_train = df_train.fillna(0)
             df_test = df_test.fillna(0)
-              
+
             y_train = df_train.values[:, 0]
             y_test = df_test.values[:, 0]
 
@@ -243,7 +255,7 @@ def transform_mts_to_ucr_format():
         #     continue
 
         a = loadmat(mts_root_dir + dataset_name + '/' + dataset_name + '.mat')
-        #a = loadmat(mts_root_dir  '/' + dataset_name + '.mat')
+        # a = loadmat(mts_root_dir  '/' + dataset_name + '.mat')
         a = a['mts']
         a = a[0, 0]
 
@@ -288,9 +300,8 @@ def transform_mts_to_ucr_format():
 
         print('Done')
 
-    file = open("MTS_Dictionary.pkl", "wb")
-    pickle.dump(MTS_DICT, file)
-    file.close()
+    write_pickle("MTS_Dictionary", MTS_DICT)
+
 
 def calculate_metrics(y_true, y_pred, duration, y_true_val=None, y_pred_val=None):
     res = pd.DataFrame(data=np.zeros((1, 4), dtype=np.float), index=[0],

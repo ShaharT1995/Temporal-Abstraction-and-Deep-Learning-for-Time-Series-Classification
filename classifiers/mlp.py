@@ -11,8 +11,8 @@ import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt 
 
-from utils.utils import save_logs
-from utils.utils import calculate_metrics
+from utils_folder.utils import save_logs
+from utils_folder.utils import calculate_metrics
 from tensorflow.python.keras import backend as K
 
 os.environ['PYTHONHASHSEED'] = '0'

@@ -1,19 +1,19 @@
-from utils.utils import generate_results_csv
-from utils.utils import create_directory
-from utils.utils import read_dataset
-from utils.utils import transform_mts_to_ucr_format
-from utils.utils import visualize_filter
-from utils.utils import viz_for_survey_paper
-from utils.utils import viz_cam
+from utils_folder.utils import generate_results_csv
+from utils_folder.utils import create_directory
+from utils_folder.utils import read_dataset
+from utils_folder.utils import transform_mts_to_ucr_format
+from utils_folder.utils import visualize_filter
+from utils_folder.utils import viz_for_survey_paper
+from utils_folder.utils import viz_cam
 import os
 import numpy as np
 import sys
 import sklearn
-import utils
-from utils.constants import CLASSIFIERS
-from utils.constants import ARCHIVE_NAMES
-from utils.constants import ITERATIONS
-from utils.utils import read_all_datasets
+import utils_folder
+from utils_folder.constants import CLASSIFIERS
+from utils_folder.constants import ARCHIVE_NAMES
+from utils_folder.constants import ITERATIONS
+from utils_folder.utils import read_all_datasets
 import random as rn
 
 os.environ['PYTHONHASHSEED'] = '0'
@@ -108,7 +108,7 @@ if sys.argv[1] == 'run_all':
 
                 tmp_output_directory = root_dir + '/results/' + classifier_name + '/' + archive_name + trr + '/'
 
-                for dataset_name in utils.constants.dataset_names_for_archive[archive_name]:
+                for dataset_name in utils_folder.constants.dataset_names_for_archive[archive_name]:
                     print('\t\t\tdataset_name: ', dataset_name)
 
                     output_directory = tmp_output_directory + dataset_name + '/'

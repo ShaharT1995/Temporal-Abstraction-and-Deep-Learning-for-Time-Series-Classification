@@ -6,8 +6,8 @@ import tensorflow as tf
 import numpy as np
 import time
 
-from utils.utils import save_logs
-from utils.utils import calculate_metrics
+from utils_folder.utils import save_logs
+from utils_folder.utils import calculate_metrics
 
 class Classifier_CNN:
 

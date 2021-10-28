@@ -4,8 +4,8 @@ import tensorflow as tf
 import numpy as np 
 import time
 
-from utils.utils import calculate_metrics
-from utils.utils import create_directory
+from utils_folder.utils import calculate_metrics
+from utils_folder.utils import create_directory
 
 class Classifier_MCNN:
 

@@ -1,8 +1,10 @@
 import pandas as pd
-from utils.constants import NEXT_ATTRIBUTE_ID
+from utils_folder.utils import open_pickle
 
 
 def create_three_files(path, method, nb_bins, paa_window_size, std_coefficient, max_gap, gradient_window_size=None):
+    next_attribute = open_pickle("next_property_index")["ID"]
+
     # GKB
     index = 0
     df_gkb = pd.DataFrame(
@@ -16,7 +18,7 @@ def create_three_files(path, method, nb_bins, paa_window_size, std_coefficient, 
     # PP
     df_pp = pd.DataFrame(columns=["TemporalPropertyID", "PAAWindowSize", "StdCoefficient", "MaxGap"])
 
-    for property_id in range(NEXT_ATTRIBUTE_ID):
+    for property_id in range(next_attribute):
         # TA
         new_row = pd.Series(data={"TemporalPropertyID": property_id, "Method": method, "NbBins": nb_bins,
                                   "GradientWindowSize": gradient_window_size})
@@ -29,6 +31,7 @@ def create_three_files(path, method, nb_bins, paa_window_size, std_coefficient, 
         df_pp = df_pp.append(new_row, ignore_index=True)
 
         # GKB
+        # TODO - Need to create this file even if the method is not gradient??
         bin_low = -90
 
         for bin_id in range(nb_bins):
@@ -44,11 +47,3 @@ def create_three_files(path, method, nb_bins, paa_window_size, std_coefficient, 
     df_ta.to_csv(path + '\\ta.csv', index=False)
     df_pp.to_csv(path + '\\pp.csv', index=False)
     df_gkb.to_csv(path + '\\gkb.csv', index=False)
-
-
-create_three_files(path="C:\\Users\\Shaha\\Desktop\\TA\\TEST",
-                   method="equal-frequency",
-                   nb_bins=3,
-                   paa_window_size=1,
-                   std_coefficient=-1,
-                   max_gap=-1)

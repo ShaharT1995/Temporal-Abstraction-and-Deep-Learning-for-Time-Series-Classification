@@ -55,15 +55,6 @@ UNIVARIATE_DATASET_NAMES_2018 = ['ACSF1', 'Adiac', 'AllGestureWiimoteX', 'AllGes
 # 'AllGestureWiimoteZ', 'AllGestureWiimoteX', 'DodgerLoopWeekend', 'DodgerLoopGame', 'DodgerLoopDay', 'AllGestureWiimoteX', 'GestureMidAirD3', 'GestureMidAirD2', 'GestureMidAirD1'
 #  'GesturePebbleZ2', 'GesturePebbleZ1', 'MelbournePedestrian', 'PickupGestureWiimoteZ', 'PLAID','ShakeGestureWiimoteZ', 'SonyAIBORobotSurface2'
 
-try:
-    file = open(sys.path[1] + "\\next_property_index.pkl", "rb")
-    NEXT_ATTRIBUTE_ID = pickle.load(file)["ID"]
-except Exception as ex:
-    NEXT_ATTRIBUTE_ID = 0
-
-file = open(sys.path[1] + "\\MTS_Dictionary.pkl", "rb")
-MTS_DICT = pickle.load(file)
-
 # MTS_DATASET_NAMES = ['ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
 #                      'JapaneseVowels', 'KickvsPunch', 'Libras', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
 

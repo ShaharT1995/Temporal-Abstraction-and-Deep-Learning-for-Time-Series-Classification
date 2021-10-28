@@ -1,14 +1,20 @@
+import pickle
+
 from temporal_abstraction_f.multivariate_ta_1 import convert_all_MTS
 from temporal_abstraction_f.univariate_ta_1 import convert_all_UTS
 from temporal_abstraction_f.set_parameters import create_three_files
 from temporal_abstraction_f.multivariate_ta_2 import new_mts_files
 from temporal_abstraction_f.univariate_ta_2 import new_uts_files
 
+from utils_folder.utils import write_pickle
+
 
 def run(path):
     # Make the first temporal abstraction -> original data sets to hugobot format
-    convert_all_MTS(path + "mtsdata")
-    convert_all_UTS(path + "UCRArchive_2018")
+    next_attribute = convert_all_UTS(path + "UCRArchive_2018", 0)
+    next_attribute = convert_all_MTS(path + "mtsdata", next_attribute)
+
+    write_pickle("next_property_index", {"ID": next_attribute})
 
     # Make the 3 files - gkb.csv, ta.csv and ppa.csv
     create_three_files(path="C:\\Users\\Shaha\\Desktop\\TA\\TEST",
