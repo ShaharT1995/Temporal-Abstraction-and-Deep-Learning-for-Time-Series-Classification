@@ -117,4 +117,4 @@ def test_all_files_have_owners(directory):
 
 
 if __name__ == '__main__':
-    pytest.main([__file__])
+    pytest.new_MTS_files([__file__])

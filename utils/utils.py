@@ -1,3 +1,4 @@
+import pickle
 from builtins import print
 import numpy as np
 import pandas as pd
@@ -11,14 +12,14 @@ matplotlib.rcParams['font.sans-serif'] = 'Arial'
 import os
 import operator
 
-import utils
-
 from utils.constants import UNIVARIATE_DATASET_NAMES as DATASET_NAMES
 from utils.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018
 from utils.constants import ARCHIVE_NAMES  as ARCHIVE_NAMES
 from utils.constants import CLASSIFIERS
 from utils.constants import ITERATIONS
 from utils.constants import MTS_DATASET_NAMES
+from utils.constants import MTS_DICT
+
 
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score
@@ -230,8 +231,8 @@ def transform_to_same_length(x, n_var, max_length):
 
 
 def transform_mts_to_ucr_format():
-    mts_root_dir = '/mnt/Other/mtsdata/'
-    mts_out_dir = '/mnt/nfs/casimir/archives/mts_archive/'
+    mts_root_dir = "C:\\Users\\Shaha\\Desktop\\mtsdata\\archives\\mts_archive\\"
+    mts_out_dir = "C:\\Users\\Shaha\\Desktop\\mtsdata\\archives\\mts_archive\\"
     for dataset_name in MTS_DATASET_NAMES:
         # print('dataset_name',dataset_name)
 
@@ -242,6 +243,7 @@ def transform_mts_to_ucr_format():
         #     continue
 
         a = loadmat(mts_root_dir + dataset_name + '/' + dataset_name + '.mat')
+        #a = loadmat(mts_root_dir  '/' + dataset_name + '.mat')
         a = a['mts']
         a = a[0, 0]
 
@@ -268,6 +270,9 @@ def transform_mts_to_ucr_format():
         max_length = get_func_length(x_train, x_test, func=max)
         min_length = get_func_length(x_train, x_test, func=min)
 
+        MTS_DICT[dataset_name] = {"time_serious_length": max_length, "number_of_entities_train": len(x_train),
+                                  "number_of_entities_test": len(x_test), "number_of_attributes": n_var}
+
         print(dataset_name, 'max', max_length, 'min', min_length)
         print()
         # continue
@@ -283,6 +288,9 @@ def transform_mts_to_ucr_format():
 
         print('Done')
 
+    file = open("MTS_Dictionary.pkl", "wb")
+    pickle.dump(MTS_DICT, file)
+    file.close()
 
 def calculate_metrics(y_true, y_pred, duration, y_true_val=None, y_pred_val=None):
     res = pd.DataFrame(data=np.zeros((1, 4), dtype=np.float), index=[0],

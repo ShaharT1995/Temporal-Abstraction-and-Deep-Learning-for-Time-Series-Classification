@@ -123,4 +123,4 @@ def test_cyclic_lr_custom_fn_test():
 
 
 if __name__ == '__main__':
-    pytest.main([__file__])
+    pytest.new_MTS_files([__file__])

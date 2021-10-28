@@ -20,4 +20,4 @@ def test_clip():
     assert(np.max(np.abs(K.eval(clipped))) <= K.cast_to_floatx(0.1))
 
 if __name__ == '__main__':
-    pytest.main([__file__])
+    pytest.new_MTS_files([__file__])

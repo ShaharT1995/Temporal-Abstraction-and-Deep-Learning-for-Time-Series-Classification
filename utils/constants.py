@@ -1,3 +1,7 @@
+import os
+import pickle
+import sys
+
 UNIVARIATE_DATASET_NAMES = ['50words', 'Adiac', 'ArrowHead', 'Beef', 'BeetleFly', 'BirdChicken', 'Car', 'CBF',
                             'ChlorineConcentration', 'CinC_ECG_torso', 'Coffee',
                             'Computers', 'Cricket_X', 'Cricket_Y', 'Cricket_Z', 'DiatomSizeReduction',
@@ -15,7 +19,7 @@ UNIVARIATE_DATASET_NAMES = ['50words', 'Adiac', 'ArrowHead', 'Beef', 'BeetleFly'
                             'synthetic_control', 'ToeSegmentation1', 'ToeSegmentation2', 'Trace', 'TwoLeadECG',
                             'Two_Patterns', 'UWaveGestureLibraryAll', 'uWaveGestureLibrary_X', 'uWaveGestureLibrary_Y',
                             'uWaveGestureLibrary_Z', 'wafer', 'Wine', 'WordsSynonyms', 'Worms', 'WormsTwoClass', 'yoga']
-                            
+
 UNIVARIATE_DATASET_NAMES_2018 = ['ACSF1', 'Adiac', 'AllGestureWiimoteX', 'AllGestureWiimoteY', 'AllGestureWiimoteZ',
                                  'ArrowHead', 'Beef', 'BeetleFly', 'BirdChicken', 'BME', 'Car', 'CBF', 'Chinatown',
                                  'ChlorineConcentration', 'CinCECGTorso', 'Coffee', 'Computers', 'CricketX',
@@ -51,9 +55,19 @@ UNIVARIATE_DATASET_NAMES_2018 = ['ACSF1', 'Adiac', 'AllGestureWiimoteX', 'AllGes
 # 'AllGestureWiimoteZ', 'AllGestureWiimoteX', 'DodgerLoopWeekend', 'DodgerLoopGame', 'DodgerLoopDay', 'AllGestureWiimoteX', 'GestureMidAirD3', 'GestureMidAirD2', 'GestureMidAirD1'
 #  'GesturePebbleZ2', 'GesturePebbleZ1', 'MelbournePedestrian', 'PickupGestureWiimoteZ', 'PLAID','ShakeGestureWiimoteZ', 'SonyAIBORobotSurface2'
 
+try:
+    file = open(sys.path[1] + "\\next_property_index.pkl", "rb")
+    NEXT_ATTRIBUTE_ID = pickle.load(file)["ID"]
+except Exception as ex:
+    NEXT_ATTRIBUTE_ID = 0
 
-MTS_DATASET_NAMES = ['ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
-                     'JapaneseVowels', 'KickvsPunch', 'Libras', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
+file = open(sys.path[1] + "\\MTS_Dictionary.pkl", "rb")
+MTS_DICT = pickle.load(file)
+
+# MTS_DATASET_NAMES = ['ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
+#                      'JapaneseVowels', 'KickvsPunch', 'Libras', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
+
+MTS_DATASET_NAMES = ["ECG"]
 
 ITERATIONS = 5  # nb of random runs for random initializations
 

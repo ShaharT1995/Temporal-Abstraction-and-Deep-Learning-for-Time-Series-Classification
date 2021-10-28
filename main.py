@@ -22,6 +22,7 @@ os.environ['TF_DETERMINISTIC_OPS'] = '1'
 np.random.seed(37)
 rn.seed(1254)
 
+
 def fit_classifier(iter):
     x_train = datasets_dict[dataset_name][0]
     y_train = datasets_dict[dataset_name][1]
@@ -144,3 +145,23 @@ else:
 
     if itr == '_itr_0':
         itr = ''
+
+    output_directory = root_dir + '/results/' + classifier_name + '/' + archive_name + itr + '/' + dataset_name + '/'
+
+    test_dir_df_metrics = output_directory + 'df_metrics.csv'
+
+    print('Method: ', archive_name, dataset_name, classifier_name, itr)
+
+    if os.path.exists(test_dir_df_metrics):
+        print('Already done')
+    else:
+
+        create_directory(output_directory)
+        datasets_dict = read_dataset(root_dir, archive_name, dataset_name)
+
+        fit_classifier()
+
+        print('DONE')
+
+        # the creation of this directory means
+        create_directory(output_directory + '/DONE')

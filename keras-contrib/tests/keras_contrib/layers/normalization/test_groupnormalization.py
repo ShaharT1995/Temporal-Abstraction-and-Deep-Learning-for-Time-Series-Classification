@@ -243,4 +243,4 @@ def test_that_trainable_disables_updates():
 
 
 if __name__ == '__main__':
-    pytest.main([__file__])
+    pytest.new_MTS_files([__file__])

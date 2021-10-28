@@ -57,4 +57,4 @@ def test_cai(tensor_shape):
             upper_bound=1, lower_bound=-1)
 
 if __name__ == '__main__':
-    pytest.main([__file__])
+    pytest.new_MTS_files([__file__])

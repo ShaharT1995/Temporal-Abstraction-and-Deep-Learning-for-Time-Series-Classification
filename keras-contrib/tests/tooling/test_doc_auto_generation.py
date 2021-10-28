@@ -363,4 +363,4 @@ def test_doc_multiple_sections_code():
 
 
 if __name__ == '__main__':
-    pytest.main([__file__])
+    pytest.new_MTS_files([__file__])

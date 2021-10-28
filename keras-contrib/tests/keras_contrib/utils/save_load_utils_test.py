@@ -51,4 +51,4 @@ def test_save_and_load_all_weights():
 
 
 if __name__ == '__main__':
-    pytest.main([__file__])
+    pytest.new_MTS_files([__file__])

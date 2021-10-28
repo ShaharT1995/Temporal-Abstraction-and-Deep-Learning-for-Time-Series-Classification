@@ -1,8 +1,13 @@
 import pandas as pd
-#from utils.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018
+
+from utils.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018
+from utils.constants import NEXT_ATTRIBUTE_ID
+next_attribute = NEXT_ATTRIBUTE_ID
 
 
 def input_to_csv(path, file_type, property_id):
+    global next_attribute
+
     # Reading the tsv file
     tsv_data = pd.read_csv(path + file_type + ".tsv", sep='\t', header=None)
 
@@ -32,12 +37,15 @@ def input_to_csv(path, file_type, property_id):
     merged.to_csv(path + '_TA' + file_type + '.csv', index=False)
 
 
-def convert_all_df(cur_root_dir):
+def convert_all_UTS(cur_root_dir):
     DATASET_NAMES_2018 = ["Coffee"]
-    for index, dataset_name in enumerate(DATASET_NAMES_2018):
-        root_dir_dataset = cur_root_dir + '/archives/UCRArchive_2018/' + dataset_name + '/' + dataset_name
-        input_to_csv(root_dir_dataset, "_TRAIN", index)
-        input_to_csv(root_dir_dataset, "_TEST", index)
 
+    file_types = ["_TRAIN", "_TEST"]
 
-convert_all_df("C:\\Users\\Shaha\\Desktop\\UCRArchive_2018")
+    for dataset_name in DATASET_NAMES_2018:
+        for file_type in file_types:
+            root_dir_dataset = cur_root_dir + '/archives/UCRArchive_2018/' + dataset_name + '/' + dataset_name
+            input_to_csv(root_dir_dataset, file_type, next_attribute)
+            next_attribute += 1
+
+#convert_all_df("C:\\Users\\Shaha\\Desktop\\UCRArchive_2018")

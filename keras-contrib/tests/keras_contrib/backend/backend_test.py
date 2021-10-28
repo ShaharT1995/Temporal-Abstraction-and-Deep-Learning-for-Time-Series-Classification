@@ -172,4 +172,4 @@ class TestBackend(object):
 
 
 if __name__ == '__main__':
-    pytest.main([__file__])
+    pytest.new_MTS_files([__file__])

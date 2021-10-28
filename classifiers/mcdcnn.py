@@ -73,7 +73,6 @@ class Classifier_MCDCNN:
         else:
             concat_layer = keras.layers.Concatenate(axis=-1)(conv2_layers)
 
-        # #TODO:
         # init = tf.keras.initializers.GlorotNormal(seed=123)
         # kernel_initializer = init
         fully_connected = keras.layers.Dense(units=732,activation='relu')(concat_layer)

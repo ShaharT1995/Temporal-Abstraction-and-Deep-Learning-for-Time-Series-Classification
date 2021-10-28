@@ -3,7 +3,8 @@ import re
 import pandas as pd
 import numpy as np
 
-def main (cur_root_dir):
+
+def new_uts_files(cur_root_dir):
     DATASET_NAMES_2018 = ["Coffee"]
 
     files_type = ["Train", "Test"]
@@ -164,4 +165,4 @@ def transformation_4(path, file_type, number_of_rows, number_of_columns, number_
     df.to_csv(path + '\\after_TA-4_' + file_type + '.csv', index=False, header=None)
 
 
-main("C:\\Users\\Shaha\\Desktop\\UCRArchive_2018")
+new_uts_files("C:\\Users\\Shaha\\Desktop\\UCRArchive_2018")

@@ -115,4 +115,4 @@ def test_DSSIM_channels_first():
 
 
 if __name__ == '__main__':
-    pytest.main([__file__])
+    pytest.new_MTS_files([__file__])

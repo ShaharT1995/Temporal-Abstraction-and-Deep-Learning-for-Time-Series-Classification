@@ -74,7 +74,7 @@ class Classifier_MLP:
 		model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='loss', 
 			save_best_only=True)
 
-		self.callbacks = [reduce_lr,model_checkpoint]
+		self.callbacks = [reduce_lr, model_checkpoint]
 
 		return model
 
