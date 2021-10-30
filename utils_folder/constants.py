@@ -55,19 +55,18 @@ UNIVARIATE_DATASET_NAMES_2018 = ['ACSF1', 'Adiac', 'AllGestureWiimoteX', 'AllGes
 # 'AllGestureWiimoteZ', 'AllGestureWiimoteX', 'DodgerLoopWeekend', 'DodgerLoopGame', 'DodgerLoopDay', 'AllGestureWiimoteX', 'GestureMidAirD3', 'GestureMidAirD2', 'GestureMidAirD1'
 #  'GesturePebbleZ2', 'GesturePebbleZ1', 'MelbournePedestrian', 'PickupGestureWiimoteZ', 'PLAID','ShakeGestureWiimoteZ', 'SonyAIBORobotSurface2'
 
-# MTS_DATASET_NAMES = ['ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
-#                      'JapaneseVowels', 'KickvsPunch', 'Libras', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
+#MTS_DATASET_NAMES = ['NetFlow']
 
 MTS_DATASET_NAMES = ["ECG"]
 
 ITERATIONS = 5  # nb of random runs for random initializations
 
-ARCHIVE_NAMES = ['UCRArchive_2018']
+ARCHIVE_NAMES = ['mts_archive']
 
-dataset_names_for_archive = {'UCRArchive_2018': UNIVARIATE_DATASET_NAMES_2018}
+dataset_names_for_archive = {'mts_archive': MTS_DATASET_NAMES}
 
 # CLASSIFIERS = ['mcdcnn', 'fcn', 'mlp', 'resnet', 'tlenet', 'mcnn', 'twiesn', 'encoder', 'cnn', 'inception']
-CLASSIFIERS = ['fcn']
+CLASSIFIERS = ['mcdcnn']
 
 dataset_types = {'ElectricDevices': 'DEVICE', 'FordB': 'SENSOR',
                  'FordA': 'SENSOR', 'NonInvasiveFatalECG_Thorax2': 'ECG',

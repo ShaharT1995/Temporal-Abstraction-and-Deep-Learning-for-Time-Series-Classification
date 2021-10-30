@@ -9,12 +9,12 @@ import matplotlib.pyplot as plt
 import os
 import operator
 
-from constants import UNIVARIATE_DATASET_NAMES as DATASET_NAMES
-from constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018
-from constants import ARCHIVE_NAMES as ARCHIVE_NAMES
-from constants import CLASSIFIERS
-from constants import ITERATIONS
-from constants import MTS_DATASET_NAMES
+from utils_folder.constants import UNIVARIATE_DATASET_NAMES as DATASET_NAMES
+from utils_folder.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018
+from utils_folder.constants import ARCHIVE_NAMES as ARCHIVE_NAMES
+from utils_folder.constants import CLASSIFIERS
+from utils_folder.constants import ITERATIONS
+from utils_folder.constants import MTS_DATASET_NAMES
 
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score

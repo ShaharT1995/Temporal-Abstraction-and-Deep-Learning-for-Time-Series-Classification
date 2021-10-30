@@ -32,6 +32,7 @@ session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op
 sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
 K.set_session(sess)
 
+
 class Classifier_MLP:
 
 	def __init__(self, output_directory, input_shape, nb_classes, verbose=False,build=True):

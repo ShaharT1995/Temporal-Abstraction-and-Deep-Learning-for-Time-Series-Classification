@@ -87,8 +87,7 @@ def create_classifier(classifier_name, input_shape, nb_classes, output_directory
 ############################################### main
 
 # change this directory for your machine
-#root_dir = '/b/home/uha/hfawaz-datas/dl-tsc-temp/'
-root_dir = "/home/shaharap/UCRArchive_2018"
+root_dir = "C:\\Users\\Shaha\\Desktop\\mtsdata"
 
 if sys.argv[1] == 'run_all':
     for classifier_name in CLASSIFIERS:
