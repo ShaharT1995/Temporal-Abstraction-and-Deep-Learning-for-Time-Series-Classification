@@ -14,30 +14,27 @@ def new_uts_files(cur_root_dir):
     """
     files_type = ["Train", "Test"]
 
-    classes_dict = open_pickle("univariate_classes_dict")
+    univariate_dict = open_pickle("univariate_dict")
 
     for index, dataset_name in enumerate(DATASET_NAMES_2018):
         root_dir_dataset = cur_root_dir + dataset_name
 
         transformation_dict = {"1": transformation_1, "2": transformation_2, "3": transformation_3}
 
-        classes = classes_dict[dataset_name]
+        print(dataset_name + ":")
 
         for file_type in files_type:
-            # Using the read me information for getting the number of entities and the length of time series
-            read_me_path = root_dir_dataset + "\\README.md"
-            # Read MD file
-            read_me = markdown.markdown(open(read_me_path).read())
-
-            # Get from the read me file the number of rows, number of columns and number of classes
-            search_string = file_type + " size: "
-            number_of_rows = int(re.search(search_string + '(.*)</p>', read_me).group(1))
-            number_of_columns = int(re.search('Time series length: (.*)</p>', read_me).group(1)) + 1
+            # Get from the read me file the number of rows, number of columns and number of
+            classes = univariate_dict[(dataset_name, file_type.lower())]["classes"]
+            number_of_rows = univariate_dict[(dataset_name, file_type.lower())]["rows"]
+            number_of_columns = univariate_dict[(dataset_name, file_type.lower())]["columns"]
 
             # Run the three transformation on the Train and Test files
             for key in transformation_dict.keys():
-                transformation_dict[key](root_dir_dataset, "Train", number_of_rows, number_of_columns, classes)
-                transformation_dict[key](root_dir_dataset, "Test", number_of_rows, number_of_columns, classes)
+                transformation_dict[key](root_dir_dataset, file_type, number_of_rows, number_of_columns, classes)
+                print("\ttransformation_" + key + ", " + file_type.lower())
+
+        print("")
 
 
 def transformation_1(path, file_type, number_of_rows, number_of_columns, classes):
@@ -55,7 +52,7 @@ def transformation_1(path, file_type, number_of_rows, number_of_columns, classes
 
     for class_id in classes:
         # Read the hugobot output file for class_id
-        ta_output = path + "\\output\\KL-class-" + str(float(class_id)) + ".txt"
+        ta_output = path + "\\output\\" + file_type.lower() + "\\KL-class-" + str(float(class_id)) + ".txt"
 
         with open(ta_output) as file:
             lines = file.readlines()
@@ -87,7 +84,7 @@ def transformation_2(path, file_type, number_of_rows, number_of_columns, classes
     :param classes: the classes in the database
     :return: the function do the transformation and save the data after it
     """
-    states_path = path + "\\output\\states.csv"
+    states_path = path + "\\output\\" + file_type.lower() + "\\states.csv"
 
     # Get the number of state from state.csv file
     states_df = pd.read_csv(states_path, header=0)
@@ -108,7 +105,7 @@ def transformation_2(path, file_type, number_of_rows, number_of_columns, classes
 
     for class_id in classes:
         # Read the hugobot output file for class_id
-        ta_output = path + "\\output\\KL-class-" + str(float(class_id)) + ".txt"
+        ta_output = path + "\\output\\" + file_type.lower() + "\\KL-class-" + str(float(class_id)) + ".txt"
 
         with open(ta_output) as file:
             lines = file.readlines()
@@ -145,7 +142,7 @@ def transformation_3(path, file_type, number_of_rows, number_of_columns, classes
     :param classes: the classes in the database
     :return: the function do the transformation and save the data after it
     """
-    states_path = path + "\\output\\states.csv"
+    states_path = path + "\\output\\" + file_type.lower() + "\\states.csv"
 
     # Get the number of state from state.csv file
     states_df = pd.read_csv(states_path, header=0)
@@ -167,7 +164,7 @@ def transformation_3(path, file_type, number_of_rows, number_of_columns, classes
 
     for class_id in classes:
         # Read the hugobot output file for class_id
-        ta_output = path + "\\output\\KL-class-" + str(float(class_id)) + ".txt"
+        ta_output = path + "\\output\\" + file_type.lower() + "\\KL-class-" + str(float(class_id)) + ".txt"
 
         with open(ta_output) as file:
             lines = file.readlines()

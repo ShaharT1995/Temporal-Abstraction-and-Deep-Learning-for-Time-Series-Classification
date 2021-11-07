@@ -7,11 +7,36 @@ from sklearn.linear_model import Ridge
 
 import gc
 
-from utils_folder.utils import calculate_metrics
-from utils_folder.utils import create_directory
-from sklearn.model_selection import train_test_split
+from utils.utils import create_directory
 
+
+import numpy as np
+from sklearn.model_selection import train_test_split
 import time
+
+from tensorflow.python.keras import backend as K
+from utils.utils import calculate_metrics
+import os
+import tensorflow as tf
+import random as rn
+
+os.environ['PYTHONHASHSEED'] = '0'
+os.environ['TF_DETERMINISTIC_OPS'] = '1'
+
+# os.environ['CUDA_VISIBLE_DEVICES'] = ''
+
+# Setting the seed for numpy-generated random numbers
+np.random.seed(37)
+
+# Setting the seed for python random numbers
+rn.seed(1254)
+
+# Setting the graph-level random seed.
+tf.random.set_seed(89)
+
+session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
+sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
+K.set_session(sess)
 
 class Classifier_TWIESN:
 
@@ -28,7 +53,7 @@ class Classifier_TWIESN:
 		self.alpha = 0.1 # leaky rate
 
 
-	def init_matrices(self):
+	def init_matrices(self, iter):
 		self.W_in = (2.0*np.random.rand(self.N_x,self.num_dim)-1.0)/(2.0*self.scaleW_in)
 
 		converged = False
@@ -40,7 +65,7 @@ class Classifier_TWIESN:
 			i+=1
 
 			# generate sparse, uniformly distributed weights
-			self.W = sparse.rand(self.N_x,self.N_x,density=self.connect).todense()
+			self.W = sparse.rand(self.N_x,self.N_x,density=self.connect, random_state=42 + iter).todense()
 
 			# ensure that the non-zero values are uniformly distributed 
 			self.W[np.where(self.W>0)] -= 0.5
@@ -87,7 +112,7 @@ class Classifier_TWIESN:
 		new_y_pred = np.argmax(new_y_pred,axis=1)
 		return new_y_pred
 
-	def train(self):
+	def train(self, iter):
 		start_time = time.time()
 
 		################
@@ -95,7 +120,7 @@ class Classifier_TWIESN:
 		################
 
 		# init the matrices 
-		self.init_matrices()
+		self.init_matrices(iter)
 		# compute the state matrices which is the new feature space  
 		state_matrix = self.compute_state_matrix(self.x_train)
 		# add the input to form the new feature space and transform to 
@@ -167,7 +192,7 @@ class Classifier_TWIESN:
 		return df_metrics , train_acc
 
 
-	def fit(self,x_train,y_train,x_test,y_test, y_true):
+	def fit(self,x_train,y_train,x_test,y_test, y_true, iter):
 		best_train_acc = -1
 
 		self.num_dim = x_train.shape[2]
@@ -199,7 +224,7 @@ class Classifier_TWIESN:
 				self.output_directory = output_directory_root+'/hyper_param_search/'+\
 					'/config_'+str(idx_config)+'/'+'rho_'+str(rho)+'/'
 				create_directory(self.output_directory)
-				df_metrics, train_acc = self.train() 
+				df_metrics, train_acc = self.train(iter)
 
 				if best_train_acc < train_acc : 
 					best_train_acc = train_acc

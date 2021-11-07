@@ -14,7 +14,7 @@ class UnivariateTA1:
         self.cur_root_dir = cur_root_dir
         self.next_attribute = next_attribute
 
-        self.classes_dict = {}
+        self.univariate_dict = {}
 
     def input_to_csv(self, path, file_type, dataset_name):
         """
@@ -25,7 +25,7 @@ class UnivariateTA1:
         :return: the function create the csv file of the hugobot input format
         """
         # Reading the tsv file
-        tsv_data = pd.read_csv(path + file_type + ".tsv", sep='\t', header=None)
+        tsv_data = pd.read_csv(path + "_" + file_type + ".tsv", sep='\t', header=None)
 
         # Drop the classifier column
         df = tsv_data.drop([0], axis=1)
@@ -40,7 +40,9 @@ class UnivariateTA1:
         # Drop all columns except classifier column
         classifier_data = tsv_data.values[:, 0]
 
-        self.classes_dict[dataset_name] = np.unique(classifier_data)
+        self.univariate_dict[(dataset_name, file_type.lower())] = {"classes": np.unique(classifier_data),
+                                                         "rows": tsv_data.shape[0],
+                                                         "columns": tsv_data.shape[1]}
 
         df_classifier = pd.DataFrame(classifier_data).reset_index().melt('index')
         df_classifier.columns = ["EntityID", "TimeStamp", "TemporalPropertyValue"]
@@ -52,7 +54,7 @@ class UnivariateTA1:
         merged = pd.concat([df, df_classifier])
         merged = merged[['EntityID', 'TemporalPropertyID', 'TimeStamp', 'TemporalPropertyValue']]
 
-        merged.to_csv(path + 'U-transformation1' + file_type + '.csv', index=False)
+        merged.to_csv(path + '_U-transformation1_' + file_type + '.csv', index=False)
 
     def convert_all_UTS(self):
         """
@@ -60,14 +62,17 @@ class UnivariateTA1:
         :param next_attribute: the count of the time series
         :return: the function return the count of the time series
         """
-        file_types = ["_TRAIN", "_TEST"]
+        file_types = ["TRAIN", "TEST"]
 
         for dataset_name in DATASET_NAMES_2018:
+            print(dataset_name + ":")
             for file_type in file_types:
                 root_dir_dataset = self.cur_root_dir + dataset_name + '/' + dataset_name
                 self.input_to_csv(root_dir_dataset, file_type, dataset_name)
+                print("\t" + file_type)
+            print("")
             self.next_attribute += 1
 
-        write_pickle("univariate_classes_dict", self.classes_dict)
+        write_pickle("univariate_dict", self.univariate_dict)
 
         return self.next_attribute
