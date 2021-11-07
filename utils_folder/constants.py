@@ -52,13 +52,10 @@ UNIVARIATE_DATASET_NAMES_2018 = ['ACSF1', 'Adiac', 'AllGestureWiimoteX', 'AllGes
                                  'UWaveGestureLibraryX', 'UWaveGestureLibraryY', 'UWaveGestureLibraryZ',
                                  'Wafer', 'Wine', 'WordSynonyms', 'Worms', 'WormsTwoClass', 'Yoga']
 
-# 'AllGestureWiimoteZ', 'AllGestureWiimoteX', 'DodgerLoopWeekend', 'DodgerLoopGame', 'DodgerLoopDay', 'AllGestureWiimoteX', 'GestureMidAirD3', 'GestureMidAirD2', 'GestureMidAirD1'
-#  'GesturePebbleZ2', 'GesturePebbleZ1', 'MelbournePedestrian', 'PickupGestureWiimoteZ', 'PLAID','ShakeGestureWiimoteZ', 'SonyAIBORobotSurface2'
-
 #MTS_DATASET_NAMES = ['NetFlow']
 
-MTS_DATASET_NAMES = ["ECG"]
-
+MTS_DATASET_NAMES = ['ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
+                     'JapaneseVowels', 'KickvsPunch', 'Libras', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
 ITERATIONS = 5  # nb of random runs for random initializations
 
 ARCHIVE_NAMES = ['mts_archive']

@@ -3,6 +3,16 @@ from utils_folder.utils import open_pickle
 
 
 def create_three_files(path, method, nb_bins, paa_window_size, std_coefficient, max_gap, gradient_window_size=None):
+    """
+    :param path: the location of the database
+    :param method: the temporal abstraction method
+    :param nb_bins: number of bins
+    :param paa_window_size: the window size of the paa
+    :param std_coefficient: outliers remover (default std_coefficient=-1 (not perform))
+    :param max_gap: the max gap between two values
+    :param gradient_window_size: the window size of the gradient method
+    :return:
+    """
     next_attribute = open_pickle("next_property_index")["ID"]
 
     # GKB

@@ -90,7 +90,7 @@ def NASNet(input_shape=None,
     """Instantiates a NASNet architecture.
     Note that only TensorFlow is supported for now,
     therefore it only works with the data format
-    `image_data_format='channels_last'` in your Keras config
+    `image_data_format='channels_last'` in your Keras configuration.py
     at `~/.keras/keras.json`.
 
     # Arguments
@@ -189,7 +189,7 @@ def NASNet(input_shape=None,
                       'However your settings specify the default '
                       'data format "channels_first" (channels, width, height).'
                       ' You should set `image_data_format="channels_last"` '
-                      'in your Keras config located at ~/.keras/keras.json. '
+                      'in your Keras configuration.py located at ~/.keras/keras.json. '
                       'The model being returned right now will expect inputs '
                       'to follow the "channels_last" data format.')
         K.set_image_data_format('channels_last')
@@ -351,7 +351,7 @@ def NASNetLarge(input_shape=(331, 331, 3),
     """Instantiates a NASNet architecture in ImageNet mode.
     Note that only TensorFlow is supported for now,
     therefore it only works with the data format
-    `image_data_format='channels_last'` in your Keras config
+    `image_data_format='channels_last'` in your Keras configuration.py
     at `~/.keras/keras.json`.
 
     # Arguments
@@ -434,7 +434,7 @@ def NASNetMobile(input_shape=(224, 224, 3),
     """Instantiates a NASNet architecture in Mobile ImageNet mode.
     Note that only TensorFlow is supported for now,
     therefore it only works with the data format
-    `image_data_format='channels_last'` in your Keras config
+    `image_data_format='channels_last'` in your Keras configuration.py
     at `~/.keras/keras.json`.
 
     # Arguments
@@ -516,7 +516,7 @@ def NASNetCIFAR(input_shape=(32, 32, 3),
     """Instantiates a NASNet architecture in CIFAR mode.
     Note that only TensorFlow is supported for now,
     therefore it only works with the data format
-    `image_data_format='channels_last'` in your Keras config
+    `image_data_format='channels_last'` in your Keras configuration.py
     at `~/.keras/keras.json`.
 
     # Arguments

@@ -131,7 +131,7 @@ def read_dataset(root_dir, archive_name, dataset_name):
     return datasets_dict
 
 
-def read_all_datasets(root_dir, archive_name, split_val=False):
+def read_all_datasets(root_dir, archive_name, transformation_name=-1, after_ta=False, split_val=False):
     datasets_dict = {}
     cur_root_dir = root_dir.replace('-temp', '')
     dataset_names_to_sort = []
@@ -141,10 +141,17 @@ def read_all_datasets(root_dir, archive_name, split_val=False):
         for dataset_name in MTS_DATASET_NAMES:
             root_dir_dataset = cur_root_dir + '/archives/' + archive_name + '/' + dataset_name + '/'
 
-            x_train = np.load(root_dir_dataset + 'x_train.npy')
-            y_train = np.load(root_dir_dataset + 'y_train.npy')
-            x_test = np.load(root_dir_dataset + 'x_test.npy')
-            y_test = np.load(root_dir_dataset + 'y_test.npy')
+            if after_ta:
+                x_train = np.load(root_dir_dataset + 'transformation2_type' + transformation_name + '_train.npy')
+                y_train = np.load(root_dir_dataset + 'y_train.npy')
+                x_test = np.load(root_dir_dataset + 'transformation2_type' + transformation_name + '_test.npy')
+                y_test = np.load(root_dir_dataset + 'y_test.npy')
+
+            else:
+                x_train = np.load(root_dir_dataset + 'x_train.npy')
+                y_train = np.load(root_dir_dataset + 'y_train.npy')
+                x_test = np.load(root_dir_dataset + 'x_test.npy')
+                y_test = np.load(root_dir_dataset + 'y_test.npy')
 
             datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(),
                                            y_test.copy())
@@ -156,6 +163,7 @@ def read_all_datasets(root_dir, archive_name, split_val=False):
 
             df_test = pd.read_csv(root_dir_dataset + '/' + dataset_name + '_TEST.tsv', sep='\t', header=None)
 
+            # Padding with zero for missing values
             df_train = df_train.fillna(0)
             df_test = df_test.fillna(0)
 
@@ -232,6 +240,9 @@ def transform_to_same_length(x, n_var, max_length):
         curr_length = mts.shape[1]
         idx = np.array(range(curr_length))
         idx_new = np.linspace(0, idx.max(), max_length)
+
+        # Make all time series in the same length (by converting them to the length of the maximum series length)
+        # by linear interpolation
         for j in range(n_var):
             ts = mts[j]
             # linear interpolation
@@ -245,6 +256,9 @@ def transform_to_same_length(x, n_var, max_length):
 def transform_mts_to_ucr_format():
     mts_root_dir = "C:\\Users\\Shaha\\Desktop\\mtsdata\\archives\\mts_archive\\"
     mts_out_dir = "C:\\Users\\Shaha\\Desktop\\mtsdata\\archives\\mts_archive\\"
+
+    MTS_DICT = {}
+
     for dataset_name in MTS_DATASET_NAMES:
         # print('dataset_name',dataset_name)
 

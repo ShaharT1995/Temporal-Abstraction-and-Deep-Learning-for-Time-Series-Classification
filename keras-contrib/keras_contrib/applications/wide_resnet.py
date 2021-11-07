@@ -42,13 +42,13 @@ def WideResidualNetwork(depth=28, width=8, dropout_rate=0.0,
         optionally loading weights pre-trained
         on CIFAR-10. Note that when using TensorFlow,
         for best performance you should set
-        `image_dim_ordering="tf"` in your Keras config
+        `image_dim_ordering="tf"` in your Keras configuration.py
         at ~/.keras/keras.json.
 
         The model and the weights are compatible with both
         TensorFlow and Theano. The dimension ordering
         convention used by the model is the one
-        specified in your Keras config file.
+        specified in your Keras configuration.py file.
 
         # Arguments
             depth: number or layers in the DenseNet
@@ -141,7 +141,7 @@ def WideResidualNetwork(depth=28, width=8, dropout_rate=0.0,
                                   '(`image_dim_ordering="th"`). '
                                   'For best performance, set '
                                   '`image_dim_ordering="tf"` in '
-                                  'your Keras config '
+                                  'your Keras configuration.py '
                                   'at ~/.keras/keras.json.')
                     convert_all_kernels_in_model(model)
             else:

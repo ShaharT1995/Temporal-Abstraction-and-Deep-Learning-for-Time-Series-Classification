@@ -30,7 +30,7 @@ install:
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
   - hash -r
-  - conda config --set always_yes yes --set changeps1 no
+  - conda configuration.py --set always_yes yes --set changeps1 no
   - conda update -q conda
   # Useful for debugging any issues with conda
   - conda info -a
@@ -67,16 +67,16 @@ install:
 # command to run tests
 script:
   - export MKL_THREADING_LAYER="GNU"
-  # run keras backend init to initialize backend config
+  # run keras backend init to initialize backend configuration.py
   - python -c "import keras_contrib.backend"
   # create dataset directory to avoid concurrent directory creation at runtime
   - mkdir ~/.keras/datasets
   # set up keras backend
   - sed -i -e 's/"backend":[[:space:]]*"[^"]*/"backend":\ "'$KERAS_BACKEND'/g' ~/.keras/keras.json;
-  - echo -e "Running tests with the following config:\n$(cat ~/.keras/keras.json)"
+  - echo -e "Running tests with the following configuration.py:\n$(cat ~/.keras/keras.json)"
   - if [[ "$TEST_MODE" == "PEP8_DOC" ]]; then
       PYTHONPATH=$PWD:$PYTHONPATH py.test --pep8 -m pep8 -n0 && py.test tests/tooling/ convert_to_tf_keras.py && cd contrib_docs && pydocmd build;
     else
       PYTHONPATH=$PWD:$PYTHONPATH py.test tests/ $PYTEST_IGNORE --ignore=tests/tooling/
-    --cov-config .coveragerc --cov=keras_contrib tests/;
+    --cov-configuration.py .coveragerc --cov=keras_contrib tests/;
     fi

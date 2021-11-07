@@ -126,7 +126,7 @@ def DenseNet(input_shape=None,
     The model and the weights are compatible with both
     TensorFlow and Theano. The dimension ordering
     convention used by the model is the one
-    specified in your Keras config file.
+    specified in your Keras configuration.py file.
 
     # Arguments
         input_shape: optional shape tuple, only to be specified
@@ -302,7 +302,7 @@ def DenseNet(input_shape=None,
                               '(`image_data_format="channels_first"`). '
                               'For best performance, set '
                               '`image_data_format="channels_last"` in '
-                              'your Keras config '
+                              'your Keras configuration.py '
                               'at ~/.keras/keras.json.')
 
             print("Weights for the model were loaded successfully")
@@ -319,7 +319,7 @@ def DenseNetFCN(input_shape, nb_dense_block=5, growth_rate=16, nb_layers_per_blo
     '''Instantiate the DenseNet FCN architecture.
         Note that when using TensorFlow,
         for best performance you should set
-        `image_data_format='channels_last'` in your Keras config
+        `image_data_format='channels_last'` in your Keras configuration.py
         at ~/.keras/keras.json.
         # Arguments
             nb_dense_block: number of dense blocks to add to end (generally = 3)

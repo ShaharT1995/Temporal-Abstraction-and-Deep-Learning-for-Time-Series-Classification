@@ -96,7 +96,7 @@ if sys.argv[1] == 'run_all':
         for archive_name in ARCHIVE_NAMES:
             print('\tarchive_name', archive_name)
 
-            datasets_dict = read_all_datasets(root_dir, archive_name)
+            datasets_dict = read_all_datasets(root_dir, archive_name, "1", True)
 
             for iter in range(ITERATIONS):
                 print('\t\titer', iter)

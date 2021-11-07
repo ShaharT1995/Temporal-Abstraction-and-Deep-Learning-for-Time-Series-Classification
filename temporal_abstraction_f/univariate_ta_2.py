@@ -4,23 +4,27 @@ import pandas as pd
 import numpy as np
 
 from utils_folder.utils import open_pickle
+from utils_folder.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018
 
 
 def new_uts_files(cur_root_dir):
-    DATASET_NAMES_2018 = ["Coffee"]
-
+    """
+    :param cur_root_dir: the location in which all the databases are saved
+    :return: the function create all the transformations
+    """
     files_type = ["Train", "Test"]
 
     classes_dict = open_pickle("univariate_classes_dict")
 
     for index, dataset_name in enumerate(DATASET_NAMES_2018):
-        root_dir_dataset = cur_root_dir + '/archives/UCRArchive_2018/' + dataset_name
+        root_dir_dataset = cur_root_dir + dataset_name
 
         transformation_dict = {"1": transformation_1, "2": transformation_2, "3": transformation_3}
 
         classes = classes_dict[dataset_name]
 
         for file_type in files_type:
+            # Using the read me information for getting the number of entities and the length of time series
             read_me_path = root_dir_dataset + "\\README.md"
             # Read MD file
             read_me = markdown.markdown(open(read_me_path).read())
@@ -37,6 +41,15 @@ def new_uts_files(cur_root_dir):
 
 
 def transformation_1(path, file_type, number_of_rows, number_of_columns, classes):
+    """
+    :param path: the location of the hugobot output
+    :param file_type: train/test
+    :param number_of_rows: the number of entities
+    :param number_of_columns: the length of time series
+    :param classes: the classes in the database
+    :return: the function do the transformation and save the data after it
+    """
+
     # Create empty numpy array
     arr = np.zeros((number_of_rows, number_of_columns), int)
 
@@ -66,6 +79,14 @@ def transformation_1(path, file_type, number_of_rows, number_of_columns, classes
 
 
 def transformation_2(path, file_type, number_of_rows, number_of_columns, classes):
+    """
+    :param path: the location of the hugobot output
+    :param file_type: train/test
+    :param number_of_rows: the number of entities
+    :param number_of_columns: the length of time series
+    :param classes: the classes in the database
+    :return: the function do the transformation and save the data after it
+    """
     states_path = path + "\\output\\states.csv"
 
     # Get the number of state from state.csv file
@@ -116,6 +137,14 @@ def transformation_2(path, file_type, number_of_rows, number_of_columns, classes
 
 
 def transformation_3(path, file_type, number_of_rows, number_of_columns, classes):
+    """
+    :param path: the location of the hugobot output
+    :param file_type: train/test
+    :param number_of_rows: the number of entities
+    :param number_of_columns: the length of time series
+    :param classes: the classes in the database
+    :return: the function do the transformation and save the data after it
+    """
     states_path = path + "\\output\\states.csv"
 
     # Get the number of state from state.csv file

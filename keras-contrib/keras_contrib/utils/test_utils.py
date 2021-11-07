@@ -112,7 +112,7 @@ def layer_test(layer_cls, kwargs={}, input_shape=None, input_dtype=None,
         model.compile('rmsprop', 'mse')
         model.train_on_batch(input_data, actual_output)
 
-    # test instantiation from layer config
+    # test instantiation from layer configuration.py
     layer_config = layer.get_config()
     layer_config['batch_input_shape'] = input_shape
     layer = layer.__class__.from_config(layer_config)

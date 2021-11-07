@@ -31,8 +31,9 @@ tf.random.set_seed(89)
 session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
 sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
 K.set_session(sess)
-class Classifier_MCDCNN:
 
+
+class Classifier_MCDCNN:
     def __init__(self, output_directory, input_shape, nb_classes, verbose=False, build=True):
         self.output_directory = output_directory
         if build:

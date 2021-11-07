@@ -71,7 +71,7 @@ class CosineConvolution2D(Layer):
             In 'channels_first' mode, the channels dimension
             (the depth) is at index 1, in 'channels_last' mode is it at index 3.
             It defaults to the `image_data_format` value found in your
-            Keras config file at `~/.keras/keras.json`.
+            Keras configuration.py file at `~/.keras/keras.json`.
             If you never set it, then it will be `'channels_last'`.
         use_bias: whether to include a use_bias
             (i.e. make the layer affine rather than linear).

@@ -68,7 +68,7 @@ def test_CRF():
     print(v_acc, np_acc)
     assert np.abs(v_acc - np_acc) < 1e-4
 
-    # test config
+    # test configuration.py
     model.get_config()
 
     # test marginal learn mode, fix length
