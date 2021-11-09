@@ -15,6 +15,7 @@ from utils_folder.constants import ARCHIVE_NAMES
 from utils_folder.constants import ITERATIONS
 from utils_folder.utils import read_all_datasets
 import random as rn
+from configuration import ConfigClass
 
 os.environ['PYTHONHASHSEED'] = '0'
 os.environ['TF_DETERMINISTIC_OPS'] = '1'
@@ -87,7 +88,8 @@ def create_classifier(classifier_name, input_shape, nb_classes, output_directory
 ############################################### main
 
 # change this directory for your machine
-root_dir = "C:\\Users\\Shaha\\Desktop\\mtsdata"
+config = ConfigClass()
+root_dir = config.get_path()
 
 if sys.argv[1] == 'run_all':
     for classifier_name in CLASSIFIERS:
@@ -96,6 +98,8 @@ if sys.argv[1] == 'run_all':
         for archive_name in ARCHIVE_NAMES:
             print('\tarchive_name', archive_name)
 
+            # The third parameter is the number of the transformation we want, the fourth parameter is to read the data
+            # after TA (TRUE) or not (FALSE)
             datasets_dict = read_all_datasets(root_dir, archive_name, "1", True)
 
             for iter in range(ITERATIONS):

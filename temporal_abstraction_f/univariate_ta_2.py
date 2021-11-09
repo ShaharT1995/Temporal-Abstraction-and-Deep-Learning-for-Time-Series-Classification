@@ -52,7 +52,10 @@ def transformation_1(path, file_type, number_of_rows, number_of_columns, classes
 
     for class_id in classes:
         # Read the hugobot output file for class_id
-        ta_output = path + "\\output\\" + file_type.lower() + "\\KL-class-" + str(float(class_id)) + ".txt"
+        if "Chinatown" in path or "HouseTwenty" in path:
+            ta_output = path + "\\output\\" + file_type.lower() + "\\KL-class-" + str(int(class_id)) + ".txt"
+        else:
+            ta_output = path + "\\output\\" + file_type.lower() + "\\KL-class-" + str(float(class_id)) + ".txt"
 
         with open(ta_output) as file:
             lines = file.readlines()
@@ -72,7 +75,7 @@ def transformation_1(path, file_type, number_of_rows, number_of_columns, classes
                     arr[int(entity_id), int(parse_data[0]): int(parse_data[1])] = parse_data[2]
 
     # Save the file
-    pd.DataFrame(arr).to_csv(path + '\\U-transformation2_type1_' + file_type + '.csv', index=False, header=None)
+    pd.DataFrame(arr).to_csv(path + '\\transformation2_type1_' + file_type + '.csv', index=False, header=None)
 
 
 def transformation_2(path, file_type, number_of_rows, number_of_columns, classes):
@@ -105,7 +108,10 @@ def transformation_2(path, file_type, number_of_rows, number_of_columns, classes
 
     for class_id in classes:
         # Read the hugobot output file for class_id
-        ta_output = path + "\\output\\" + file_type.lower() + "\\KL-class-" + str(float(class_id)) + ".txt"
+        if "Chinatown" in path or "HouseTwenty" in path:
+            ta_output = path + "\\output\\" + file_type.lower() + "\\KL-class-" + str(int(class_id)) + ".txt"
+        else:
+            ta_output = path + "\\output\\" + file_type.lower() + "\\KL-class-" + str(float(class_id)) + ".txt"
 
         with open(ta_output) as file:
             lines = file.readlines()
@@ -164,7 +170,13 @@ def transformation_3(path, file_type, number_of_rows, number_of_columns, classes
 
     for class_id in classes:
         # Read the hugobot output file for class_id
-        ta_output = path + "\\output\\" + file_type.lower() + "\\KL-class-" + str(float(class_id)) + ".txt"
+        # TODO
+        # ta_output = path + "\\output\\" + file_type.lower() + "\\KL-class-" + str(int(float(class_id))) + ".txt"
+
+        if "Chinatown" in path or "HouseTwenty" in path:
+            ta_output = path + "\\output\\" + file_type.lower() + "\\KL-class-" + str(int(class_id)) + ".txt"
+        else:
+            ta_output = path + "\\output\\" + file_type.lower() + "\\KL-class-" + str(float(class_id)) + ".txt"
 
         with open(ta_output) as file:
             lines = file.readlines()

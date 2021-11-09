@@ -1,7 +1,3 @@
-import os
-import pickle
-import sys
-
 UNIVARIATE_DATASET_NAMES = ['50words', 'Adiac', 'ArrowHead', 'Beef', 'BeetleFly', 'BirdChicken', 'Car', 'CBF',
                             'ChlorineConcentration', 'CinC_ECG_torso', 'Coffee',
                             'Computers', 'Cricket_X', 'Cricket_Y', 'Cricket_Z', 'DiatomSizeReduction',
@@ -58,12 +54,29 @@ MTS_DATASET_NAMES = ['ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubj
                      'JapaneseVowels', 'KickvsPunch', 'Libras', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
 ITERATIONS = 5  # nb of random runs for random initializations
 
-ARCHIVE_NAMES = ['mts_archive']
+# ARCHIVE_NAMES = ['mts_archive']
+# dataset_names_for_archive = {'mts_archive': MTS_DATASET_NAMES}
 
-dataset_names_for_archive = {'mts_archive': MTS_DATASET_NAMES}
+ARCHIVE_NAMES = ['UCRArchive_2018']
+dataset_names_for_archive = {'UCRArchive_2018': UNIVARIATE_DATASET_NAMES_2018}
 
 # CLASSIFIERS = ['mcdcnn', 'fcn', 'mlp', 'resnet', 'tlenet', 'mcnn', 'twiesn', 'encoder', 'cnn', 'inception']
-CLASSIFIERS = ['mcdcnn']
+
+# CLASSIFIERS = ['mcdcnn - V',
+#                'fcn - V',
+#                'mlp - V',
+#                'cnn - V',
+#
+#                'resnet - Roze',
+#                'twiesn - Shahar & Hadas',
+#                'inception - Osher'
+#
+#                'tlenet - Not working',
+#                'mcnn - Not working',
+#
+#                'encoder - Need to run']
+
+CLASSIFIERS = ['twiesn']
 
 dataset_types = {'ElectricDevices': 'DEVICE', 'FordB': 'SENSOR',
                  'FordA': 'SENSOR', 'NonInvasiveFatalECG_Thorax2': 'ECG',

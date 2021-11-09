@@ -27,14 +27,13 @@ session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op
 sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
 K.set_session(sess)
 
-
 class Classifier_ENCODER:
 
     def __init__(self, output_directory, input_shape, nb_classes, verbose=False,build=True):
         self.output_directory = output_directory
-        if build:
+        if build == True:
             self.model = self.build_model(input_shape, nb_classes)
-            if verbose:
+            if (verbose == True):
                 self.model.summary()
             self.verbose = verbose
             self.model.save_weights(self.output_directory + 'model_init.hdf5')

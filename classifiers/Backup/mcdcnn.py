@@ -37,8 +37,8 @@ class Classifier_MCDCNN:
     def __init__(self, output_directory, input_shape, nb_classes, verbose=False, build=True):
         self.output_directory = output_directory
         if build:
-            if "NetFlow" in output_directory or "Wafer" in output_directory:
-                self.model = self.build_NetFlowAndWafer_model(input_shape, nb_classes)
+            if "NetFlow" in output_directory:
+                self.model = self.build_NetFlow_model(input_shape, nb_classes)
             else:
                 self.model = self.build_model(input_shape, nb_classes)
 
@@ -48,7 +48,7 @@ class Classifier_MCDCNN:
             self.model.save_weights(self.output_directory + 'model_init.hdf5')
         return
 
-    def build_NetFlowAndWafer_model(self, input_shape, nb_classes):
+    def build_NetFlow_model(self, input_shape, nb_classes):
         n_t = input_shape[0]
         n_vars = input_shape[1]
 
@@ -203,3 +203,5 @@ class Classifier_MCDCNN:
             return df_metrics
         else:
             return y_pred
+
+

@@ -4,16 +4,16 @@ import tensorflow as tf
 import numpy as np
 import time
 
-from utils_folder.utils import calculate_metrics
-from utils_folder.utils import create_directory
+from utils.utils import calculate_metrics
+from utils.utils import create_directory
 
 import numpy as np
 from sklearn.model_selection import train_test_split
 import time
 
 from tensorflow.python.keras import backend as K
-from utils_folder.utils import save_logs
-from utils_folder.utils import calculate_metrics
+from utils.utils import save_logs
+from utils.utils import calculate_metrics
 import os
 import random as rn
 
@@ -510,7 +510,7 @@ class Classifier_MCNN:
                 df_metrics, model, valid_loss = self.train(x_train, y_train, x_test,
                                                            y_test, y_true, iteration, pool_factor, filter_size)
 
-                if (valid_loss < best_valid_loss):
+                if valid_loss < best_valid_loss:
                     best_valid_loss = valid_loss
                     best_df_metrics = df_metrics
                     best_df_metrics.to_csv(output_directory_root + 'df_metrics.csv', index=False)

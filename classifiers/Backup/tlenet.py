@@ -6,29 +6,6 @@ import time
 
 from utils_folder.utils import save_logs_t_leNet as save_logs
 from utils_folder.utils import calculate_metrics
-import os
-import random as rn
-from tensorflow.python.keras import backend as K
-
-os.environ['PYTHONHASHSEED'] = '0'
-os.environ['TF_DETERMINISTIC_OPS'] = '1'
-
-# Setting the seed for numpy-generated random numbers1
-np.random.seed(37)
-
-# Setting the seed for python random numbers
-
-rn.seed(1254)
-
-# Setting the graph-level random seed.
-tf.random.set_seed(89)
-
-gpu_options = tf.compat.v1.GPUOptions(per_process_gpu_memory_fraction=0.7)
-session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1,
-                                        gpu_options=gpu_options)
-sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
-K.set_session(sess)
-
 
 class Classifier_TLENET:
     
@@ -164,7 +141,7 @@ class Classifier_TLENET:
                 idx += increase_num
         return new_x_train,new_y_train,new_x_test,new_y_test, tot_increase_num
     
-    def fit(self, x_train, y_train, x_test, y_test,y_true, iteration):
+    def fit(self, x_train, y_train, x_test, y_test,y_true):
         if not tf.test.is_gpu_available:
             print('error')
             exit()
@@ -269,6 +246,7 @@ class Classifier_TLENET:
         return df_metrics
         
                 
+        
         
         
         

@@ -32,6 +32,7 @@ session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op
 sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
 K.set_session(sess)
 
+
 class Classifier_MLP:
 
 	def __init__(self, output_directory, input_shape, nb_classes, verbose=False,build=True):
@@ -74,7 +75,7 @@ class Classifier_MLP:
 		model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='loss', 
 			save_best_only=True)
 
-		self.callbacks = [reduce_lr,model_checkpoint]
+		self.callbacks = [reduce_lr, model_checkpoint]
 
 		return model
 

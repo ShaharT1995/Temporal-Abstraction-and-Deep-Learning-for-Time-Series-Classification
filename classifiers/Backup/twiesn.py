@@ -7,7 +7,7 @@ from sklearn.linear_model import Ridge
 
 import gc
 
-from utils_folder.utils import create_directory
+from utils.utils import create_directory
 
 
 import numpy as np
@@ -15,7 +15,7 @@ from sklearn.model_selection import train_test_split
 import time
 
 from tensorflow.python.keras import backend as K
-from utils_folder.utils import calculate_metrics
+from utils.utils import calculate_metrics
 import os
 import tensorflow as tf
 import random as rn
@@ -203,7 +203,7 @@ class Classifier_TWIESN:
 
 		# split train to validation set to choose best hyper parameters 
 		self.x_train, self.x_val, self.y_train,self.y_val = \
-			train_test_split(x_train,y_train, test_size=0.2, random_state=(42 + iter))
+			train_test_split(x_train,y_train, test_size=0.2)
 		self.N = self.x_train.shape[0]
 
 		# limit the hyperparameter search if dataset is too big 
