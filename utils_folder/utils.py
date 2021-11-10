@@ -9,6 +9,9 @@ import matplotlib.pyplot as plt
 import os
 import operator
 
+from numpy import genfromtxt
+
+from utils_folder.constants import dataset_types
 from utils_folder.constants import UNIVARIATE_DATASET_NAMES as DATASET_NAMES
 from utils_folder.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018
 from utils_folder.constants import ARCHIVE_NAMES as ARCHIVE_NAMES
@@ -139,7 +142,7 @@ def read_all_datasets(root_dir, archive_name, transformation_name=-1, after_ta=F
     if archive_name == 'mts_archive':
 
         for dataset_name in MTS_DATASET_NAMES:
-            root_dir_dataset = cur_root_dir + '/archives/' + archive_name + '/' + dataset_name + '/'
+            root_dir_dataset = cur_root_dir + 'archives/' + archive_name + '/' + dataset_name + '/'
 
             if after_ta:
                 x_train = np.load(root_dir_dataset + 'transformation2_type' + transformation_name + '_train.npy')
@@ -372,6 +375,45 @@ def generate_results_csv(output_file_name, root_dir):
     return res
 
 
+def compare_results():
+    path_raw_data = "C:\\Users\\Shaha\\Desktop\\2.csv"
+    path_ta = "C:\\Users\\Shaha\\Desktop\\1.csv"
+
+    res_raw_data = pd.read_csv(path_raw_data, sep=',', header=0, encoding="utf-8")
+    res_ta_data = pd.read_csv(path_ta, sep=',', header=0, encoding="utf-8")
+
+    classifiers = pd.unique(res_ta_data["classifier_name"])
+    archives = pd.unique(res_ta_data["archive_name"])
+
+    df = pd.DataFrame(columns=["classifier_name", "archive_name", "precision improvement",
+                               "accuracy improvement", "recall improvement"])
+    methods = {"precision": None, "accuracy": None, "recall": None}
+
+    for classifier in classifiers:
+        for archive in archives:
+            ta_data = res_ta_data.loc[res_ta_data["classifier_name"].eq(classifier) &
+                                      res_ta_data["archive_name"].eq(archive)]
+            raw_data = res_raw_data.loc[res_raw_data["classifier_name"].eq(classifier) &
+                                        res_raw_data["archive_name"].eq(archive)]
+
+            if ta_data.shape[0] == raw_data.shape[0]:
+                for method in methods:
+                    cmp = pd.to_numeric(res_ta_data[method]) - pd.to_numeric(res_raw_data[method])
+                    methods[method] = (cmp[cmp > 0].count() / ta_data.shape[0]) * 100
+
+                new_row = pd.Series(data={"classifier_name": classifier, "archive_name": archive,
+                                          "precision improvement": methods['precision'],
+                                          "accuracy improvement": methods["accuracy"],
+                                          "recall improvement": methods["recall"]})
+                df = df.append(new_row, ignore_index=True)
+
+            else:
+                print("The two files contains different number of datasets")
+
+    df.to_csv('results.csv', index=False)
+    print("")
+
+
 def plot_epochs_metric(hist, file_name, metric='loss'):
     plt.figure()
     plt.plot(hist.history[metric])
@@ -497,7 +539,7 @@ def viz_perf_themes(root_dir, df):
     themes_index = []
     # add the themes
     for dataset_name in df.index:
-        themes_index.append(utils.constants.dataset_types[dataset_name])
+        themes_index.append(utils_folder.constants.dataset_types[dataset_name])
 
     themes_index = np.array(themes_index)
     themes, themes_counts = np.unique(themes_index, return_counts=True)

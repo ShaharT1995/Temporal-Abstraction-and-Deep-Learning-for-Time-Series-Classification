@@ -128,6 +128,9 @@ if sys.argv[1] == 'run_all':
                     # the creation of this directory means
                     create_directory(output_directory + '/DONE')
 
+    res = generate_results_csv('results.csv', root_dir)
+    print(res.to_string())
+
 elif sys.argv[1] == 'transform_mts_to_ucr_format':
     transform_mts_to_ucr_format()
 elif sys.argv[1] == 'visualize_filter':

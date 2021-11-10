@@ -5,11 +5,13 @@ class ConfigClass:
         self.ucr_path = self.path + "UCRArchive_2018\\archives\\UCRArchive_2018\\"
         self.properties_path = "C:\\Users\\Shaha\\Desktop\\TA\\TEST"
 
-        self.method = "equal-frequency"
-        self.nb_bin = 3
-        self.paa_window_size = 1
-        self.std_coefficient = -1
-        self.max_gap = -1
+        self.method = ["gradient", "equal-frequency", "equal-width", "sax", "td4c-skl", "td4c-entropy", "td4c-entropy-ig",
+                       "td4c-cosine", "td4c-diffsum", "td4c-diffmax"]
+
+        self.nb_bin = [2, 3, 5, 10]
+        self.paa_window_size = [1, 2, 5, 7]
+        self.std_coefficient = [-1, 2, 3]
+        self.max_gap = [-1, 2, 5]
 
     def get_path(self):
         return self.path

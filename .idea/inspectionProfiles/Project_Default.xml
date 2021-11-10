@@ -136,6 +136,7 @@
       <option name="ignoredIdentifiers">
         <list>
           <option value="createCSVs.converyNPtoTA.NEXT_ATTRIBUTE_ID" />
+          <option value="utils_folder.utils.utils_folder" />
         </list>
       </option>
     </inspection_tool>

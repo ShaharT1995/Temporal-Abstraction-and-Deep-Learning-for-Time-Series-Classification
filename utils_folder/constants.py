@@ -62,20 +62,6 @@ dataset_names_for_archive = {'UCRArchive_2018': UNIVARIATE_DATASET_NAMES_2018}
 
 # CLASSIFIERS = ['mcdcnn', 'fcn', 'mlp', 'resnet', 'tlenet', 'mcnn', 'twiesn', 'encoder', 'cnn', 'inception']
 
-# CLASSIFIERS = ['mcdcnn - V',
-#                'fcn - V',
-#                'mlp - V',
-#                'cnn - V',
-#
-#                'resnet - Roze',
-#                'twiesn - Shahar & Hadas',
-#                'inception - Osher'
-#
-#                'tlenet - Not working',
-#                'mcnn - Not working',
-#
-#                'encoder - Need to run']
-
 CLASSIFIERS = ['twiesn']
 
 dataset_types = {'ElectricDevices': 'DEVICE', 'FordB': 'SENSOR',
