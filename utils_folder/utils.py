@@ -1,5 +1,5 @@
 import pickle
-import sys
+import re
 from builtins import print
 import numpy as np
 import pandas as pd
@@ -9,9 +9,6 @@ import matplotlib.pyplot as plt
 import os
 import operator
 
-from numpy import genfromtxt
-
-from utils_folder.constants import dataset_types
 from utils_folder.constants import UNIVARIATE_DATASET_NAMES as DATASET_NAMES
 from utils_folder.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018
 from utils_folder.constants import ARCHIVE_NAMES as ARCHIVE_NAMES
@@ -43,8 +40,8 @@ rn.seed(1254)
 
 def open_pickle(name):
     file = open(name + ".pkl", "rb")
-    date = pickle.load(file)
-    return date
+    data = pickle.load(file)
+    return data
 
 
 def write_pickle(name, data):
@@ -142,7 +139,7 @@ def read_all_datasets(root_dir, archive_name, transformation_name=-1, after_ta=F
     if archive_name == 'mts_archive':
 
         for dataset_name in MTS_DATASET_NAMES:
-            root_dir_dataset = cur_root_dir + 'archives/' + archive_name + '/' + dataset_name + '/'
+            root_dir_dataset = cur_root_dir + 'mtsdata/archives/' + archive_name + '/' + dataset_name + '/'
 
             if after_ta:
                 x_train = np.load(root_dir_dataset + 'transformation2_type' + transformation_name + '_train.npy')
@@ -160,7 +157,7 @@ def read_all_datasets(root_dir, archive_name, transformation_name=-1, after_ta=F
                                            y_test.copy())
     elif archive_name == 'UCRArchive_2018':
         for dataset_name in DATASET_NAMES_2018:
-            root_dir_dataset = cur_root_dir + '/archives/' + archive_name + '/' + dataset_name + '/'
+            root_dir_dataset = cur_root_dir + 'UCRArchive_2018/archives/' + archive_name + '/' + dataset_name + '/'
 
             df_train = pd.read_csv(root_dir_dataset + '/' + dataset_name + '_TRAIN.tsv', sep='\t', header=None)
 
@@ -261,6 +258,7 @@ def transform_mts_to_ucr_format():
     mts_out_dir = "C:\\Users\\Shaha\\Desktop\\mtsdata\\archives\\mts_archive\\"
 
     MTS_DICT = {}
+    length_dict = {}
 
     for dataset_name in MTS_DATASET_NAMES:
         # print('dataset_name',dataset_name)
@@ -309,6 +307,8 @@ def transform_mts_to_ucr_format():
         x_train = transform_to_same_length(x_train, n_var, max_length)
         x_test = transform_to_same_length(x_test, n_var, max_length)
 
+        length_dict[dataset_name] = max_length
+
         # save them
         np.save(out_dir + 'x_train.npy', x_train)
         np.save(out_dir + 'y_train.npy', y_train)
@@ -318,6 +318,7 @@ def transform_mts_to_ucr_format():
         print('Done')
 
     write_pickle("MTS_Dictionary", MTS_DICT)
+    write_pickle("length_dict", length_dict)
 
 
 def calculate_metrics(y_true, y_pred, duration, y_true_val=None, y_pred_val=None):
@@ -342,7 +343,7 @@ def save_test_duration(file_name, test_duration):
     res.to_csv(file_name, index=False)
 
 
-def generate_results_csv(output_file_name, root_dir):
+def generate_results_csv(output_file_name, root_dir, after_ta=False):
     res = pd.DataFrame(data=np.zeros((0, 7), dtype=np.float), index=[],
                        columns=['classifier_name', 'archive_name', 'dataset_name',
                                 'precision', 'accuracy', 'recall', 'duration'])
@@ -365,7 +366,14 @@ def generate_results_csv(output_file_name, root_dir):
                     df_metrics['iteration'] = it
                     res = pd.concat((res, df_metrics), axis=0, sort=False)
 
-    res.to_csv(root_dir + output_file_name, index=False)
+    path = root_dir + "\\results"
+    if after_ta:
+        path += "_after_ta"
+
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    res.to_csv(path + "\\" + output_file_name, index=False)
     # aggreagte the accuracy for iterations on same dataset
     res = pd.DataFrame({
         'accuracy': res.groupby(
@@ -375,43 +383,59 @@ def generate_results_csv(output_file_name, root_dir):
     return res
 
 
-def compare_results():
-    path_raw_data = "C:\\Users\\Shaha\\Desktop\\2.csv"
-    path_ta = "C:\\Users\\Shaha\\Desktop\\1.csv"
-
-    res_raw_data = pd.read_csv(path_raw_data, sep=',', header=0, encoding="utf-8")
-    res_ta_data = pd.read_csv(path_ta, sep=',', header=0, encoding="utf-8")
-
-    classifiers = pd.unique(res_ta_data["classifier_name"])
-    archives = pd.unique(res_ta_data["archive_name"])
+def compare_results(path_raw_data_file, path_ta_dir):
+    res_raw_data = pd.read_csv(path_raw_data_file, sep=',', header=0, encoding="utf-8")
 
     df = pd.DataFrame(columns=["classifier_name", "archive_name", "precision improvement",
-                               "accuracy improvement", "recall improvement"])
-    methods = {"precision": None, "accuracy": None, "recall": None}
+                               "accuracy improvement", "recall improvement", "equal precision",
+                               "equal accuracy", "equal recall",  "method", "nb bins", "paa", "std",
+                               "max gap"])
+    measures = {"precision": None, "accuracy": None, "recall": None}
+    equals_measures = {"equal_precision": None, "equal_accuracy": None, "equal_recall": None}
 
-    for classifier in classifiers:
-        for archive in archives:
-            ta_data = res_ta_data.loc[res_ta_data["classifier_name"].eq(classifier) &
-                                      res_ta_data["archive_name"].eq(archive)]
-            raw_data = res_raw_data.loc[res_raw_data["classifier_name"].eq(classifier) &
-                                        res_raw_data["archive_name"].eq(archive)]
+    for root, dirs, files in os.walk(path_ta_dir):
+        for file in files:
+            if file.endswith(".csv"):
 
-            if ta_data.shape[0] == raw_data.shape[0]:
-                for method in methods:
-                    cmp = pd.to_numeric(res_ta_data[method]) - pd.to_numeric(res_raw_data[method])
-                    methods[method] = (cmp[cmp > 0].count() / ta_data.shape[0]) * 100
+                arguments = re.split('[_.]', file)
 
-                new_row = pd.Series(data={"classifier_name": classifier, "archive_name": archive,
-                                          "precision improvement": methods['precision'],
-                                          "accuracy improvement": methods["accuracy"],
-                                          "recall improvement": methods["recall"]})
-                df = df.append(new_row, ignore_index=True)
+                res_ta_data = pd.read_csv(root + "\\" + file, sep=',', header=0, encoding="utf-8")
 
-            else:
-                print("The two files contains different number of datasets")
+                classifiers = pd.unique(res_ta_data["classifier_name"])
+                archives = pd.unique(res_ta_data["archive_name"])
 
-    df.to_csv('results.csv', index=False)
-    print("")
+                for classifier in classifiers:
+                    for archive in archives:
+                        ta_data = res_ta_data.loc[res_ta_data["classifier_name"].eq(classifier) &
+                                                  res_ta_data["archive_name"].eq(archive)]
+                        raw_data = res_raw_data.loc[res_raw_data["classifier_name"].eq(classifier) &
+                                                    res_raw_data["archive_name"].eq(archive)]
+
+                        if ta_data.shape[0] == raw_data.shape[0]:
+                            for measure in measures:
+                                cmp = pd.to_numeric(res_ta_data[measure]) - pd.to_numeric(res_raw_data[measure])
+                                measures[measure] = (cmp[cmp > 0].count() / ta_data.shape[0]) * 100
+                                equals_measures["equal_" + measure] = (cmp[cmp == 0].count() / ta_data.shape[0]) * 100
+
+                            new_row = pd.Series(data={"classifier_name": classifier, "archive_name": archive,
+                                                      "precision improvement": measures['precision'],
+                                                      "accuracy improvement": measures["accuracy"],
+                                                      "recall improvement": measures["recall"],
+                                                      "equal recall": equals_measures["equal_recall"],
+                                                      "equal precision": equals_measures["equal_accuracy"],
+                                                      "equal accuracy": equals_measures["equal_accuracy"],
+                                                      "method": arguments[1], "nb bins": arguments[2],
+                                                      "paa": arguments[3], "std": arguments[4],
+                                                      "max gap": arguments[5]})
+                            df = df.append(new_row, ignore_index=True)
+
+                        else:
+                            print("The two files contains different number of datasets")
+
+    if os.path.exists('results.csv'):
+        df.to_csv('results.csv', index=False, mode='a', header=0)
+    else:
+        df.to_csv('results.csv', index=False)
 
 
 def plot_epochs_metric(hist, file_name, metric='loss'):
@@ -633,11 +657,11 @@ def viz_perf_length(root_dir, df):
 def viz_plot(root_dir, df):
     df_lengths = df.copy()
     lengths = []
-    datasets_dict_ucr = read_all_datasets(root_dir, archive_name='UCR_TS_Archive_2015')
+    datasets_dict_ucr = read_all_datasets(root_dir, archive_name='UCRArchive_2018')
     datasets_dict_mts = read_all_datasets(root_dir, archive_name='mts_archive')
     datasets_dict = dict(datasets_dict_ucr, **datasets_dict_mts)
 
-    for dataset_name in df.index:
+    for index, dataset_name in df.iloc[0].items():
         length = datasets_dict[dataset_name][0].shape[1]
         lengths.append(length)
 
@@ -653,7 +677,7 @@ def viz_plot(root_dir, df):
 
 
 def viz_for_survey_paper(root_dir, filename='results-ucr-mts.csv'):
-    df = pd.read_csv(root_dir + filename, index_col=0)
+    df = pd.read_csv(root_dir + filename, encoding="utf-8")
     df = df.T
     df = df.round(decimals=2)
 
@@ -754,3 +778,30 @@ def viz_cam(root_dir):
         # cbar.ax.set_yticklabels([100,75,50,25,0])
         plt.savefig(root_dir + '/temp/' + classifier + '-cam-' + save_name + '-class-' + str(int(c)) + '.png',
                     bbox_inches='tight', dpi=1080)
+
+
+def merge_two_columns(x):
+    # merged = str(round(x[3] * 100, 1)) + "(" + str(round(x[4] * 100, 1)) + ")"
+    merged = round(x[4] * 100, 1)
+    return merged
+
+
+# todo
+def create_results_table():
+    file_path = "C:\\Users\\Shaha\\Desktop\\results-mts.csv"
+
+    df = pd.read_csv(file_path, encoding="utf-8")
+
+    res_df = df.groupby(["classifier_name", "archive_name", "dataset_name"], as_index=False).agg({"accuracy": [np.mean,
+                                                                                                               np.std]})
+
+    res_df["res"] = res_df.apply(merge_two_columns, axis=1)
+
+    ucr_df = res_df.loc[res_df.archive_name == "UCRArchive_2018"]
+    mts_df = res_df.loc[res_df.archive_name == "mts_archive"]
+
+    mts_df = mts_df.pivot(index="dataset_name", columns="classifier_name", values="res").reset_index()
+    ucr_df = ucr_df.pivot(index="dataset_name", columns="classifier_name", values="res").reset_index()
+
+    mts_df.to_csv("mts_results.csv", index=False)
+    ucr_df.to_csv("ucr_results.csv", index=False)

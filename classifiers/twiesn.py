@@ -99,9 +99,10 @@ class Classifier_TWIESN:
 			# save in previous state 
 			X_t_1 = curr_state
 			# save in state matrix 
-			X_t[:,t,:] = curr_state
+			X_t[:, t, :] = curr_state
 				
 		return X_t
+
 
 	def reshape_prediction(self,y_pred, num_instances,length_series): 
 		# reshape so the first axis has the number of instances 
@@ -124,9 +125,9 @@ class Classifier_TWIESN:
 		# compute the state matrices which is the new feature space  
 		state_matrix = self.compute_state_matrix(self.x_train)
 		# add the input to form the new feature space and transform to 
-		# the new feature space to be feeded to the classifier 
-		new_x_train = np.concatenate((self.x_train,state_matrix), axis=2).reshape(
-			self.N * self.T , self.num_dim+self.N_x)
+		# the new feature space to be fed to the classifier
+		new_x_train = np.concatenate((self.x_train, state_matrix), axis=2).reshape(
+			self.N * self.T, self.num_dim+self.N_x)
 		# memory free 
 		state_matrix = None 
 		gc.collect()
@@ -135,7 +136,7 @@ class Classifier_TWIESN:
 		# new model 
 		ridge_classifier = Ridge(alpha=self.lamda)
 		# fit the new feature space 
-		ridge_classifier.fit(new_x_train,new_labels)
+		ridge_classifier.fit(new_x_train, new_labels)
 
 		################
 		## Validation ##

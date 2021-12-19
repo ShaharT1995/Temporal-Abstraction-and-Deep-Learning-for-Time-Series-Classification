@@ -17,15 +17,14 @@ from utils_folder.utils import calculate_metrics
 
 
 class Classifier_RESNET:
-
     def __init__(self, output_directory, input_shape, nb_classes, verbose=False, build=True, load_weights=False):
         self.output_directory = output_directory
-        if build == True:
+        if build:
             self.model = self.build_model(input_shape, nb_classes)
-            if (verbose == True):
+            if verbose:
                 self.model.summary()
             self.verbose = verbose
-            if load_weights == True:
+            if load_weights:
                 self.model.load_weights(self.output_directory
                                         .replace('resnet_augment', 'resnet')
                                         .replace('TSC_itr_augment_x_10', 'TSC_itr_10')

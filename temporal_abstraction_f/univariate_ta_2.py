@@ -9,6 +9,7 @@ from utils_folder.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAME
 
 def new_uts_files(cur_root_dir):
     """
+    :param datasets:
     :param cur_root_dir: the location in which all the databases are saved
     :return: the function create all the transformations
     """
@@ -21,7 +22,7 @@ def new_uts_files(cur_root_dir):
 
         transformation_dict = {"1": transformation_1, "2": transformation_2, "3": transformation_3}
 
-        print(dataset_name + ":")
+        print("\t" + dataset_name + ":")
 
         for file_type in files_type:
             # Get from the read me file the number of rows, number of columns and number of
@@ -32,7 +33,7 @@ def new_uts_files(cur_root_dir):
             # Run the three transformation on the Train and Test files
             for key in transformation_dict.keys():
                 transformation_dict[key](root_dir_dataset, file_type, number_of_rows, number_of_columns, classes)
-                print("\ttransformation_" + key + ", " + file_type.lower())
+                print("\t\ttransformation_" + key + ", " + file_type.lower())
 
         print("")
 

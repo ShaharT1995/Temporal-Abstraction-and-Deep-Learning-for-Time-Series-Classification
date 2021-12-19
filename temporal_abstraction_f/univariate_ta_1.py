@@ -64,15 +64,19 @@ class UnivariateTA1:
         """
         file_types = ["TRAIN", "TEST"]
 
+        attributes_dict = {}
+
         for dataset_name in DATASET_NAMES_2018:
-            print(dataset_name + ":")
+            print("\t\t" + dataset_name + ":")
             for file_type in file_types:
                 root_dir_dataset = self.cur_root_dir + dataset_name + '/' + dataset_name
                 self.input_to_csv(root_dir_dataset, file_type, dataset_name)
-                print("\t" + file_type)
-            print("")
+                print("\t\t\t" + file_type)
+
+            attributes_dict[dataset_name] = [self.next_attribute]
             self.next_attribute += 1
 
-        write_pickle("univariate_dict", self.univariate_dict)
+            print("")
 
-        return self.next_attribute
+        write_pickle("univariate_dict", self.univariate_dict)
+        return self.next_attribute, attributes_dict

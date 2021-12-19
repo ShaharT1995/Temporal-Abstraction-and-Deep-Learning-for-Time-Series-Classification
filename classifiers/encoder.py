@@ -28,6 +28,13 @@ sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=sessi
 K.set_session(sess)
 
 
+
+tfa.random.set_seed(89)
+session_conf = tfa.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
+sess = tfa.compat.v1.Session(graph=tfa.compat.v1.get_default_graph(), config=session_conf)
+K.set_session(sess)
+
+
 class Classifier_ENCODER:
 
     def __init__(self, output_directory, input_shape, nb_classes, verbose=False,build=True):
@@ -60,17 +67,17 @@ class Classifier_ENCODER:
         conv3 = keras.layers.PReLU(shared_axes=[1])(conv3)
         conv3 = keras.layers.Dropout(rate=0.2)(conv3)
         # split for attention
-        attention_data = keras.layers.Lambda(lambda x: x[:,:,:256])(conv3)
-        attention_softmax = keras.layers.Lambda(lambda x: x[:,:,256:])(conv3)
+        attention_data = keras.layers.Lambda(lambda x: x[:, :, :256])(conv3)
+        attention_softmax = keras.layers.Lambda(lambda x: x[:, :, 256:])(conv3)
         # attention mechanism
         attention_softmax = keras.layers.Softmax()(attention_softmax)
-        multiply_layer = keras.layers.Multiply()([attention_softmax,attention_data])
+        multiply_layer = keras.layers.Multiply()([attention_softmax, attention_data])
         # last layer
-        dense_layer = keras.layers.Dense(units=256,activation='sigmoid')(multiply_layer)
+        dense_layer = keras.layers.Dense(units=256, activation='sigmoid')(multiply_layer)
         dense_layer = tfa.layers.InstanceNormalization()(dense_layer)
         # output layer
         flatten_layer = keras.layers.Flatten()(dense_layer)
-        output_layer = keras.layers.Dense(units=nb_classes,activation='softmax')(flatten_layer)
+        output_layer = keras.layers.Dense(units=nb_classes, activation='softmax')(flatten_layer)
 
         model = keras.models.Model(inputs=input_layer, outputs=output_layer)
 
@@ -116,7 +123,7 @@ class Classifier_ENCODER:
 
         keras.backend.clear_session()
 
-    def predict(self, x_test,y_true,x_train,y_train,y_test,return_df_metrics = True):
+    def predict(self, x_test, y_true, x_train, y_train, y_test, return_df_metrics=True):
         model_path = self.output_directory + 'best_model.hdf5'
         model = keras.models.load_model(model_path)
         y_pred = model.predict(x_test)

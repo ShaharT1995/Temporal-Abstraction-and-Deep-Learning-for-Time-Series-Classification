@@ -17,7 +17,7 @@ def new_mts_files(cur_root_dir):
     mts_dict = open_pickle("MTS_Dictionary")
 
     for index, dataset_name in enumerate(MTS_DATASET_NAMES):
-        print(dataset_name)
+        print("\t" + dataset_name)
 
         root_dir_dataset = cur_root_dir + dataset_name + "/"
 
@@ -37,11 +37,11 @@ def new_mts_files(cur_root_dir):
                 if file_type == "train":
                     transformation_dict[key](root_dir_dataset, file_type, number_of_entities_train, time_serious_length,
                                              number_of_attributes, classes)
-                    print("\t transformation_" + key + ", train")
+                    print("\t\ttransformation_" + key + ", train")
                 else:
                     transformation_dict[key](root_dir_dataset, file_type, number_of_entities_test, time_serious_length,
                                              number_of_attributes, classes)
-                    print("\t transformation_" + key + ", test")
+                    print("\t\ttransformation_" + key + ", test")
 
         print("")
 

@@ -1,4 +1,4 @@
-from utils_folder.utils import generate_results_csv
+from utils_folder.utils import generate_results_csv, create_results_table
 from utils_folder.utils import create_directory
 from utils_folder.utils import read_dataset
 from utils_folder.utils import transform_mts_to_ucr_format
@@ -22,7 +22,6 @@ os.environ['TF_DETERMINISTIC_OPS'] = '1'
 
 np.random.seed(37)
 rn.seed(1254)
-
 
 def fit_classifier(iter):
     x_train = datasets_dict[dataset_name][0]
@@ -91,19 +90,20 @@ def create_classifier(classifier_name, input_shape, nb_classes, output_directory
 config = ConfigClass()
 root_dir = config.get_path()
 
+
 if sys.argv[1] == 'run_all':
     for classifier_name in CLASSIFIERS:
-        print('classifier_name', classifier_name)
+        print('\tclassifier_name', classifier_name)
 
         for archive_name in ARCHIVE_NAMES:
-            print('\tarchive_name', archive_name)
+            print('\t\tarchive_name', archive_name)
 
             # The third parameter is the number of the transformation we want, the fourth parameter is to read the data
             # after TA (TRUE) or not (FALSE)
             datasets_dict = read_all_datasets(root_dir, archive_name, "1", True)
 
             for iter in range(ITERATIONS):
-                print('\t\titer', iter)
+                print('\t\t\titer', iter)
 
                 trr = ''
                 if iter != 0:
@@ -112,24 +112,21 @@ if sys.argv[1] == 'run_all':
                 tmp_output_directory = root_dir + '/results/' + classifier_name + '/' + archive_name + trr + '/'
 
                 for dataset_name in utils_folder.constants.dataset_names_for_archive[archive_name]:
-                    print('\t\t\tdataset_name: ', dataset_name)
+                    print('\t\t\t\tdataset_name: ', dataset_name)
 
                     output_directory = tmp_output_directory + dataset_name + '/'
-                    if os.path.exists(output_directory + "/DONE"):
-                        print("Already Done")
-                        continue
+                    # if os.path.exists(output_directory + "/DONE"):
+                        # print("\t\t\t\tAlready Done")
+                        # continue
 
                     create_directory(output_directory)
 
                     fit_classifier(iter)
 
-                    print('\t\t\t\tDONE')
+                    print('\t\t\t\t\tDONE')
 
                     # the creation of this directory means
                     create_directory(output_directory + '/DONE')
-
-    res = generate_results_csv('results.csv', root_dir)
-    print(res.to_string())
 
 elif sys.argv[1] == 'transform_mts_to_ucr_format':
     transform_mts_to_ucr_format()
