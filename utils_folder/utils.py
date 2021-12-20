@@ -39,13 +39,13 @@ rn.seed(1254)
 
 
 def open_pickle(name):
-    file = open(name + ".pkl", "rb")
+    file = open("pickle_files//" + name + ".pkl", "rb")
     data = pickle.load(file)
     return data
 
 
 def write_pickle(name, data):
-    file = open(name + ".pkl", "wb")
+    file = open("pickle_files//" + name + ".pkl", "wb")
     pickle.dump(data, file)
     file.close()
 
@@ -432,10 +432,10 @@ def compare_results(path_raw_data_file, path_ta_dir):
                         else:
                             print("The two files contains different number of datasets")
 
-    if os.path.exists('results.csv'):
-        df.to_csv('results.csv', index=False, mode='a', header=0)
+    if os.path.exists('../../results.csv'):
+        df.to_csv('../../results.csv', index=False, mode='a', header=0)
     else:
-        df.to_csv('results.csv', index=False)
+        df.to_csv('../../results.csv', index=False)
 
 
 def plot_epochs_metric(hist, file_name, metric='loss'):

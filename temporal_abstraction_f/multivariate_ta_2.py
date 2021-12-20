@@ -56,7 +56,7 @@ def transformation_1(path, file_type, number_of_entities, time_serious_length, n
     :param classes: the classes in the database
     :return: the function do the transformation and save the data after it
     """
-    states_path = path + "\\output\\" + file_type + "\\states.csv"
+    states_path = path + "//output//" + file_type + "//states.csv"
 
     # Get the number of state from state.csv file
     states_df = pd.read_csv(states_path, header=0)
@@ -67,7 +67,7 @@ def transformation_1(path, file_type, number_of_entities, time_serious_length, n
 
     for class_id in classes:
         # Read the hugobot output file for class_id
-        ta_output = path + "\\output\\" + file_type + "\\KL-class-" + str(float(class_id)) + ".txt"
+        ta_output = path + "//output//" + file_type + "//KL-class-" + str(float(class_id)) + ".txt"
 
         with open(ta_output) as file:
             lines = file.readlines()
@@ -87,7 +87,7 @@ def transformation_1(path, file_type, number_of_entities, time_serious_length, n
                         = parse_data[2]
 
     # Save the file
-    np.save(path + '\\transformation2_type1_' + file_type + '.npy', arr)
+    np.save(path + '//transformation2_type1_' + file_type + '.npy', arr)
 
 
 def transformation_2(path, file_type, number_of_entities, time_serious_length, number_of_attributes, classes):
@@ -100,7 +100,7 @@ def transformation_2(path, file_type, number_of_entities, time_serious_length, n
     :param classes: the classes in the database
     :return: the function do the transformation and save the data after it
     """
-    states_path = path + "\\output\\" + file_type + "\\states.csv"
+    states_path = path + "//output//" + file_type + "//states.csv"
 
     # Get the number of state from state.csv file
     states_df = pd.read_csv(states_path, header=0)
@@ -113,7 +113,7 @@ def transformation_2(path, file_type, number_of_entities, time_serious_length, n
 
     for class_id in classes:
         # Read the hugobot output file for class_id
-        ta_output = path + "\\output\\" + file_type + "\\KL-class-" + str(float(class_id)) + ".txt"
+        ta_output = path + "//output//" + file_type + "//KL-class-" + str(float(class_id)) + ".txt"
 
         with open(ta_output) as file:
             lines = file.readlines()
@@ -130,7 +130,7 @@ def transformation_2(path, file_type, number_of_entities, time_serious_length, n
                     arr[int(entity_id)][int(parse_data[0]) - 1: int(parse_data[1]) - 1, int(parse_data[2]) - 1] = True
 
     # Save the file
-    np.save(path + '\\transformation2_type2_' + file_type + '.npy', arr)
+    np.save(path + '//transformation2_type2_' + file_type + '.npy', arr)
 
 
 def transformation_3(path, file_type, number_of_entities, time_serious_length, number_of_attributes, classes):
@@ -143,7 +143,7 @@ def transformation_3(path, file_type, number_of_entities, time_serious_length, n
     :param classes: the classes in the database
     :return: the function do the transformation and save the data after it
     """
-    states_path = path + "\\output\\" + file_type + "\\states.csv"
+    states_path = path + "//output//" + file_type + "//states.csv"
 
     # Get the number of state from state.csv file
     states_df = pd.read_csv(states_path, header=0)
@@ -164,7 +164,7 @@ def transformation_3(path, file_type, number_of_entities, time_serious_length, n
 
     for class_id in classes:
         # Read the hugobot output file for class_id
-        ta_output = path + "\\output\\" + file_type + "\\KL-class-" + str(float(class_id)) + ".txt"
+        ta_output = path + "//output//" + file_type + "//KL-class-" + str(float(class_id)) + ".txt"
 
         with open(ta_output) as file:
             lines = file.readlines()
@@ -186,4 +186,4 @@ def transformation_3(path, file_type, number_of_entities, time_serious_length, n
                     arr[int(entity_id)][int(parse_data[1]) - 2][dict_value_2] = True
 
     # Save the file
-    np.save(path + '\\transformation2_type3_' + file_type + '.npy', arr)
+    np.save(path + '//transformation2_type3_' + file_type + '.npy', arr)

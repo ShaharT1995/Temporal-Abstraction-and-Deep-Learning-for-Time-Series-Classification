@@ -2,10 +2,9 @@ import os
 import pickle
 import sys
 
+sys.path.insert(0, '../')
 
-sys.path.append('../')
-
-from configuration import ConfigClass
+from utils_folder.configuration import ConfigClass
 from multivariate_ta_1 import MultivariateTA1
 from univariate_ta_1 import UnivariateTA1
 from set_parameters import create_three_files
@@ -14,10 +13,8 @@ from univariate_ta_2 import new_uts_files
 
 from utils_folder.utils import write_pickle
 
-sys.path.insert(0, '../../Hugobot')
+sys.path.insert(0, '../Hugobot')
 from cli import run_cli
-
-sys.path.insert(0, '../-dl-4-tsc')
 
 from utils_folder.utils import generate_results_csv
 from utils_folder.constants import MTS_DATASET_NAMES
@@ -45,6 +42,7 @@ def run():
     write_pickle("next_property_index", {"ID": next_attribute})
     # Make the 3 files - gkb.csv, ta.csv and ppa.csv
 
+    print()
     print("Step 2: make the gkb.csv, ta.csv and ppa.csv")
     print()
     for method in config.get_method():
@@ -82,7 +80,8 @@ def run():
                         new_uts_files(config.get_ucr_path())
 
                         print("Run all:")
-                        os.system('py D:\\Git\\-dl-4-tsc\\main.py run_all')
+
+                        os.system('python ' + config.get_path() + '/GitProject/-dl-4-tsc/main.py run_all')
                         print("")
 
                         print("Generate Results to CSV")
@@ -91,14 +90,13 @@ def run():
 
                         generate_results_csv(file_name, config.get_path())
 
+    print("Compare the results between running on the raw data and the data after the TA")
     for archive_name in ARCHIVE_NAMES:
-        path_raw_data_file = config.get_path() + archive_name + "\\results\\raw_data_results.csv"
-        # path_raw_data_file = "C:\\Users\\Shaha\\Desktop\\1.csv"
+        path_raw_data_file = config.get_path() + "GitProject//results//" + archive_name + "//raw_data_results.csv"
+        path_ta_dir = config.get_path() + "GitProject//results//" + archive_name + "//results_after_ta//"
 
-        path_ta_dir = config.get_path() + archive_name + "\\results_after_ta\\"
-        # path_ta_dir = "C:\\Users\\Shaha\\Desktop\\results_after_ta"
         compare_results(path_raw_data_file, path_ta_dir)
-
+    print("Done comparing")
 
 run()
 

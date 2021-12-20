@@ -1,9 +1,9 @@
 class ConfigClass:
     def __init__(self):
-        self.path = "C:\\Users\\Shaha\\Desktop\\"
-        self.mts_path = self.path + "mtsdata\\archives\\mts_archive\\"
-        self.ucr_path = self.path + "UCRArchive_2018\\archives\\UCRArchive_2018\\"
-        self.properties_path = "C:\\Users\\Shaha\\Desktop\\TA"
+        self.path = "/home/shaharap/"
+        self.mts_path = self.path + "mtsdata//archives//mts_archive/"
+        self.ucr_path = self.path + "UCRArchive_2018//archives//UCRArchive_2018/"
+        self.properties_path = self.path + "GitProject//TA//HugoBotFiles"
 
         # self.method = ["gradient", "equal-frequency", "equal-width", "sax", "td4c-skl", "td4c-entropy",
         #                "td4c-entropy-ig",

@@ -1,3 +1,0 @@
-classifier_name,archive_name,precision improvement,accuracy improvement,recall improvement,equal precision,equal accuracy,equal recall,method,nb bins,paa,std,max gap
-mcdcnn,UCRArchive_2018,66.66666666666666,53.333333333333336,66.66666666666666,6.666666666666667,6.666666666666667,0.0,equal-frequency,5,1,-1,5
-mcdcnn,UCRArchive_2018,66.66666666666666,53.333333333333336,66.66666666666666,6.666666666666667,6.666666666666667,0.0,equal-width,5,1,-1,5

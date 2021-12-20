@@ -58,11 +58,11 @@ def run_cli(prop_path, data_path, ds_dict, dataset_type, max_gap):
                     standalone_mode=False)
 
             else:
-                train_gkb_path = data_path + dataset_name + "\\output\\train\\states.csv"
+                train_gkb_path = data_path + dataset_name + "//output//train//states.csv"
                 df = pd.read_csv(train_gkb_path)
                 df["Method"] = "knowledge-based"
 
-                test_gkb_path = data_path + dataset_name + "\\output\\test\\states.csv"
+                test_gkb_path = data_path + dataset_name + "//output//test//states.csv"
                 df.to_csv(test_gkb_path, index=False)
 
                 cli(['temporal-abstraction',

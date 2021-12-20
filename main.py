@@ -1,3 +1,4 @@
+import sys
 from utils_folder.utils import generate_results_csv, create_results_table
 from utils_folder.utils import create_directory
 from utils_folder.utils import read_dataset
@@ -7,7 +8,6 @@ from utils_folder.utils import viz_for_survey_paper
 from utils_folder.utils import viz_cam
 import os
 import numpy as np
-import sys
 import sklearn
 import utils_folder
 from utils_folder.constants import CLASSIFIERS
@@ -15,7 +15,7 @@ from utils_folder.constants import ARCHIVE_NAMES
 from utils_folder.constants import ITERATIONS
 from utils_folder.utils import read_all_datasets
 import random as rn
-from configuration import ConfigClass
+from utils_folder.configuration import ConfigClass
 
 os.environ['PYTHONHASHSEED'] = '0'
 os.environ['TF_DETERMINISTIC_OPS'] = '1'

@@ -54,6 +54,6 @@ def create_three_files(path, method, nb_bins, paa_window_size, std_coefficient, 
             df_gkb = df_gkb.append(new_row, ignore_index=True)
 
     # Save all data frames to csv
-    df_ta.to_csv(path + '\\ta.csv', index=False)
-    df_pp.to_csv(path + '\\pp.csv', index=False)
-    df_gkb.to_csv(path + '\\gkb.csv', index=False)
+    df_ta.to_csv(path + '//ta.csv', index=False)
+    df_pp.to_csv(path + '//pp.csv', index=False)
+    df_gkb.to_csv(path + '//gkb.csv', index=False)
