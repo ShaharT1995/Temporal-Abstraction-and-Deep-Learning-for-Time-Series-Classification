@@ -9,12 +9,12 @@ class ConfigClass:
         #                "td4c-entropy-ig",
         #                "td4c-cosine", "td4c-diffsum", "td4c-diffmax"]
 
-        self.method = ["equal-frequency", "equal-width"]
+        self.method = ["td4c-cosine"]
 
         self.nb_bin = [5]
         self.std_coefficient = [-1]
 
-        self.paa_window_size = [1]
+        self.paa_window_size = [5]
 
         self.gradient_window_size = [2]
 
