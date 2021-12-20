@@ -1,0 +1,13 @@
+Dataset,Length
+JapaneseVowels,29
+Libras,45
+ArabicDigits,93
+AUSLAN,136
+ECG,152
+Wafer,198
+CharacterTrajectories,205
+UWave,315
+CMUsubject16,580
+KickvsPunch,841
+NetFlow,997
+WalkvsRun,1918
