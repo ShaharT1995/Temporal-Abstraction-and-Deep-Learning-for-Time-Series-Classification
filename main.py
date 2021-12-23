@@ -23,7 +23,8 @@ os.environ['TF_DETERMINISTIC_OPS'] = '1'
 np.random.seed(37)
 rn.seed(1254)
 
-def fit_classifier(iter):
+
+def fit_classifier(iter, datasets_dict, dataset_name, classifier_name, output_directory):
     x_train = datasets_dict[dataset_name][0]
     y_train = datasets_dict[dataset_name][1]
     x_test = datasets_dict[dataset_name][2]
@@ -84,14 +85,12 @@ def create_classifier(classifier_name, input_shape, nb_classes, output_directory
         return inception.Classifier_INCEPTION(output_directory, input_shape, nb_classes, verbose)
 
 
-############################################### main
-
 # change this directory for your machine
 config = ConfigClass()
 root_dir = config.get_path()
 
 
-if sys.argv[1] == 'run_all':
+def run_all():
     for classifier_name in CLASSIFIERS:
         print('\tclassifier_name', classifier_name)
 
@@ -100,7 +99,7 @@ if sys.argv[1] == 'run_all':
 
             # The third parameter is the number of the transformation we want, the fourth parameter is to read the data
             # after TA (TRUE) or not (FALSE)
-            datasets_dict = read_all_datasets(root_dir, archive_name, "1", True)
+            datasets_dict = read_all_datasets(root_dir, archive_name, "1", False)
 
             for iter in range(ITERATIONS):
                 print('\t\t\titer', iter)
@@ -115,56 +114,57 @@ if sys.argv[1] == 'run_all':
                     print('\t\t\t\tdataset_name: ', dataset_name)
 
                     output_directory = tmp_output_directory + dataset_name + '/'
-                    # if os.path.exists(output_directory + "/DONE"):
-                        # print("\t\t\t\tAlready Done")
-                        # continue
-
                     create_directory(output_directory)
 
-                    fit_classifier(iter)
+                    fit_classifier(iter, datasets_dict, dataset_name, classifier_name, output_directory)
 
                     print('\t\t\t\t\tDONE')
 
                     # the creation of this directory means
                     create_directory(output_directory + '/DONE')
 
-elif sys.argv[1] == 'transform_mts_to_ucr_format':
-    transform_mts_to_ucr_format()
-elif sys.argv[1] == 'visualize_filter':
-    visualize_filter(root_dir)
-elif sys.argv[1] == 'viz_for_survey_paper':
-    viz_for_survey_paper(root_dir)
-elif sys.argv[1] == 'viz_cam':
-    viz_cam(root_dir)
-elif sys.argv[1] == 'generate_results_csv':
-    res = generate_results_csv('results.csv', root_dir)
-    print(res.to_string())
-else:
-    # this is the code used to launch an experiment on a dataset
-    archive_name = sys.argv[1]
-    dataset_name = sys.argv[2]
-    classifier_name = sys.argv[3]
-    itr = sys.argv[4]
 
-    if itr == '_itr_0':
-        itr = ''
+if __name__ == '__main__':
+    if sys.argv[1] == 'run_all':
+        run_all()
 
-    output_directory = root_dir + '/results/' + classifier_name + '/' + archive_name + itr + '/' + dataset_name + '/'
-
-    test_dir_df_metrics = output_directory + 'df_metrics.csv'
-
-    print('Method: ', archive_name, dataset_name, classifier_name, itr)
-
-    if os.path.exists(test_dir_df_metrics):
-        print('Already done')
+    elif sys.argv[1] == 'transform_mts_to_ucr_format':
+        transform_mts_to_ucr_format()
+    elif sys.argv[1] == 'visualize_filter':
+        visualize_filter(root_dir)
+    elif sys.argv[1] == 'viz_for_survey_paper':
+        viz_for_survey_paper(root_dir)
+    elif sys.argv[1] == 'viz_cam':
+        viz_cam(root_dir)
+    elif sys.argv[1] == 'generate_results_csv':
+        res = generate_results_csv('results.csv', root_dir)
+        print(res.to_string())
     else:
+        # this is the code used to launch an experiment on a dataset
+        archive_name = sys.argv[1]
+        dataset_name = sys.argv[2]
+        classifier_name = sys.argv[3]
+        itr = sys.argv[4]
 
-        create_directory(output_directory)
-        datasets_dict = read_dataset(root_dir, archive_name, dataset_name)
+        if itr == '_itr_0':
+            itr = ''
 
-        fit_classifier()
+        output_directory = root_dir + '/results/' + classifier_name + '/' + archive_name + itr + '/' + dataset_name + '/'
 
-        print('DONE')
+        test_dir_df_metrics = output_directory + 'df_metrics.csv'
 
-        # the creation of this directory means
-        create_directory(output_directory + '/DONE')
+        print('Method: ', archive_name, dataset_name, classifier_name, itr)
+
+        if os.path.exists(test_dir_df_metrics):
+            print('Already done')
+        else:
+
+            create_directory(output_directory)
+            datasets_dict = read_dataset(root_dir, archive_name, dataset_name)
+
+            fit_classifier()
+
+            print('DONE')
+
+            # the creation of this directory means
+            create_directory(output_directory + '/DONE')

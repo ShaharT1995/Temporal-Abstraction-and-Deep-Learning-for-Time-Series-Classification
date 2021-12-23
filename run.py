@@ -1,23 +1,22 @@
 import os
 import pickle
 import sys
-print(sys.path)
+import main
+
 sys.path.insert(0, '/home/shaharap/SyncProject/')
 
 from utils_folder.configuration import ConfigClass
-from multivariate_ta_1 import MultivariateTA1
-from univariate_ta_1 import UnivariateTA1
-from set_parameters import create_three_files
-from multivariate_ta_2 import new_mts_files
-from univariate_ta_2 import new_uts_files
+from temporal_abstraction_f.multivariate_ta_1 import MultivariateTA1
+from temporal_abstraction_f.univariate_ta_1 import UnivariateTA1
+from temporal_abstraction_f.set_parameters import create_three_files
+from temporal_abstraction_f.multivariate_ta_2 import new_mts_files
+from temporal_abstraction_f.univariate_ta_2 import new_uts_files
 
 from utils_folder.utils import write_pickle
 
 sys.path.insert(0, '/home/shaharap/SyncProject/Hugobot')
-# sys.path.insert(0, '../Hugobot')
-print(sys.path)
 
-from cli import run_cli
+from Hugobot.cli import run_cli
 
 from utils_folder.utils import generate_results_csv
 from utils_folder.constants import MTS_DATASET_NAMES
@@ -26,6 +25,7 @@ from utils_folder.constants import ARCHIVE_NAMES as ARCHIVE_NAMES
 from utils_folder.utils import open_pickle
 
 from utils_folder.utils import compare_results
+
 
 def run():
     config = ConfigClass()
@@ -82,28 +82,22 @@ def run():
                         new_uts_files(config.get_ucr_path())
 
                         print("Run all:")
-                        # sys.path.insert(0, '/home/shaharap/GitProject/TSC-Project/main.py')
-                        # import main
-                        # main.run_all()
-                        cmd = "sbatch run_python_code"
-                        os.system(cmd)
-
-                        # os.system('python ' + '/' + config.get_path() + '/GitProject/TSC-Project/main.py run_all')
+                        main.run_all()
                         print("")
 
                         print("Generate Results to CSV")
                         file_name = "res_" + str(method) + "_" + str(nb_bin) + "_" + str(paa) + "_" + str(std)\
                                     + "_" + str(max_gap) + ".csv"
 
-                        generate_results_csv(file_name, config.get_path())
+                        generate_results_csv(file_name, config.get_path(), True)
 
     print("Compare the results between running on the raw data and the data after the TA")
     for archive_name in ARCHIVE_NAMES:
-        path_raw_data_file = config.get_path() + "GitProject//results//" + archive_name + "//raw_data_results.csv"
-        path_ta_dir = config.get_path() + "GitProject//results//" + archive_name + "//results_after_ta//"
+        path_raw_data_file = config.get_path() + "SyncProject//results//" + archive_name + "//raw_data_results.csv"
+        path_ta_dir = config.get_path() + "SyncProject//results//" + archive_name + "//results_after_ta"
 
         compare_results(path_raw_data_file, path_ta_dir)
     print("Done comparing")
 
-run()
 
+run()

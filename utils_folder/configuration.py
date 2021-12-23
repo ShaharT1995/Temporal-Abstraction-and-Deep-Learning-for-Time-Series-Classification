@@ -9,19 +9,25 @@ class ConfigClass:
         #                "td4c-entropy-ig",
         #                "td4c-cosine", "td4c-diffsum", "td4c-diffmax"]
 
-        self.method = ["td4c-cosine"]
+        # self.method = ["td4c-cosine"]
+        #
+        # self.nb_bin = [5]
+        # self.std_coefficient = [-1]
+        #
+        # self.paa_window_size = [1]
+        #
+        # self.gradient_window_size = [2]
+        #
+        # # interpolation_gap
+        # self.max_gap = [5]
 
-        self.nb_bin = [5]
+        self.method = ["equal-frequency"]
+        self.nb_bin = [3]
+        self.paa_window_size = [1]
         self.std_coefficient = [-1]
+        self.max_gap = [1]
 
-        self.paa_window_size = [5]
-
-        self.gradient_window_size = [2]
-
-        # interpolation_gap
-        self.max_gap = [5]
-
-        # self.nb_bin = [5, 2, 3, 10]
+        # self.nb_bin = [2, 3, 5, 10, 25]
         # self.std_coefficient = [-1]
         #
         # self.paa_window_size = {1: [1, 2],
@@ -39,7 +45,7 @@ class ConfigClass:
         #                              6: [-1, 2, 5, 10, 20, 50, 100]}
         #
         # # interpolation_gap
-        # self.max_gap = {1: [-1, 2],
+        # self.max_gap = {1: [-1, 1, 2],
         #                 2: [-1, 2, 5],
         #                 3: [-1, 2, 5, 10],
         #                 4: [-1, 2, 5, 10, 20],

@@ -130,7 +130,7 @@ class Classifier_MCDCNN:
 
         # init = tf.keras.initializers.GlorotNormal(seed=123)
         # kernel_initializer = init
-        fully_connected = keras.layers.Dense(units=732,activation='relu')(concat_layer)
+        fully_connected = keras.layers.Dense(units=732,activation='tanh')(concat_layer)
 
         output_layer = keras.layers.Dense(nb_classes, activation='softmax')(fully_connected)
 
@@ -175,7 +175,7 @@ class Classifier_MCDCNN:
 
         start_time = time.time()
 
-        hist = self.model.fit(x_train, y_train,batch_size=mini_batch_size, epochs=nb_epochs,
+        hist = self.model.fit(x_train, y_train, batch_size=mini_batch_size, epochs=nb_epochs,
                               verbose=self.verbose, validation_data=(x_val, y_val), callbacks=self.callbacks)
 
         duration = time.time() - start_time

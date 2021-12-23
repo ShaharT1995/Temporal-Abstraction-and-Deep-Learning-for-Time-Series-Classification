@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/../Hugobot/.idea/Hugobot_v1.1.0.iml" filepath="$PROJECT_DIR$/../Hugobot/.idea/Hugobot_v1.1.0.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/dl-4-tsc.iml" filepath="$PROJECT_DIR$/.idea/dl-4-tsc.iml" />
     </modules>
   </component>

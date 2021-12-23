@@ -5,10 +5,10 @@ import numpy as np
 import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
-
+import sys
 import os
 import operator
-
+# sys.path.insert(0,'/home/shaharap/GitProject/TSC-Project' )
 from utils_folder.constants import UNIVARIATE_DATASET_NAMES as DATASET_NAMES
 from utils_folder.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018
 from utils_folder.constants import ARCHIVE_NAMES as ARCHIVE_NAMES
@@ -39,13 +39,13 @@ rn.seed(1254)
 
 
 def open_pickle(name):
-    file = open("pickle_files//" + name + ".pkl", "rb")
+    file = open("/home/shaharap/SyncProject/temporal_abstraction_f/pickle_files//" + name + ".pkl", "rb")
     data = pickle.load(file)
     return data
 
 
 def write_pickle(name, data):
-    file = open("pickle_files//" + name + ".pkl", "wb")
+    file = open("/home/shaharap/SyncProject/temporal_abstraction_f/pickle_files//" + name + ".pkl", "wb")
     pickle.dump(data, file)
     file.close()
 
@@ -366,14 +366,15 @@ def generate_results_csv(output_file_name, root_dir, after_ta=False):
                     df_metrics['iteration'] = it
                     res = pd.concat((res, df_metrics), axis=0, sort=False)
 
-    path = root_dir + "\\results"
+    # todo
+    path = root_dir + "SyncProject//results//"
     if after_ta:
-        path += "_after_ta"
+        path += archive_name + "//results_after_ta//"
 
     if not os.path.exists(path):
         os.makedirs(path)
 
-    res.to_csv(path + "\\" + output_file_name, index=False)
+    res.to_csv(path + "//" + output_file_name, index=False)
     # aggreagte the accuracy for iterations on same dataset
     res = pd.DataFrame({
         'accuracy': res.groupby(
@@ -399,7 +400,7 @@ def compare_results(path_raw_data_file, path_ta_dir):
 
                 arguments = re.split('[_.]', file)
 
-                res_ta_data = pd.read_csv(root + "\\" + file, sep=',', header=0, encoding="utf-8")
+                res_ta_data = pd.read_csv(root + "//" + file, sep=',', header=0, encoding="utf-8")
 
                 classifiers = pd.unique(res_ta_data["classifier_name"])
                 archives = pd.unique(res_ta_data["archive_name"])
@@ -432,10 +433,10 @@ def compare_results(path_raw_data_file, path_ta_dir):
                         else:
                             print("The two files contains different number of datasets")
 
-    if os.path.exists('../../results.csv'):
-        df.to_csv('../../results.csv', index=False, mode='a', header=0)
+    if os.path.exists('results.csv'):
+        df.to_csv('results.csv', index=False, mode='a', header=0)
     else:
-        df.to_csv('../../results.csv', index=False)
+        df.to_csv('results.csv', index=False)
 
 
 def plot_epochs_metric(hist, file_name, metric='loss'):

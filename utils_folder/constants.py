@@ -48,8 +48,9 @@ UNIVARIATE_DATASET_NAMES = ['50words', 'Adiac', 'ArrowHead', 'Beef', 'BeetleFly'
 #                                  'UWaveGestureLibraryX', 'UWaveGestureLibraryY', 'UWaveGestureLibraryZ',
 #                                  'Wafer', 'Wine', 'WordSynonyms', 'Worms', 'WormsTwoClass', 'Yoga']
 
-UNIVARIATE_DATASET_NAMES_2018 = ['ArrowHead', 'Beef', 'BeetleFly']
-MTS_DATASET_NAMES = []
+# UNIVARIATE_DATASET_NAMES_2018 = ['ArrowHead', 'Beef', 'BeetleFly']
+UNIVARIATE_DATASET_NAMES_2018 = []
+MTS_DATASET_NAMES = ['Libras']
 
 # MTS_DATASET_NAMES = ['ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
 #                      'JapaneseVowels', 'KickvsPunch', 'Libras', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
@@ -59,12 +60,12 @@ ITERATIONS = 5  # nb of random runs for random initializations
 # ARCHIVE_NAMES = ['mts_archive']
 # dataset_names_for_archive = {'mts_archive': MTS_DATASET_NAMES}
 
-ARCHIVE_NAMES = ['UCRArchive_2018']
-dataset_names_for_archive = {'UCRArchive_2018': UNIVARIATE_DATASET_NAMES_2018}
+ARCHIVE_NAMES = ['UCRArchive_2018', 'mts_archive']
+dataset_names_for_archive = {'UCRArchive_2018': UNIVARIATE_DATASET_NAMES_2018, 'mts_archive': MTS_DATASET_NAMES}
 
 # CLASSIFIERS = ['mcdcnn', 'fcn', 'mlp', 'resnet', 'tlenet', 'mcnn', 'twiesn', 'encoder', 'cnn', 'inception']
 
-CLASSIFIERS = ['mcdcnn', ',lp']
+CLASSIFIERS = ['mcdcnn']
 
 dataset_types = {'ElectricDevices': 'DEVICE', 'FordB': 'SENSOR',
                  'FordA': 'SENSOR', 'NonInvasiveFatalECG_Thorax2': 'ECG',

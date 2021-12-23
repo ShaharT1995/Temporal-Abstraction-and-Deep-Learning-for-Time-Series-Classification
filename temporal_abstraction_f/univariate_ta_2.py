@@ -88,7 +88,7 @@ def transformation_2(path, file_type, number_of_rows, number_of_columns, classes
     :param classes: the classes in the database
     :return: the function do the transformation and save the data after it
     """
-    states_path = path + "//output//" + file_type.lower() + "//states.csv"
+    states_path = path + "//output//train//states.csv"
 
     # Get the number of state from state.csv file
     states_df = pd.read_csv(states_path, header=0)
@@ -149,7 +149,7 @@ def transformation_3(path, file_type, number_of_rows, number_of_columns, classes
     :param classes: the classes in the database
     :return: the function do the transformation and save the data after it
     """
-    states_path = path + "//output//" + file_type.lower() + "//states.csv"
+    states_path = path + "//output//train//states.csv"
 
     # Get the number of state from state.csv file
     states_df = pd.read_csv(states_path, header=0)
@@ -196,7 +196,7 @@ def transformation_3(path, file_type, number_of_rows, number_of_columns, classes
                     dict_value_2 = rows_dict[(int(entity_id), int(parse_data[2]), '-')]
 
                     arr[dict_value_1, int(parse_data[0])] = True
-                    arr[dict_value_2, int(parse_data[0])] = True
+                    arr[dict_value_2, int(parse_data[1]) - 1] = True
 
                     # Add the classifier column
                     arr[dict_value_1, 0] = int(class_id)

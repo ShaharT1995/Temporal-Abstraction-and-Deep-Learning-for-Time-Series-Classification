@@ -2,7 +2,6 @@ import os
 
 import click
 import sys
-
 import pandas as pd
 
 from user_interface.results_union import results_union
@@ -10,6 +9,7 @@ from user_interface.temporal_abstraction import temporal_abstraction
 
 TEMPORAL_ABSTRACTION_PROJECT_PATH = "/"
 sys.path.append(TEMPORAL_ABSTRACTION_PROJECT_PATH)
+
 
 @click.group()
 def cli():
