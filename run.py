@@ -11,7 +11,7 @@ from temporal_abstraction_f.set_parameters import create_three_files
 from temporal_abstraction_f.multivariate_ta_2 import new_mts_files
 from temporal_abstraction_f.univariate_ta_2 import new_uts_files
 
-from utils_folder.utils import write_pickle, results_table_by_dataset_lengths, create_df_for_rank_graph, create_graphs
+from utils_folder.utils import write_pickle
 
 # todo
 sys.path.insert(0, '/sise/robertmo-group/TA-DL-TSC/SyncProject/Hugobot')
@@ -43,6 +43,7 @@ def run():
 
     write_pickle("next_property_index", {"ID": next_attribute})
     print()
+
     # Make the 3 files - gkb.csv, ta.csv and ppa.csv
     print("Step 2: make the gkb.csv, ta.csv and ppa.csv")
     print()
@@ -110,13 +111,14 @@ def execute_running(config, max_gap, method, nb_bin, paa, std, gradient_window=N
         generate_results_csv(file_name, config.get_path(), classifier, True)
 
 
-#run()
-file_path = "/home/shaharap/results-ucr-mts.csv"
-file_path1 = "/home/shaharap/test.csv"
+run()
+
+# file_path = "/home/shaharap/results-ucr-mts.csv"
+# file_path1 = "/home/shaharap/test.csv"
 
 # # results_table_by_dataset_lengths("/home/shaharap/", file_path, file_path)
 #
 # create_df_for_rank_graph(file_path)
 # print("SHAHAR")
-config = ConfigClass()
-create_graphs(config.get_path(), file_path, file_path1)
+# config = ConfigClass()
+# create_graphs(config.get_path(), file_path, file_path1)

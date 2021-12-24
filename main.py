@@ -1,5 +1,5 @@
 import sys
-from utils_folder.utils import generate_results_csv, create_results_table
+from utils_folder.utils import generate_results_csv
 from utils_folder.utils import create_directory
 from utils_folder.utils import read_dataset
 from utils_folder.utils import transform_mts_to_ucr_format
@@ -56,30 +56,39 @@ def create_classifier(classifier_name, input_shape, nb_classes, output_directory
     if classifier_name == 'fcn':
         from classifiers import fcn
         return fcn.Classifier_FCN(output_directory, input_shape, nb_classes, verbose)
+
     if classifier_name == 'mlp':
         from classifiers import mlp
         return mlp.Classifier_MLP(output_directory, input_shape, nb_classes, verbose)
+
     if classifier_name == 'resnet':
         from classifiers import resnet
         return resnet.Classifier_RESNET(output_directory, input_shape, nb_classes, verbose)
+
     if classifier_name == 'mcnn':
         from classifiers import mcnn
         return mcnn.Classifier_MCNN(output_directory, verbose)
+
     if classifier_name == 'tlenet':
         from classifiers import tlenet
         return tlenet.Classifier_TLENET(output_directory, verbose)
+
     if classifier_name == 'twiesn':
         from classifiers import twiesn
         return twiesn.Classifier_TWIESN(output_directory, verbose)
+
     if classifier_name == 'encoder':
         from classifiers import encoder
         return encoder.Classifier_ENCODER(output_directory, input_shape, nb_classes, verbose)
+
     if classifier_name == 'mcdcnn':
         from classifiers import mcdcnn
         return mcdcnn.Classifier_MCDCNN(output_directory, input_shape, nb_classes, verbose)
+
     if classifier_name == 'cnn':  # Time-CNN
         from classifiers import cnn
         return cnn.Classifier_CNN(output_directory, input_shape, nb_classes, verbose)
+
     if classifier_name == 'inception':
         from classifiers import inception
         return inception.Classifier_INCEPTION(output_directory, input_shape, nb_classes, verbose)
@@ -99,7 +108,7 @@ def run_all():
 
             # The third parameter is the number of the transformation we want, the fourth parameter is to read the data
             # after TA (TRUE) or not (FALSE)
-            datasets_dict = read_all_datasets(root_dir, archive_name, "1", False)
+            datasets_dict = read_all_datasets(root_dir, archive_name, "1", True)
 
             for iter in range(ITERATIONS):
                 print('\t\t\titer', iter)
@@ -115,10 +124,9 @@ def run_all():
 
                     output_directory = tmp_output_directory + dataset_name + '/'
 
-                    # todo
-                    if os.path.exists(output_directory + "/DONE"):
-                        print("Already Done")
-                        continue
+                    # if os.path.exists(output_directory + "/DONE"):
+                    #     print("Already Done")
+                    #     continue
 
                     create_directory(output_directory)
 
@@ -136,16 +144,21 @@ if __name__ == '__main__':
 
     elif sys.argv[1] == 'transform_mts_to_ucr_format':
         transform_mts_to_ucr_format()
+
     elif sys.argv[1] == 'visualize_filter':
         visualize_filter(root_dir)
+
     elif sys.argv[1] == 'viz_for_survey_paper':
         viz_for_survey_paper(root_dir)
+
     elif sys.argv[1] == 'viz_cam':
         viz_cam(root_dir)
+
     elif sys.argv[1] == 'generate_results_csv':
         for classifier in CLASSIFIERS:
             res = generate_results_csv('results.csv', config.get_path(), classifier)
             print(res.to_string())
+
     else:
         # this is the code used to launch an experiment on a dataset
         archive_name = sys.argv[1]
