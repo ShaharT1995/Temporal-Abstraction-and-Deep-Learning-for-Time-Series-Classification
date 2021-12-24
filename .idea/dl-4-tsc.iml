@@ -6,8 +6,9 @@
       <sourceFolder url="file://$MODULE_DIR$/Hugobot" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Hugobot/temporal_abstraction" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Hugobot/temporal_abstraction/discretization" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/cd-diagram-master" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="Remote Python 3.8.2 (sftp://shaharap@132.72.46.8:22/home/shaharap/.conda/envs/new_env/bin/python)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.7" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

@@ -2,29 +2,52 @@
 # when tuning start with learning rate->mini_batch_size -> 
 # momentum-> #hidden_units -> # learning_rate_decay -> #layers 
 import tensorflow.keras as keras
-import tensorflow as tf
 import numpy as np
 import time
 
 import matplotlib
+from sklearn.model_selection import train_test_split
 from utils_folder.utils import save_test_duration
 
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
+from tensorflow.python.keras import backend as K
 from utils_folder.utils import save_logs
 from utils_folder.utils import calculate_metrics
+import os
+import tensorflow as tf
+import random as rn
+
+os.environ['PYTHONHASHSEED'] = '0'
+os.environ['TF_DETERMINISTIC_OPS'] = '1'
+
+# os.environ['CUDA_VISIBLE_DEVICES'] = ''
+
+# Setting the seed for numpy-generated random numbers
+np.random.seed(37)
+
+# Setting the seed for python random numbers
+rn.seed(1254)
+
+# Setting the graph-level random seed.
+tf.random.set_seed(89)
+
+session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
+sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
+K.set_session(sess)
 
 
 class Classifier_RESNET:
+
     def __init__(self, output_directory, input_shape, nb_classes, verbose=False, build=True, load_weights=False):
         self.output_directory = output_directory
-        if build:
+        if build == True:
             self.model = self.build_model(input_shape, nb_classes)
-            if verbose:
+            if (verbose == True):
                 self.model.summary()
             self.verbose = verbose
-            if load_weights:
+            if load_weights == True:
                 self.model.load_weights(self.output_directory
                                         .replace('resnet_augment', 'resnet')
                                         .replace('TSC_itr_augment_x_10', 'TSC_itr_10')
@@ -119,7 +142,7 @@ class Classifier_RESNET:
 
         return model
 
-    def fit(self, x_train, y_train, x_val, y_val, y_true):
+    def fit(self, x_train, y_train, x_test, y_val, y_true, iteration):
         if not tf.test.is_gpu_available:
             print('error')
             exit()
@@ -131,6 +154,10 @@ class Classifier_RESNET:
 
         start_time = time.time()
 
+        # Added lines because model's fit on the testing set - bug in the original code
+        x_train, x_val, y_train, y_val = \
+            train_test_split(x_train, y_train, test_size=0.3, random_state=(42 + iteration))
+
         hist = self.model.fit(x_train, y_train, batch_size=mini_batch_size, epochs=nb_epochs,
                               verbose=self.verbose, validation_data=(x_val, y_val), callbacks=self.callbacks)
 
@@ -138,7 +165,7 @@ class Classifier_RESNET:
 
         self.model.save(self.output_directory + 'last_model.hdf5')
 
-        y_pred = self.predict(x_val, y_true, x_train, y_train, y_val,
+        y_pred = self.predict(x_test, y_true, x_train, y_train, y_val,
                               return_df_metrics=False)
 
         # save predictions

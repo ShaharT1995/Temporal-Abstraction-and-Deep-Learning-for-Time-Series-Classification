@@ -108,12 +108,18 @@ def run_all():
                 if iter != 0:
                     trr = 'itr' + str(iter)
 
-                tmp_output_directory = root_dir + '/results/' + classifier_name + '/' + archive_name + trr + '/'
+                tmp_output_directory = root_dir + archive_name + '/results/' + classifier_name + '/' + archive_name + trr + '/'
 
                 for dataset_name in utils_folder.constants.dataset_names_for_archive[archive_name]:
                     print('\t\t\t\tdataset_name: ', dataset_name)
 
                     output_directory = tmp_output_directory + dataset_name + '/'
+
+                    # todo
+                    if os.path.exists(output_directory + "/DONE"):
+                        print("Already Done")
+                        continue
+
                     create_directory(output_directory)
 
                     fit_classifier(iter, datasets_dict, dataset_name, classifier_name, output_directory)
@@ -137,8 +143,9 @@ if __name__ == '__main__':
     elif sys.argv[1] == 'viz_cam':
         viz_cam(root_dir)
     elif sys.argv[1] == 'generate_results_csv':
-        res = generate_results_csv('results.csv', root_dir)
-        print(res.to_string())
+        for classifier in CLASSIFIERS:
+            res = generate_results_csv('results.csv', config.get_path(), classifier)
+            print(res.to_string())
     else:
         # this is the code used to launch an experiment on a dataset
         archive_name = sys.argv[1]

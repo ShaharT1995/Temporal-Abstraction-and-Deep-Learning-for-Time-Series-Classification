@@ -6,6 +6,8 @@ import tensorflow as tf
 import numpy as np
 import time
 
+from sklearn.model_selection import train_test_split
+
 from utils_folder.utils import save_logs
 from utils_folder.utils import calculate_metrics
 
@@ -79,7 +81,7 @@ class Classifier_FCN:
 
         return model
 
-    def fit(self, x_train, y_train, x_val, y_val, y_true, iteration):
+    def fit(self, x_train, y_train, x_test, y_val, y_true, iteration):
         if not tf.test.is_gpu_available:
             print('error')
             exit()
@@ -91,6 +93,10 @@ class Classifier_FCN:
 
         start_time = time.time()
 
+        # Added lines because model's fit on the testing set - bug in the original code
+        x_train, x_val, y_train, y_val = \
+            train_test_split(x_train, y_train, test_size=0.3, random_state=(42 + iteration))
+
         hist = self.model.fit(x_train, y_train, batch_size=mini_batch_size, epochs=nb_epochs,
                               verbose=self.verbose, validation_data=(x_val, y_val), callbacks=self.callbacks)
 
@@ -100,7 +106,7 @@ class Classifier_FCN:
 
         model = keras.models.load_model(self.output_directory + 'best_model.hdf5')
 
-        y_pred = model.predict(x_val)
+        y_pred = model.predict(x_test)
 
         # convert the predicted from binary to integer 
         y_pred = np.argmax(y_pred, axis=1)

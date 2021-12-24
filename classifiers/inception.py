@@ -5,6 +5,8 @@ import tensorflow as tf
 import numpy as np
 import time
 import random as rn
+
+from sklearn.model_selection import train_test_split
 from tensorflow.python.keras import backend as K
 
 from utils_folder.utils import save_logs
@@ -128,7 +130,7 @@ class Classifier_INCEPTION:
 
         return model
 
-    def fit(self, x_train, y_train, x_val, y_val, y_true, iteration):
+    def fit(self, x_train, y_train, x_test, y_val, y_true, iteration):
         if not tf.test.is_gpu_available:
             print('error no gpu')
             exit()
@@ -141,6 +143,10 @@ class Classifier_INCEPTION:
 
         start_time = time.time()
 
+        # Added lines because model's fit on the testing set - bug in the original code
+        x_train, x_val, y_train, y_val = \
+            train_test_split(x_train, y_train, test_size=0.3, random_state=(42 + iteration))
+
         hist = self.model.fit(x_train, y_train, batch_size=mini_batch_size, epochs=self.nb_epochs,
                               verbose=self.verbose, validation_data=(x_val, y_val), callbacks=self.callbacks)
 
@@ -148,7 +154,7 @@ class Classifier_INCEPTION:
 
         self.model.save(self.output_directory + 'last_model.hdf5')
 
-        y_pred = self.predict(x_val, y_true, x_train, y_train, y_val,
+        y_pred = self.predict(x_test, y_true, x_train, y_train, y_val,
                               return_df_metrics=False)
 
         # save predictions

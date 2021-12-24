@@ -69,10 +69,10 @@ class Classifier_MCNN:
         np.random.shuffle(ind)  # shuffle the train set
 
         # split train set into train set and validation set
-        valid_x = train_x[ind[0:int(0.2 * n)]]
-        valid_y = train_y[ind[0:int(0.2 * n)]]
+        valid_x = train_x[ind[0:int(0.3 * n)]]
+        valid_y = train_y[ind[0:int(0.3 * n)]]
 
-        ind = np.delete(ind, (range(0, int(0.2 * n))))
+        ind = np.delete(ind, (range(0, int(0.3 * n))))
 
         train_x = train_x[ind]
         train_y = train_y[ind]

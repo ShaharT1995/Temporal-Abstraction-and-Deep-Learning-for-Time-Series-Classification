@@ -204,7 +204,7 @@ class Classifier_TWIESN:
 
 		# split train to validation set to choose best hyper parameters 
 		self.x_train, self.x_val, self.y_train,self.y_val = \
-			train_test_split(x_train,y_train, test_size=0.2, random_state=(42 + iter))
+			train_test_split(x_train,y_train, test_size=0.3, random_state=(42 + iter))
 		self.N = self.x_train.shape[0]
 
 		# limit the hyperparameter search if dataset is too big 

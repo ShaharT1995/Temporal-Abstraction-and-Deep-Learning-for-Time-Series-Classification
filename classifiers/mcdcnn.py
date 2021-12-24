@@ -167,7 +167,7 @@ class Classifier_MCDCNN:
         nb_epochs = 120
 
         x_train, x_val, y_train, y_val = \
-            train_test_split(x, y, test_size=0.33, random_state=(42 + iteration))
+            train_test_split(x, y, test_size=0.3, random_state=(42 + iteration))
 
         x_test = self.prepare_input(x_test)
         x_train = self.prepare_input(x_train)

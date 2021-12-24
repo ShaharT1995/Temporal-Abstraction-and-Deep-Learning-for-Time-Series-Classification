@@ -1,22 +1,19 @@
 class ConfigClass:
     def __init__(self):
-        self.path = "/home/shaharap/"
+        self.path = "/sise/robertmo-group/TA-DL-TSC/"
         self.mts_path = self.path + "mtsdata//archives//mts_archive/"
         self.ucr_path = self.path + "UCRArchive_2018//archives//UCRArchive_2018/"
-        self.properties_path = self.path + "GitProject//TA//HugoBotFiles"
+        self.properties_path = self.path + "SyncProject//TA//"
 
         # self.method = ["gradient", "equal-frequency", "equal-width", "sax", "td4c-skl", "td4c-entropy",
-        #                "td4c-entropy-ig",
-        #                "td4c-cosine", "td4c-diffsum", "td4c-diffmax"]
-
-        # self.method = ["td4c-cosine"]
+        #                "td4c-entropy-ig", "td4c-cosine", "td4c-diffsum", "td4c-diffmax"]
         #
         # self.nb_bin = [5]
         # self.std_coefficient = [-1]
         #
         # self.paa_window_size = [1]
         #
-        # self.gradient_window_size = [2]
+        self.gradient_window_size = [2]
         #
         # # interpolation_gap
         # self.max_gap = [5]

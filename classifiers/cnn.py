@@ -6,17 +6,40 @@ import tensorflow as tf
 import numpy as np
 import time
 
+from sklearn.model_selection import train_test_split
+
 from utils_folder.utils import save_logs
 from utils_folder.utils import calculate_metrics
+from tensorflow.python.keras import backend as K
+import tensorflow as tf
+import random as rn
+import os
+os.environ['PYTHONHASHSEED'] = '0'
+os.environ['TF_DETERMINISTIC_OPS'] = '1'
+
+# os.environ['CUDA_VISIBLE_DEVICES'] = ''
+
+# Setting the seed for numpy-generated random numbers
+np.random.seed(37)
+
+# Setting the seed for python random numbers
+rn.seed(1254)
+
+# Setting the graph-level random seed.
+tf.random.set_seed(89)
+
+session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
+sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
+K.set_session(sess)
+
 
 class Classifier_CNN:
-
     def __init__(self, output_directory, input_shape, nb_classes, verbose=False,build=True):
         self.output_directory = output_directory
 
-        if build == True:
+        if build:
             self.model = self.build_model(input_shape, nb_classes)
-            if (verbose == True):
+            if verbose:
                 self.model.summary()
             self.verbose = verbose
             self.model.save_weights(self.output_directory + 'model_init.hdf5')
@@ -54,7 +77,7 @@ class Classifier_CNN:
 
         return model
 
-    def fit(self, x_train, y_train, x_val, y_val, y_true):
+    def fit(self, x_train, y_train, x_test, y_val, y_true,  iteration):
         if not tf.test.is_gpu_available:
             print('error')
             exit()
@@ -65,6 +88,10 @@ class Classifier_CNN:
 
         start_time = time.time()
 
+        # Added lines because model's fit on the testing set - bug in the original code
+        x_train, x_val, y_train, y_val = \
+            train_test_split(x_train, y_train, test_size=0.3, random_state=(42 + iteration))
+
         hist = self.model.fit(x_train, y_train, batch_size=mini_batch_size, epochs=nb_epochs,
                               verbose=self.verbose, validation_data=(x_val, y_val), callbacks=self.callbacks)
 
@@ -74,7 +101,7 @@ class Classifier_CNN:
 
         model = keras.models.load_model(self.output_directory + 'best_model.hdf5')
 
-        y_pred = model.predict(x_val)
+        y_pred = model.predict(x_test)
 
         # convert the predicted from binary to integer
         y_pred = np.argmax(y_pred, axis=1)

@@ -40,20 +40,20 @@ def create_three_files(path, method, nb_bins, paa_window_size, std_coefficient, 
                   "MaxGap": max_gap})
         df_pp = df_pp.append(new_row, ignore_index=True)
 
-        # GKB
-        # TODO - Need to create this file even if the method is not gradient??
-        bin_low = -90
+        if method == "gradient":
+            bin_low = -90
 
-        for bin_id in range(nb_bins):
-            new_row = pd.Series(data={"StateID": index, "TemporalPropertyID": property_id, "Method": "gradient",
-                                      "BinID": bin_id, "BinLow": bin_low, "BinHigh": bin_low + bin_degree,
-                                      "BinLowScore": ""})
-            bin_low += bin_degree
-            index += 1
+            for bin_id in range(nb_bins):
+                new_row = pd.Series(data={"StateID": index, "TemporalPropertyID": property_id, "Method": "gradient",
+                                          "BinID": bin_id, "BinLow": bin_low, "BinHigh": bin_low + bin_degree,
+                                          "BinLowScore": ""})
+                bin_low += bin_degree
+                index += 1
 
-            df_gkb = df_gkb.append(new_row, ignore_index=True)
+                df_gkb = df_gkb.append(new_row, ignore_index=True)
+
+            df_gkb.to_csv(path + '//gkb.csv', index=False)
 
     # Save all data frames to csv
     df_ta.to_csv(path + '//ta.csv', index=False)
     df_pp.to_csv(path + '//pp.csv', index=False)
-    df_gkb.to_csv(path + '//gkb.csv', index=False)

@@ -5,21 +5,25 @@ import numpy as np
 import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
-import sys
 import os
 import operator
-# sys.path.insert(0,'/home/shaharap/GitProject/TSC-Project' )
+import seaborn as sns
+
 from utils_folder.constants import UNIVARIATE_DATASET_NAMES as DATASET_NAMES
 from utils_folder.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018
 from utils_folder.constants import ARCHIVE_NAMES as ARCHIVE_NAMES
 from utils_folder.constants import CLASSIFIERS
 from utils_folder.constants import ITERATIONS
 from utils_folder.constants import MTS_DATASET_NAMES
+from utils_folder.configuration import ConfigClass
+from utils_folder.ranking_graph import draw_cd_diagram
+
 
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.preprocessing import LabelEncoder
+
 
 from scipy.interpolate import interp1d
 from scipy.io import loadmat
@@ -39,13 +43,15 @@ rn.seed(1254)
 
 
 def open_pickle(name):
-    file = open("/home/shaharap/SyncProject/temporal_abstraction_f/pickle_files//" + name + ".pkl", "rb")
+    config = ConfigClass()
+    file = open(config.get_path() + "/SyncProject/temporal_abstraction_f/pickle_files//" + name + ".pkl", "rb")
     data = pickle.load(file)
     return data
 
 
 def write_pickle(name, data):
-    file = open("/home/shaharap/SyncProject/temporal_abstraction_f/pickle_files//" + name + ".pkl", "wb")
+    config = ConfigClass()
+    file = open(config.get_path() + "/SyncProject/temporal_abstraction_f/pickle_files//" + name + ".pkl", "wb")
     pickle.dump(data, file)
     file.close()
 
@@ -254,8 +260,9 @@ def transform_to_same_length(x, n_var, max_length):
 
 
 def transform_mts_to_ucr_format():
-    mts_root_dir = "C:\\Users\\Shaha\\Desktop\\mtsdata\\archives\\mts_archive\\"
-    mts_out_dir = "C:\\Users\\Shaha\\Desktop\\mtsdata\\archives\\mts_archive\\"
+    config = ConfigClass()
+    mts_root_dir = config.get_mts_path()
+    mts_out_dir = config.get_mts_path()
 
     MTS_DICT = {}
     length_dict = {}
@@ -343,7 +350,7 @@ def save_test_duration(file_name, test_duration):
     res.to_csv(file_name, index=False)
 
 
-def generate_results_csv(output_file_name, root_dir, after_ta=False):
+def generate_results_csv(output_file_name, root_dir, classifier, after_ta=False):
     res = pd.DataFrame(data=np.zeros((0, 7), dtype=np.float), index=[],
                        columns=['classifier_name', 'archive_name', 'dataset_name',
                                 'precision', 'accuracy', 'recall', 'duration'])
@@ -355,7 +362,7 @@ def generate_results_csv(output_file_name, root_dir, after_ta=False):
                 if it != 0:
                     curr_archive_name = curr_archive_name + 'itr' + str(it)
                 for dataset_name in datasets_dict.keys():
-                    output_dir = root_dir + '/results/' + classifier_name + '/' \
+                    output_dir = root_dir + '/' + archive_name + '/results/' + classifier_name + '/' \
                                  + curr_archive_name + '/' + dataset_name + '/' + 'df_metrics.csv'
                     if not os.path.exists(output_dir):
                         continue
@@ -367,15 +374,16 @@ def generate_results_csv(output_file_name, root_dir, after_ta=False):
                     res = pd.concat((res, df_metrics), axis=0, sort=False)
 
     # todo
-    path = root_dir + "SyncProject//results//"
+    path = root_dir + "Results//"
     if after_ta:
-        path += archive_name + "//results_after_ta//"
+        path += "ResultsAfterTA"
 
-    if not os.path.exists(path):
-        os.makedirs(path)
+    if not os.path.exists(path + "//" + classifier + "//"):
+        os.makedirs(path + "//" + classifier + "//")
 
-    res.to_csv(path + "//" + output_file_name, index=False)
-    # aggreagte the accuracy for iterations on same dataset
+    res.to_csv(path + "//" + classifier + "//" + output_file_name, index=False)
+
+    # aggregate the accuracy for iterations on same dataset
     res = pd.DataFrame({
         'accuracy': res.groupby(
             ['classifier_name', 'archive_name', 'dataset_name'])['accuracy'].mean()
@@ -389,8 +397,8 @@ def compare_results(path_raw_data_file, path_ta_dir):
 
     df = pd.DataFrame(columns=["classifier_name", "archive_name", "precision improvement",
                                "accuracy improvement", "recall improvement", "equal precision",
-                               "equal accuracy", "equal recall",  "method", "nb bins", "paa", "std",
-                               "max gap"])
+                               "equal accuracy", "equal recall", "method", "nb bins", "paa", "std",
+                               "max gap", "gradient_window_size"])
     measures = {"precision": None, "accuracy": None, "recall": None}
     equals_measures = {"equal_precision": None, "equal_accuracy": None, "equal_recall": None}
 
@@ -427,7 +435,8 @@ def compare_results(path_raw_data_file, path_ta_dir):
                                                       "equal accuracy": equals_measures["equal_accuracy"],
                                                       "method": arguments[1], "nb bins": arguments[2],
                                                       "paa": arguments[3], "std": arguments[4],
-                                                      "max gap": arguments[5]})
+                                                      "max gap": arguments[5],
+                                                      "gradient_window_size": arguments[6]})
                             df = df.append(new_row, ignore_index=True)
 
                         else:
@@ -787,6 +796,11 @@ def merge_two_columns(x):
     return merged
 
 
+def merge_accuracy(x):
+    merged = str(round(x.accuracy, 2)) + " / " + str(round(x.accuracy_before, 2)) + " (" + str(round(
+        x.accuracy - x.accuracy_before, 2)) + ")"
+    return merged
+
 # todo
 def create_results_table():
     file_path = "C:\\Users\\Shaha\\Desktop\\results-mts.csv"
@@ -795,7 +809,6 @@ def create_results_table():
 
     res_df = df.groupby(["classifier_name", "archive_name", "dataset_name"], as_index=False).agg({"accuracy": [np.mean,
                                                                                                                np.std]})
-
     res_df["res"] = res_df.apply(merge_two_columns, axis=1)
 
     ucr_df = res_df.loc[res_df.archive_name == "UCRArchive_2018"]
@@ -806,3 +819,97 @@ def create_results_table():
 
     mts_df.to_csv("mts_results.csv", index=False)
     ucr_df.to_csv("ucr_results.csv", index=False)
+
+
+def results_table_by_dataset_lengths(root_dir, path_file_raw_data, path_file_data_ta):
+    res_df = set_df_for_graphs_and_tables(path_file_data_ta, path_file_raw_data)
+
+    res_df["res"] = res_df.apply(merge_accuracy, axis=1)
+
+    ucr_df = res_df.loc[res_df.archive_name == "UCRArchive_2018"]
+    mts_df = res_df.loc[res_df.archive_name == "mts_archive"]
+
+    mts_df = mts_df.pivot(index="groups_lengths", columns="classifier_name", values="res").reset_index()
+    ucr_df = ucr_df.pivot(index="groups_lengths", columns="classifier_name", values="res").reset_index()
+
+    mts_df.to_csv(root_dir + "/Results/mts_archive/results_by_ds_length.csv", index=False)
+    ucr_df.to_csv(root_dir + "/Results/UCRArchive_2018/results_by_ds_length.csv", index=False)
+
+
+def set_df_for_graphs_and_tables(path_file_data_ta, path_file_raw_data):
+    raw_data_df = pd.read_csv(path_file_raw_data, encoding="utf-8")
+    data_after_ta_df = pd.read_csv(path_file_data_ta, encoding="utf-8")
+
+    raw_data_df = raw_data_df.rename(columns={"accuracy": "accuracy_before"})
+
+    df = pd.merge(raw_data_df, data_after_ta_df, on=["dataset_name", "classifier_name", "archive_name", "iteration"])
+
+    ucr_length = open_pickle("uts_length")
+    mts_length = open_pickle("mts_length")
+    lengths = {**ucr_length, **mts_length}
+    length_df = pd.DataFrame(list(lengths.items()), columns=['dataset_name', 'lengths'])
+
+    merged = pd.merge(df, length_df, on="dataset_name")
+
+    merged.loc[merged.lengths < 81, 'groups_lengths'] = "< 81"
+    merged.loc[(merged.lengths >= 81) & (merged.lengths <= 250), 'groups_lengths'] = "81 - 250"
+    merged.loc[(merged.lengths >= 251) & (merged.lengths <= 450), 'groups_lengths'] = "251 - 450"
+    merged.loc[(merged.lengths >= 451) & (merged.lengths <= 700), 'groups_lengths'] = "451 - 700"
+    merged.loc[(merged.lengths >= 701) & (merged.lengths <= 1000), 'groups_lengths'] = "701 - 1000"
+    merged.loc[merged.lengths > 1000, 'groups_lengths'] = " > 1000"
+
+    res_df = merged.groupby(["classifier_name", "archive_name", "groups_lengths"], as_index=False).agg \
+        ({"accuracy": np.mean, "accuracy_before": np.mean})
+    return res_df
+
+
+def create_df_for_rank_graph(path):
+    df = pd.read_csv(path, encoding="utf-8")
+
+    res_df = df.groupby(["classifier_name", "archive_name", "dataset_name"], as_index=False).agg({"accuracy": np.mean})
+
+    ucr_df = res_df.loc[res_df.archive_name == "UCRArchive_2018"]
+    mts_df = res_df.loc[res_df.archive_name == "mts_archive"]
+
+    mts_df.drop("archive_name", axis=1, inplace=True)
+    ucr_df.drop("archive_name", axis=1, inplace=True)
+
+    draw_cd_diagram(df_perf=mts_df, title='Accuracy', labels=True)
+    draw_cd_diagram(df_perf=ucr_df, title='Accuracy', labels=True)
+
+
+def create_graphs(root_dir, path_before, path_after):
+    res_df = set_df_for_graphs_and_tables(path_before, path_after)
+
+    ucr_df = res_df.loc[res_df.archive_name == "UCRArchive_2018"].iloc[:: -1]
+    mts_df = res_df.loc[res_df.archive_name == "mts_archive"].iloc[:: -1]
+
+    for classifier in CLASSIFIERS:
+        ucr_classifier = ucr_df.loc[ucr_df.classifier_name == classifier]
+        mts_classifier = mts_df.loc[mts_df.classifier_name == classifier]
+
+        sns.set_theme(style="darkgrid")
+        colors = ["#FF0B04", "#4374B3"]
+        sns.set_palette(sns.color_palette(colors))
+
+        # sns.set_palette(sns.color_palette("viridis", as_cmap=True))
+
+        sns.lineplot(x="groups_lengths", y="accuracy", data=ucr_classifier)
+        fig = sns.lineplot(x="groups_lengths", y="accuracy_before", data=ucr_classifier)
+        fig.set(xlabel='Length', ylabel='Accuracy')
+        fig.legend(['Accuracy Before TA', 'Accuracy After TA'])
+
+        plt.savefig("Plots/UCR/" + classifier + ".png")
+        plt.clf()
+
+        sns.lineplot(x="groups_lengths", y="accuracy", data=mts_classifier)
+        fig = sns.lineplot(x="groups_lengths", y="accuracy_before", data=mts_classifier)
+        fig.set(xlabel='Length', ylabel='Accuracy')
+
+        plt.savefig("Plots/MTS/" + classifier + ".png")
+        plt.clf()
+        print()
+
+
+
+

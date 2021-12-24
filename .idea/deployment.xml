@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="shaharap@132.72.46.8:22" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="shaharap@132.72.65.18:22" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
       <paths name="shaharap@132.72.42.98:22">
         <serverdata>
@@ -19,7 +19,14 @@
       <paths name="shaharap@132.72.46.8:22">
         <serverdata>
           <mappings>
-            <mapping deploy="/home/shaharap/SyncProject" local="$PROJECT_DIR$" />
+            <mapping deploy="/sise/robertmo-group/TA-DL-TSC/SyncProject" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="shaharap@132.72.46.8:22 (2)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/sise/robertmo-group/TA-DL-TSC/SyncProject" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>
@@ -27,6 +34,13 @@
         <serverdata>
           <mappings>
             <mapping deploy="/tmp/pycharm_project_339" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="shaharap@132.72.65.18:22">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/sise/robertmo-group/TA-DL-TSC/SyncProject" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>

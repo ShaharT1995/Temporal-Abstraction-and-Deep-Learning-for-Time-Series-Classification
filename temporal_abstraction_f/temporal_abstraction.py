@@ -12,6 +12,7 @@ from multivariate_ta_2 import new_mts_files
 from univariate_ta_2 import new_uts_files
 
 from utils_folder.utils import write_pickle
+from utils_folder.utils import results_table_by_dataset_lengths
 
 sys.path.insert(0, '/home/shaharap/SyncProject/Hugobot')
 # sys.path.insert(0, '../Hugobot')
@@ -82,13 +83,13 @@ def run():
                         new_uts_files(config.get_ucr_path())
 
                         print("Run all:")
-                        # sys.path.insert(0, '/home/shaharap/GitProject/TSC-Project/main.py')
+                        # sys.path.insert(0, '/home/shaharap/GitProject/TSC-Project/ranking_graph.py')
                         # import main
                         # main.run_all()
                         cmd = "sbatch run_python_code"
                         os.system(cmd)
 
-                        # os.system('python ' + '/' + config.get_path() + '/GitProject/TSC-Project/main.py run_all')
+                        # os.system('python ' + '/' + config.get_path() + '/GitProject/TSC-Project/ranking_graph.py run_all')
                         print("")
 
                         print("Generate Results to CSV")
@@ -105,5 +106,8 @@ def run():
         compare_results(path_raw_data_file, path_ta_dir)
     print("Done comparing")
 
-run()
+# run()
+
+results_table_by_dataset_lengths()
+
 
