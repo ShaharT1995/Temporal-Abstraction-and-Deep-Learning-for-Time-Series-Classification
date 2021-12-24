@@ -7,40 +7,33 @@ class ConfigClass:
 
         # self.method = ["gradient", "equal-frequency", "equal-width", "sax", "td4c-skl", "td4c-entropy",
         #                "td4c-entropy-ig", "td4c-cosine", "td4c-diffsum", "td4c-diffmax"]
-        #
-        # self.nb_bin = [5]
-        # self.std_coefficient = [-1]
-        #
-        # self.paa_window_size = [1]
-        #
-        self.gradient_window_size = [2]
-        #
-        # # interpolation_gap
-        # self.max_gap = [5]
 
         self.method = ["equal-frequency"]
-        self.nb_bin = [3]
-        self.paa_window_size = [1]
+        self.nb_bin = [2, 3, 5, 10, 25]
         self.std_coefficient = [-1]
-        self.max_gap = [1]
+        self.max_gap = [-1, 1, 2]
+        self.paa_window_size = [1, 2, 5, 10, 20]
+        self.gradient_window_size = [1, 2, 5]
 
-        # self.nb_bin = [2, 3, 5, 10, 25]
-        # self.std_coefficient = [-1]
-        #
+        # self.paa_window_size = [1]
+        # self.max_gap = [5]
+        # self.paa_window_size = [1]
+        # self.max_gap = [1]
+
         # self.paa_window_size = {1: [1, 2],
         #                         2: [1, 2, 5],
         #                         3: [1, 2, 5, 10],
         #                         4: [1, 2, 5, 10, 20],
         #                         5: [1, 2, 5, 10, 20, 50],
         #                         6: [1, 2, 5, 10, 20, 50, 100]}
-        #
+
         # self.gradient_window_size = {1: [-1, 2],
         #                              2: [-1, 2, 5],
         #                              3: [-1, 2, 5, 10],
         #                              4: [-1, 2, 5, 10, 20],
         #                              5: [-1, 2, 5, 10, 20, 50],
         #                              6: [-1, 2, 5, 10, 20, 50, 100]}
-        #
+
         # # interpolation_gap
         # self.max_gap = {1: [-1, 1, 2],
         #                 2: [-1, 2, 5],
