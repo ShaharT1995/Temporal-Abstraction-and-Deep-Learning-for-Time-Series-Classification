@@ -98,6 +98,9 @@ def read_dataset(root_dir, archive_name, dataset_name):
         datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(),
                                        y_test.copy())
 
+    # todo
+    # elif archive_name == 'UCRArchive_2018_Hadas':
+    # elif archive_name == 'UCRArchive_2018_osher':
     elif archive_name == 'UCRArchive_2018':
         root_dir_dataset = cur_root_dir + '/archives/' + archive_name + '/' + dataset_name + '/'
         df_train = pd.read_csv(root_dir_dataset + '/' + dataset_name + '_TRAIN.tsv', sep='\t', header=None)
@@ -141,11 +144,15 @@ def read_all_datasets(root_dir, archive_name, transformation_name=-1, after_ta=F
     datasets_dict = {}
     cur_root_dir = root_dir.replace('-temp', '')
     dataset_names_to_sort = []
+    config = ConfigClass()
 
+    # todo
     if archive_name == 'mts_archive':
 
         for dataset_name in MTS_DATASET_NAMES:
-            root_dir_dataset = cur_root_dir + 'mtsdata/archives/' + archive_name + '/' + dataset_name + '/'
+            mts_path = config.get_mts_path()
+            # root_dir_dataset = cur_root_dir + 'mtsdata/archives/' + archive_name + '/' + dataset_name + '/'
+            root_dir_dataset = mts_path + '/' + dataset_name + '/'
 
             if after_ta:
                 x_train = np.load(root_dir_dataset + 'transformation2_type' + transformation_name + '_train.npy')
@@ -161,9 +168,13 @@ def read_all_datasets(root_dir, archive_name, transformation_name=-1, after_ta=F
 
             datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(),
                                            y_test.copy())
+    # todo
+    # elif archive_name == 'UCRArchive_2018_Hadas':
+    # elif archive_name == 'UCRArchive_2018_osher':
     elif archive_name == 'UCRArchive_2018':
         for dataset_name in DATASET_NAMES_2018:
-            root_dir_dataset = cur_root_dir + 'UCRArchive_2018/archives/' + archive_name + '/' + dataset_name + '/'
+            ucr_path = config.get_ucr_path()
+            root_dir_dataset = ucr_path + '/' + dataset_name + '/'
 
             df_train = pd.read_csv(root_dir_dataset + '/' + dataset_name + '_TRAIN.tsv', sep='\t', header=None)
 

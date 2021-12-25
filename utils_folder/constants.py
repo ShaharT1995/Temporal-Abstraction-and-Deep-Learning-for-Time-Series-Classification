@@ -4,9 +4,21 @@ UNIVARIATE_DATASET_NAMES_2018 = ['SmoothSubspace', 'Crop', 'Adiac', 'BME', 'Coff
 UNIVARIATE_DATASET_NAMES = ['SmoothSubspace', 'Crop', 'Adiac', 'BME', 'Coffee', 'Yoga', 'BeetleFly', 'Car',
                                  'Computers', 'Worms', 'PLAID', 'ACSF1']
 MTS_DATASET_NAMES = []
+ITERATIONS = 5
+
+# Shahar
 ARCHIVE_NAMES = ['UCRArchive_2018']
 dataset_names_for_archive = {'UCRArchive_2018': UNIVARIATE_DATASET_NAMES_2018}
-ITERATIONS = 5
+
+# Hadas
+# ARCHIVE_NAMES = ['UCRArchive_2018_Hadas']
+# dataset_names_for_archive = {'UCRArchive_2018_Hadas': UNIVARIATE_DATASET_NAMES_2018}
+
+# Osher
+# ARCHIVE_NAMES = ['UCRArchive_2018_osher']
+# dataset_names_for_archive = {'UCRArchive_2018_osher': UNIVARIATE_DATASET_NAMES_2018}
+
+########################################################################################################################
 
 # MTS
 # MTS_DATASET_NAMES = ['Libras', 'JapaneseVowels', 'ECG', 'Wafer', 'CMUsubject16', 'KickvsPunch', 'NetFlow', 'WalkvsRun']
