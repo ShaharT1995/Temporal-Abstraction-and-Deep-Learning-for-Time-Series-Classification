@@ -59,11 +59,10 @@ def run():
                             execute_running(config, max_gap, method, nb_bin, paa, std)
 
     print("Compare the results between running on the raw data and the data after the TA")
-    for archive_name in ARCHIVE_NAMES:
-        path_raw_data_file = config.get_path() + "Results//" + archive_name + "//raw_data_results.csv"
-        path_ta_dir = config.get_path() + "//Results//" + archive_name + "//ResultsAfterTA"
+    path_raw_data_file = config.get_path() + "Results//raw_data_results.csv"
+    path_ta_dir = config.get_path() + "//Results//ResultsAfterTA"
 
-        compare_results(path_raw_data_file, path_ta_dir)
+    compare_results(path_raw_data_file, path_ta_dir)
     print("Done comparing")
 
 

@@ -8,17 +8,16 @@ class ConfigClass:
         # self.method = ["gradient", "equal-frequency", "equal-width", "sax", "td4c-skl", "td4c-entropy",
         #                "td4c-entropy-ig", "td4c-cosine", "td4c-diffsum", "td4c-diffmax"]
 
-        self.method = ["equal-frequency"]
-        self.nb_bin = [2, 3, 5, 10, 25]
+        self.method = ["equal-width"]
+        self.nb_bin = [2, 5, 10, 20]
         self.std_coefficient = [-1]
         self.max_gap = [-1, 1, 2]
         self.paa_window_size = [1, 2, 5, 10, 20]
-        self.gradient_window_size = [1, 2, 5]
+        self.gradient_window_size = [1, 2, 5, 10, 20]
 
-        # self.paa_window_size = [1]
+        # self.nb_bin = [5]
         # self.max_gap = [5]
         # self.paa_window_size = [1]
-        # self.max_gap = [1]
 
         # self.paa_window_size = {1: [1, 2],
         #                         2: [1, 2, 5],

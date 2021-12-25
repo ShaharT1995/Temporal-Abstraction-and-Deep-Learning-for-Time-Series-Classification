@@ -17,7 +17,7 @@ ITERATIONS = 5
 # ITERATIONS = 10
 
 # CLASSIFIERS = ['mcdcnn', 'fcn', 'mlp', 'resnet', 'tlenet', 'mcnn', 'twiesn', 'encoder', 'cnn', 'inception']
-CLASSIFIERS = ['fcn']
+CLASSIFIERS = ['mcdcnn']
 
 
 dataset_types = {'ElectricDevices': 'DEVICE', 'FordB': 'SENSOR',

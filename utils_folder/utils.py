@@ -442,10 +442,11 @@ def compare_results(path_raw_data_file, path_ta_dir):
                         else:
                             print("The two files contains different number of datasets")
 
-    if os.path.exists('results.csv'):
-        df.to_csv('results.csv', index=False, mode='a', header=0)
+    config = ConfigClass()
+    if os.path.exists(config.get_path() + '//results.csv'):
+        df.to_csv(config.get_path() + "//results.csv", index=False, mode='a', header=0)
     else:
-        df.to_csv('results.csv', index=False)
+        df.to_csv(config.get_path() +'//results.csv', index=False)
 
 
 def plot_epochs_metric(hist, file_name, metric='loss'):
