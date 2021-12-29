@@ -12,6 +12,7 @@ import seaborn as sns
 from utils_folder.constants import UNIVARIATE_DATASET_NAMES as DATASET_NAMES
 from utils_folder.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018
 from utils_folder.constants import ARCHIVE_NAMES as ARCHIVE_NAMES
+from utils_folder.constants import dataset_names_for_archive
 from utils_folder.constants import CLASSIFIERS
 from utils_folder.constants import ITERATIONS
 from utils_folder.constants import MTS_DATASET_NAMES
@@ -379,12 +380,15 @@ def generate_results_csv(output_file_name, root_dir, classifier, params="", afte
 
     for classifier_name in CLASSIFIERS:
         for archive_name in ARCHIVE_NAMES:
-            datasets_dict = read_all_datasets(root_dir, archive_name)
+            # todo
+            # datasets_dict = read_all_datasets(root_dir, archive_name)
             for it in range(ITERATIONS):
-                curr_archive_name = archive_name
                 if it != 0:
                     curr_archive_name = 'itr' + str(it) + ", " + params + '/'
-                for dataset_name in datasets_dict.keys():
+                else:
+                    curr_archive_name = ", " + params + '/'
+
+                for dataset_name in dataset_names_for_archive[archive_name]:
                     output_dir = root_dir + '/' + archive_name + '/results/' + classifier_name + '/' + \
                                  config.get_method()[0] + "//" + curr_archive_name + '/' + dataset_name + '/' \
                                  + 'df_metrics.csv'

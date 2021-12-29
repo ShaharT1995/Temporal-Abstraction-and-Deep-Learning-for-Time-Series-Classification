@@ -18,7 +18,7 @@ import random as rn
 def create_seed():
     os.environ['PYTHONHASHSEED'] = '0'
     os.environ['TF_DETERMINISTIC_OPS'] = '1'
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 
     # Setting the seed for numpy-generated random numbers
     np.random.seed(37)
@@ -90,8 +90,8 @@ class Classifier_MCDCNN:
 
         model = keras.models.Model(inputs=input_layers, outputs=output_layer)
 
-        model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.SGD(lr=0.01,momentum=0.9,decay=0.0005),
-                      metrics=['accuracy'])
+        model.compile(loss='categorical_crossentropy', metrics=['accuracy'],
+                      optimizer=keras.optimizers.SGD(lr=0.01, momentum=0.9, decay=0.0005))
 
         file_path = self.output_directory + 'best_model.hdf5'
 

@@ -156,7 +156,7 @@ def execute_running(config, running_dict, max_gap, method, nb_bin, paa, std, gra
     # print("\tUnivariate")
     # new_uts_files(config.get_ucr_path())
 
-    print("Step 5: Run all:")
+    # print("Step 5: Run all:")
     params = "res_" + str(method) + "_" + str(nb_bin) + "_" + str(paa) + "_" + str(std) \
                     + "_" + str(max_gap) + "_" + str(gradient_window)
     main.run_all(params)
@@ -167,7 +167,7 @@ def execute_running(config, running_dict, max_gap, method, nb_bin, paa, std, gra
     for classifier in CLASSIFIERS:
         file_name = "res_" + str(method) + "_" + str(nb_bin) + "_" + str(paa) + "_" + str(std) \
                     + "_" + str(max_gap) + "_" + str(gradient_window) + ".csv"
-        generate_results_csv(file_name, config.get_path(), classifier, params, True)
+        generate_results_csv(file_name, config.get_path(), classifier, params, False)
 
     running_dict[key] = True
 
