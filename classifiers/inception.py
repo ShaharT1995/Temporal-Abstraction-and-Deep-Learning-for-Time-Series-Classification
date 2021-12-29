@@ -13,28 +13,29 @@ from utils_folder.utils import save_logs
 from utils_folder.utils import calculate_metrics
 from utils_folder.utils import save_test_duration
 
-os.environ['PYTHONHASHSEED'] = '0'
-os.environ['TF_DETERMINISTIC_OPS'] = '1'
 
-# os.environ['CUDA_VISIBLE_DEVICES'] = ''
+def create_seed():
+    os.environ['PYTHONHASHSEED'] = '0'
+    os.environ['TF_DETERMINISTIC_OPS'] = '1'
 
-# Setting the seed for numpy-generated random numbers
-np.random.seed(37)
+    # Setting the seed for numpy-generated random numbers
+    np.random.seed(37)
 
-# Setting the seed for python random numbers
-rn.seed(1254)
+    # Setting the seed for python random numbers
+    rn.seed(1254)
 
-# Setting the graph-level random seed.
-tf.random.set_seed(89)
+    # Setting the graph-level random seed.
+    tf.random.set_seed(89)
 
-session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
-sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
-K.set_session(sess)
+    session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
+    sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
+    K.set_session(sess)
 
 
 class Classifier_INCEPTION:
     def __init__(self, output_directory, input_shape, nb_classes, verbose=False, build=True, batch_size=64, lr=0.001,
                  nb_filters=32, use_residual=True, use_bottleneck=True, depth=6, kernel_size=41, nb_epochs=1500):
+        create_seed()
 
         self.output_directory = output_directory
 

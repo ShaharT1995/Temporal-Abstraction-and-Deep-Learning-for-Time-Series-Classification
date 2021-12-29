@@ -2,7 +2,8 @@ import pandas as pd
 import numpy as np
 
 from utils_folder.utils import open_pickle
-from utils_folder.constants import MTS_DATASET_NAMES
+from utils_folder.constants import MTS_DATASET_NAMES, ARCHIVE_NAMES, CLASSIFIERS
+from utils_folder.configuration import ConfigClass
 
 
 def new_mts_files(cur_root_dir):
@@ -15,6 +16,8 @@ def new_mts_files(cur_root_dir):
     # Dictionary that contains the following data for each database: number_of_entities_train, number_of_entities_test
     # time_serious_length and number_of_attributes
     mts_dict = open_pickle("MTS_Dictionary")
+
+    config = ConfigClass()
 
     for index, dataset_name in enumerate(MTS_DATASET_NAMES):
         print("\t" + dataset_name)
@@ -34,12 +37,15 @@ def new_mts_files(cur_root_dir):
         for file_type in files_type:
             # Run the three transformation on the Train and Test files
             for key in transformation_dict.keys():
+                path = config.get_prop_path() + ARCHIVE_NAMES[0] + "//" + CLASSIFIERS[0] + "//" + \
+                       config.get_method()[0] + "//" + dataset_name + "//"
+
                 if file_type == "train":
-                    transformation_dict[key](root_dir_dataset, file_type, number_of_entities_train, time_serious_length,
+                    transformation_dict[key](path, file_type, number_of_entities_train, time_serious_length,
                                              number_of_attributes, classes)
                     print("\t\ttransformation_" + key + ", train")
                 else:
-                    transformation_dict[key](root_dir_dataset, file_type, number_of_entities_test, time_serious_length,
+                    transformation_dict[key](path, file_type, number_of_entities_test, time_serious_length,
                                              number_of_attributes, classes)
                     print("\t\ttransformation_" + key + ", test")
 

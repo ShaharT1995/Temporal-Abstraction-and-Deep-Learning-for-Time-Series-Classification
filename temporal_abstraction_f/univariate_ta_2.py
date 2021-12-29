@@ -4,7 +4,8 @@ import pandas as pd
 import numpy as np
 
 from utils_folder.utils import open_pickle
-from utils_folder.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018
+from utils_folder.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018, ARCHIVE_NAMES, CLASSIFIERS
+from utils_folder.configuration import ConfigClass
 
 
 def new_uts_files(cur_root_dir):
@@ -16,6 +17,7 @@ def new_uts_files(cur_root_dir):
     files_type = ["Train", "Test"]
 
     univariate_dict = open_pickle("univariate_dict")
+    config = ConfigClass()
 
     for index, dataset_name in enumerate(DATASET_NAMES_2018):
         root_dir_dataset = cur_root_dir + dataset_name
@@ -25,6 +27,9 @@ def new_uts_files(cur_root_dir):
         print("\t" + dataset_name + ":")
 
         for file_type in files_type:
+            path = config.get_prop_path() + ARCHIVE_NAMES[0] + "//" + CLASSIFIERS[0] + "//" + \
+                   config.get_method()[0] + "//" + dataset_name + "//"
+
             # Get from the read me file the number of rows, number of columns and number of
             classes = univariate_dict[(dataset_name, file_type.lower())]["classes"]
             number_of_rows = univariate_dict[(dataset_name, file_type.lower())]["rows"]
@@ -32,7 +37,7 @@ def new_uts_files(cur_root_dir):
 
             # Run the three transformation on the Train and Test files
             for key in transformation_dict.keys():
-                transformation_dict[key](root_dir_dataset, file_type, number_of_rows, number_of_columns, classes)
+                transformation_dict[key](path, file_type, number_of_rows, number_of_columns, classes)
                 print("\t\ttransformation_" + key + ", " + file_type.lower())
 
         print("")
@@ -171,9 +176,6 @@ def transformation_3(path, file_type, number_of_rows, number_of_columns, classes
 
     for class_id in classes:
         # Read the hugobot output file for class_id
-        # TODO
-        # ta_output = path + "\\output\\" + file_type.lower() + "\\KL-class-" + str(int(float(class_id))) + ".txt"
-
         if "Chinatown" in path or "HouseTwenty" in path:
             ta_output = path + "//output//" + file_type.lower() + "//KL-class-" + str(int(class_id)) + ".txt"
         else:

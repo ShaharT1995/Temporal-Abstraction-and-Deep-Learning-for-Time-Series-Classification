@@ -14,27 +14,31 @@ import os
 import tensorflow as tf
 import random as rn
 
-os.environ['PYTHONHASHSEED'] = '0'
-os.environ['TF_DETERMINISTIC_OPS'] = '1'
 
-# os.environ['CUDA_VISIBLE_DEVICES'] = ''
+def create_seed():
+    os.environ['PYTHONHASHSEED'] = '0'
+    os.environ['TF_DETERMINISTIC_OPS'] = '1'
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-# Setting the seed for numpy-generated random numbers
-np.random.seed(37)
+    # Setting the seed for numpy-generated random numbers
+    np.random.seed(37)
 
-# Setting the seed for python random numbers
-rn.seed(1254)
+    # Setting the seed for python random numbers
+    rn.seed(1254)
 
-# Setting the graph-level random seed.
-tf.random.set_seed(89)
+    # Setting the graph-level random seed.
+    tf.random.set_seed(89)
 
-session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
-sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
-K.set_session(sess)
+    session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
+    sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
+    K.set_session(sess)
 
 
 class Classifier_MCDCNN:
     def __init__(self, output_directory, input_shape, nb_classes, verbose=False, build=True):
+
+        create_seed()
+
         self.output_directory = output_directory
         if build:
             if "NetFlow" in output_directory or "Wafer" in output_directory:

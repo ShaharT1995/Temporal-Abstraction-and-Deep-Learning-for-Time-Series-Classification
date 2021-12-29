@@ -1,7 +1,10 @@
+import os
+
 import numpy as np
 import pandas as pd
 
-from utils_folder.constants import MTS_DATASET_NAMES
+from utils_folder.configuration import ConfigClass
+from utils_folder.constants import MTS_DATASET_NAMES, ARCHIVE_NAMES, CLASSIFIERS
 from utils_folder.utils import write_pickle
 
 
@@ -15,7 +18,7 @@ class MultivariateTA1:
         self.next_attribute = next_attribute
         self.attributes_dict = attributes_dict
 
-    def input_to_csv(self, path, dataset_name, file_type):
+    def input_to_csv(self, path, dataset_name, file_type, output_path):
         """
         :param path: the location of the original files
         :param file_type: the type of the file - train/test
@@ -58,16 +61,23 @@ class MultivariateTA1:
         # Merging between the two data frames
         merged = pd.concat([df, df_classifier])
 
-        merged.to_csv(path + 'M-transformation1_' + file_type + '.csv', index=False)
+        if not os.path.exists(path + dataset_name + "/" + dataset_name + "/"):
+            os.makedirs(path + dataset_name + "/" + dataset_name + "/")
+        merged.to_csv(path + dataset_name + "/" + dataset_name + '/M-transformation1_' + file_type + '.csv', index=False)
 
     def convert_all_MTS(self):
         """
         :return: the function return the count of the time series
         """
+        config = ConfigClass()
+
         for dataset_name in MTS_DATASET_NAMES:
+            output_path = config.get_prop_path() + ARCHIVE_NAMES[0] + "//" + CLASSIFIERS[0] + "//" + \
+                          config.get_method()[0] + "//"
             root_dir_dataset = self.cur_root_dir + dataset_name + '/'
-            self.input_to_csv(root_dir_dataset, dataset_name, "train")
-            self.input_to_csv(root_dir_dataset, dataset_name, "test")
+
+            self.input_to_csv(root_dir_dataset, dataset_name, "train", output_path)
+            self.input_to_csv(root_dir_dataset, dataset_name, "test", output_path)
 
         write_pickle("attributes_dict", self.attributes_dict)
 

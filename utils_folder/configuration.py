@@ -4,22 +4,9 @@ class ConfigClass:
         # Shahar
         self.mts_path = self.path + "mtsdata//archives//mts_archive/"
         self.ucr_path = self.path + "UCRArchive_2018//archives//UCRArchive_2018/"
-        self.properties_path = self.path + "SyncProject//TA//Shahar//"
+        self.properties_path = self.path + "SyncProject//TA//"
 
-        # # Hadas
-        # self.mts_path = self.path + "mtsdata_Hadas//archives//mts_archive/"
-        # self.ucr_path = self.path + "UCRArchive_2018_Hadas//archives//UCRArchive_2018/"
-        # self.properties_path = self.path + "SyncProject//TA//Hadas//"
-
-        # Osher
-        # self.mts_path = self.path + "mtsdata_osher//archives//mts_archive/"
-        # self.ucr_path = self.path + "UCRArchive_2018_osher//archives//UCRArchive_2018/"
-        # self.properties_path = self.path + "SyncProject//TA//Osher//"
-
-        # self.method = ["gradient", "equal-frequency", "equal-width", "sax", "td4c-skl", "td4c-entropy",
-        #                "td4c-entropy-ig", "td4c-cosine", "td4c-diffsum", "td4c-diffmax"]
-
-        self.method = ["equal-width"]
+        self.method = ["gradient"]
         self.nb_bin = [2, 5, 10, 20]
         self.std_coefficient = [-1]
         self.max_gap = [1, 2]

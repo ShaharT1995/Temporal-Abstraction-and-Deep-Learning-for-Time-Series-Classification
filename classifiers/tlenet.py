@@ -10,29 +10,30 @@ import os
 import random as rn
 from tensorflow.python.keras import backend as K
 
-os.environ['PYTHONHASHSEED'] = '0'
-os.environ['TF_DETERMINISTIC_OPS'] = '1'
 
-# Setting the seed for numpy-generated random numbers1
-np.random.seed(37)
+def create_seed():
+    os.environ['PYTHONHASHSEED'] = '0'
+    os.environ['TF_DETERMINISTIC_OPS'] = '1'
 
-# Setting the seed for python random numbers
+    # Setting the seed for numpy-generated random numbers
+    np.random.seed(37)
 
-rn.seed(1254)
+    # Setting the seed for python random numbers
+    rn.seed(1254)
 
-# Setting the graph-level random seed.
-tf.random.set_seed(89)
+    # Setting the graph-level random seed.
+    tf.random.set_seed(89)
 
-gpu_options = tf.compat.v1.GPUOptions(per_process_gpu_memory_fraction=0.7)
-session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1,
-                                        gpu_options=gpu_options)
-sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
-K.set_session(sess)
+    session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
+    sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
+    K.set_session(sess)
 
 
 class Classifier_TLENET:
     
     def __init__(self, output_directory, verbose,build=True):
+        create_seed()
+
         self.output_directory = output_directory
         self.verbose = verbose
         self.warping_ratios = [0.5,1,2]

@@ -1,8 +1,11 @@
+import os
+
 import numpy as np
 import pandas as pd
 
-from utils_folder.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018
+from utils_folder.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018, ARCHIVE_NAMES, CLASSIFIERS
 from utils_folder.utils import write_pickle
+from utils_folder.utils import ConfigClass
 
 
 class UnivariateTA1:
@@ -16,7 +19,7 @@ class UnivariateTA1:
 
         self.univariate_dict = {}
 
-    def input_to_csv(self, path, file_type, dataset_name):
+    def input_to_csv(self, path, file_type, dataset_name, output_path):
         """
         :param path: the location of the original files
         :param file_type: the type of the file - train/test
@@ -54,7 +57,12 @@ class UnivariateTA1:
         merged = pd.concat([df, df_classifier])
         merged = merged[['EntityID', 'TemporalPropertyID', 'TimeStamp', 'TemporalPropertyValue']]
 
-        merged.to_csv(path + '_U-transformation1_' + file_type + '.csv', index=False)
+        if not os.path.exists(output_path + dataset_name + "/"):
+            os.makedirs(output_path + dataset_name + "/")
+
+        merged.to_csv(output_path + dataset_name + "/" + dataset_name + '_U-transformation1_' +
+                      file_type + '.csv', index=False)
+
 
     def convert_all_UTS(self):
         """
@@ -63,14 +71,18 @@ class UnivariateTA1:
         :return: the function return the count of the time series
         """
         file_types = ["TRAIN", "TEST"]
+        config = ConfigClass()
 
         attributes_dict = {}
 
         for dataset_name in DATASET_NAMES_2018:
             print("\t\t" + dataset_name + ":")
             for file_type in file_types:
+                output_path = config.get_prop_path() + ARCHIVE_NAMES[0] + "//" + CLASSIFIERS[0] + "//" + \
+                              config.get_method()[0] + "//"
                 root_dir_dataset = self.cur_root_dir + dataset_name + '/' + dataset_name
-                self.input_to_csv(root_dir_dataset, file_type, dataset_name)
+
+                self.input_to_csv(root_dir_dataset, file_type, dataset_name, output_path)
                 print("\t\t\t" + file_type)
 
             attributes_dict[dataset_name] = [self.next_attribute]

@@ -19,35 +19,36 @@ import os
 import tensorflow as tf
 import random as rn
 
-os.environ['PYTHONHASHSEED'] = '0'
-os.environ['TF_DETERMINISTIC_OPS'] = '1'
 
-# os.environ['CUDA_VISIBLE_DEVICES'] = ''
+def create_seed():
+    os.environ['PYTHONHASHSEED'] = '0'
+    os.environ['TF_DETERMINISTIC_OPS'] = '1'
 
-# Setting the seed for numpy-generated random numbers
-np.random.seed(37)
+    # Setting the seed for numpy-generated random numbers
+    np.random.seed(37)
 
-# Setting the seed for python random numbers
-rn.seed(1254)
+    # Setting the seed for python random numbers
+    rn.seed(1254)
 
-# Setting the graph-level random seed.
-tf.random.set_seed(89)
+    # Setting the graph-level random seed.
+    tf.random.set_seed(89)
 
-session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
-sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
-K.set_session(sess)
+    session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
+    sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
+    K.set_session(sess)
 
 
 class Classifier_RESNET:
 
     def __init__(self, output_directory, input_shape, nb_classes, verbose=False, build=True, load_weights=False):
         self.output_directory = output_directory
-        if build == True:
+        create_seed()
+        if build:
             self.model = self.build_model(input_shape, nb_classes)
-            if (verbose == True):
+            if verbose:
                 self.model.summary()
             self.verbose = verbose
-            if load_weights == True:
+            if load_weights:
                 self.model.load_weights(self.output_directory
                                         .replace('resnet_augment', 'resnet')
                                         .replace('TSC_itr_augment_x_10', 'TSC_itr_10')

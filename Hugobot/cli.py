@@ -23,29 +23,30 @@ if __name__ == '__main__':
     pass
 
 
-def run_cli(prop_path, data_path, ds_dict, dataset_type, method, max_gap):
+def run_cli(prop_path, ds_dict, dataset_type, method, max_gap):
     data_types = ["train", "test"]
     for dataset_name in ds_dict:
         print("\t" + dataset_name + ":")
 
         for file_type in data_types:
             if dataset_type == "mtsdata":
-                raw_data_path = data_path + dataset_name + "/M-transformation1_" + file_type + ".csv"
+                raw_data_path = prop_path + dataset_name + "/" + dataset_name + "/M-transformation1_" +\
+                                file_type + ".csv"
             else:
-                raw_data_path = data_path + dataset_name + "/" + dataset_name + "_U-transformation1_" + \
+                raw_data_path = prop_path + dataset_name + "/" + dataset_name + "_U-transformation1_" + \
                                 file_type.upper() + ".csv"
-            output_folder = data_path + dataset_name + "/output/" + file_type + "/"
+            output_folder = prop_path + dataset_name + "/output/" + file_type + "/"
 
             if not os.path.exists(output_folder):
                 os.makedirs(output_folder)
 
             print("\t\t" + file_type)
 
-            pp_path = prop_path + "/pp.csv"
-            ta_path = prop_path + "/ta.csv"
+            pp_path = prop_path + "pp.csv"
+            ta_path = prop_path + "ta.csv"
 
             if method == "gradient":
-                gkb_path = prop_path + "/gkb.csv"
+                gkb_path = prop_path + "gkb.csv"
 
                 cli(['temporal-abstraction',
                      f'{raw_data_path}',  # 'Path to data set file'
@@ -70,11 +71,11 @@ def run_cli(prop_path, data_path, ds_dict, dataset_type, method, max_gap):
 
                 # file type == test
                 else:
-                    train_gkb_path = data_path + dataset_name + "//output//train//states.csv"
+                    train_gkb_path = prop_path + dataset_name + "//output//train//states.csv"
                     df = pd.read_csv(train_gkb_path)
                     df["Method"] = "knowledge-based"
 
-                    test_gkb_path = data_path + dataset_name + "//output//test//states.csv"
+                    test_gkb_path = prop_path + dataset_name + "//output//test//states.csv"
                     df.to_csv(test_gkb_path, index=False)
 
                     cli(['temporal-abstraction',

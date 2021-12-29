@@ -17,23 +17,30 @@ from utils_folder.utils import calculate_metrics
 import os
 import random as rn
 
-os.environ['PYTHONHASHSEED'] = '0'
-os.environ['TF_DETERMINISTIC_OPS'] = '1'
 
-# Setting the seed for python random numbers
-rn.seed(1254)
+def create_seed():
+    os.environ['PYTHONHASHSEED'] = '0'
+    os.environ['TF_DETERMINISTIC_OPS'] = '1'
 
-# Setting the graph-level random seed.
-tf.random.set_seed(89)
+    # Setting the seed for numpy-generated random numbers
+    np.random.seed(37)
 
-session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
-sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
-K.set_session(sess)
+    # Setting the seed for python random numbers
+    rn.seed(1254)
+
+    # Setting the graph-level random seed.
+    tf.random.set_seed(89)
+
+    session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
+    sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
+    K.set_session(sess)
 
 
 class Classifier_MCNN:
 
     def __init__(self, output_directory, verbose, build=True):
+        create_seed()
+
         self.output_directory = output_directory
         self.verbose = verbose
         self.pool_factors = [2, 3, 5]  # used for hyperparameters grid search

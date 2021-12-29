@@ -85,59 +85,58 @@ def create_path(root_dir, classifier_name, archive_name):
 
 
 def read_dataset(root_dir, archive_name, dataset_name):
-    datasets_dict = {}
-    cur_root_dir = root_dir.replace('-temp', '')
-
-    if archive_name == 'mts_archive':
-        file_name = cur_root_dir + '/archives/' + archive_name + '/' + dataset_name + '/'
-        x_train = np.load(file_name + 'x_train.npy')
-        y_train = np.load(file_name + 'y_train.npy')
-        x_test = np.load(file_name + 'x_test.npy')
-        y_test = np.load(file_name + 'y_test.npy')
-
-        datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(),
-                                       y_test.copy())
-
-    # todo
-    # elif archive_name == 'UCRArchive_2018_Hadas':
-    # elif archive_name == 'UCRArchive_2018_osher':
-    elif archive_name == 'UCRArchive_2018':
-        root_dir_dataset = cur_root_dir + '/archives/' + archive_name + '/' + dataset_name + '/'
-        df_train = pd.read_csv(root_dir_dataset + '/' + dataset_name + '_TRAIN.tsv', sep='\t', header=None)
-
-        df_test = pd.read_csv(root_dir_dataset + '/' + dataset_name + '_TEST.tsv', sep='\t', header=None)
-
-        y_train = df_train.values[:, 0]
-        y_test = df_test.values[:, 0]
-
-        x_train = df_train.drop(columns=[0])
-        x_test = df_test.drop(columns=[0])
-
-        x_train.columns = range(x_train.shape[1])
-        x_test.columns = range(x_test.shape[1])
-
-        x_train = x_train.values
-        x_test = x_test.values
-
-        # znorm
-        std_ = x_train.std(axis=1, keepdims=True)
-        std_[std_ == 0] = 1.0
-        x_train = (x_train - x_train.mean(axis=1, keepdims=True)) / std_
-
-        std_ = x_test.std(axis=1, keepdims=True)
-        std_[std_ == 0] = 1.0
-        x_test = (x_test - x_test.mean(axis=1, keepdims=True)) / std_
-
-        datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(),
-                                       y_test.copy())
-    else:
-        file_name = cur_root_dir + '/archives/' + archive_name + '/' + dataset_name + '/' + dataset_name
-        x_train, y_train = readucr(file_name + '_TRAIN')
-        x_test, y_test = readucr(file_name + '_TEST')
-        datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(),
-                                       y_test.copy())
-
-    return datasets_dict
+    print("ERROR!!")
+    return None
+    # datasets_dict = {}
+    # cur_root_dir = root_dir.replace('-temp', '')
+    #
+    # if archive_name == 'mts_archive':
+    #     file_name = cur_root_dir + '/archives/' + archive_name + '/' + dataset_name + '/'
+    #     x_train = np.load(file_name + 'x_train.npy')
+    #     y_train = np.load(file_name + 'y_train.npy')
+    #     x_test = np.load(file_name + 'x_test.npy')
+    #     y_test = np.load(file_name + 'y_test.npy')
+    #
+    #     datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(),
+    #                                    y_test.copy())
+    #
+    # elif archive_name == 'UCRArchive_2018':
+    #     root_dir_dataset = cur_root_dir + '/archives/' + archive_name + '/' + dataset_name + '/'
+    #     df_train = pd.read_csv(root_dir_dataset + '/' + dataset_name + '_TRAIN.tsv', sep='\t', header=None)
+    #
+    #     df_test = pd.read_csv(root_dir_dataset + '/' + dataset_name + '_TEST.tsv', sep='\t', header=None)
+    #
+    #     y_train = df_train.values[:, 0]
+    #     y_test = df_test.values[:, 0]
+    #
+    #     x_train = df_train.drop(columns=[0])
+    #     x_test = df_test.drop(columns=[0])
+    #
+    #     x_train.columns = range(x_train.shape[1])
+    #     x_test.columns = range(x_test.shape[1])
+    #
+    #     x_train = x_train.values
+    #     x_test = x_test.values
+    #
+    #     # znorm
+    #     std_ = x_train.std(axis=1, keepdims=True)
+    #     std_[std_ == 0] = 1.0
+    #     x_train = (x_train - x_train.mean(axis=1, keepdims=True)) / std_
+    #
+    #     std_ = x_test.std(axis=1, keepdims=True)
+    #     std_[std_ == 0] = 1.0
+    #     x_test = (x_test - x_test.mean(axis=1, keepdims=True)) / std_
+    #
+    #     datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(),
+    #                                    y_test.copy())
+    # else:
+    #     file_name = cur_root_dir + '/archives/' + archive_name + '/' + dataset_name + '/' + dataset_name
+    #     x_train, y_train = readucr(file_name + '_TRAIN')
+    #     x_test, y_test = readucr(file_name + '_TEST')
+    #     datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(),
+    #                                    y_test.copy())
+    #
+    # return datasets_dict
 
 
 def read_all_datasets(root_dir, archive_name, transformation_name=-1, after_ta=False, split_val=False):
@@ -155,9 +154,12 @@ def read_all_datasets(root_dir, archive_name, transformation_name=-1, after_ta=F
             root_dir_dataset = mts_path + '/' + dataset_name + '/'
 
             if after_ta:
-                x_train = np.load(root_dir_dataset + 'transformation2_type' + transformation_name + '_train.npy')
+                path = config.get_prop_path() + ARCHIVE_NAMES[0] + "//" + CLASSIFIERS[0] + "//" + \
+                        config.get_method()[0] + "//" + dataset_name + "//"
+
+                x_train = np.load(path + 'transformation2_type' + transformation_name + '_train.npy')
                 y_train = np.load(root_dir_dataset + 'y_train.npy')
-                x_test = np.load(root_dir_dataset + 'transformation2_type' + transformation_name + '_test.npy')
+                x_test = np.load(path + 'transformation2_type' + transformation_name + '_test.npy')
                 y_test = np.load(root_dir_dataset + 'y_test.npy')
 
             else:
@@ -168,21 +170,29 @@ def read_all_datasets(root_dir, archive_name, transformation_name=-1, after_ta=F
 
             datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(),
                                            y_test.copy())
-    # todo
-    # elif archive_name == 'UCRArchive_2018_Hadas':
-    # elif archive_name == 'UCRArchive_2018_osher':
     elif archive_name == 'UCRArchive_2018':
         for dataset_name in DATASET_NAMES_2018:
-            ucr_path = config.get_ucr_path()
-            root_dir_dataset = ucr_path + '/' + dataset_name + '/'
+            if after_ta:
+                path = config.get_prop_path() + ARCHIVE_NAMES[0] + "//" + CLASSIFIERS[0] + "//" + \
+                       config.get_method()[0] + "//" + dataset_name + "//"
 
-            df_train = pd.read_csv(root_dir_dataset + '/' + dataset_name + '_TRAIN.tsv', sep='\t', header=None)
+                df_train = pd.read_csv(path + '//transformation2_type' + transformation_name + '_Train.csv',
+                                       sep=',', header=None)
 
-            df_test = pd.read_csv(root_dir_dataset + '/' + dataset_name + '_TEST.tsv', sep='\t', header=None)
+                df_test = pd.read_csv(path + '//transformation2_type' + transformation_name + '_Test.csv',
+                                       sep=',', header=None)
 
-            # Padding with zero for missing values
-            df_train = df_train.fillna(0)
-            df_test = df_test.fillna(0)
+            else:
+                ucr_path = config.get_ucr_path()
+                root_dir_dataset = ucr_path + '/' + dataset_name + '/'
+
+                df_train = pd.read_csv(root_dir_dataset + '/' + dataset_name + '_TRAIN.tsv', sep='\t', header=None)
+
+                df_test = pd.read_csv(root_dir_dataset + '/' + dataset_name + '_TEST.tsv', sep='\t', header=None)
+
+                # Padding with zero for missing values
+                df_train = df_train.fillna(0)
+                df_test = df_test.fillna(0)
 
             y_train = df_train.values[:, 0]
             y_test = df_test.values[:, 0]
@@ -208,22 +218,22 @@ def read_all_datasets(root_dir, archive_name, transformation_name=-1, after_ta=F
             datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(),
                                            y_test.copy())
 
-    else:
-        for dataset_name in DATASET_NAMES:
-            root_dir_dataset = cur_root_dir + '/archives/' + archive_name + '/' + dataset_name + '/'
-            file_name = root_dir_dataset + dataset_name
-            x_train, y_train = readucr(file_name + '_TRAIN')
-            x_test, y_test = readucr(file_name + '_TEST')
-
-            datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(),
-                                           y_test.copy())
-
-            dataset_names_to_sort.append((dataset_name, len(x_train)))
-
-        dataset_names_to_sort.sort(key=operator.itemgetter(1))
-
-        for i in range(len(DATASET_NAMES)):
-            DATASET_NAMES[i] = dataset_names_to_sort[i][0]
+    # else:
+    #     for dataset_name in DATASET_NAMES:
+    #         root_dir_dataset = cur_root_dir + '/archives/' + archive_name + '/' + dataset_name + '/'
+    #         file_name = root_dir_dataset + dataset_name
+    #         x_train, y_train = readucr(file_name + '_TRAIN')
+    #         x_test, y_test = readucr(file_name + '_TEST')
+    #
+    #         datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(),
+    #                                        y_test.copy())
+    #
+    #         dataset_names_to_sort.append((dataset_name, len(x_train)))
+    #
+    #     dataset_names_to_sort.sort(key=operator.itemgetter(1))
+    #
+    #     for i in range(len(DATASET_NAMES)):
+    #         DATASET_NAMES[i] = dataset_names_to_sort[i][0]
 
     return datasets_dict
 
@@ -361,20 +371,23 @@ def save_test_duration(file_name, test_duration):
     res.to_csv(file_name, index=False)
 
 
-def generate_results_csv(output_file_name, root_dir, classifier, after_ta=False):
+def generate_results_csv(output_file_name, root_dir, classifier, params="", after_ta=False):
     res = pd.DataFrame(data=np.zeros((0, 7), dtype=np.float), index=[],
                        columns=['classifier_name', 'archive_name', 'dataset_name',
                                 'precision', 'accuracy', 'recall', 'duration'])
+    config = ConfigClass()
+
     for classifier_name in CLASSIFIERS:
         for archive_name in ARCHIVE_NAMES:
             datasets_dict = read_all_datasets(root_dir, archive_name)
             for it in range(ITERATIONS):
                 curr_archive_name = archive_name
                 if it != 0:
-                    curr_archive_name = curr_archive_name + 'itr' + str(it)
+                    curr_archive_name = 'itr' + str(it) + ", " + params + '/'
                 for dataset_name in datasets_dict.keys():
-                    output_dir = root_dir + '/' + archive_name + '/results/' + classifier_name + '/' \
-                                 + curr_archive_name + '/' + dataset_name + '/' + 'df_metrics.csv'
+                    output_dir = root_dir + '/' + archive_name + '/results/' + classifier_name + '/' + \
+                                 config.get_method()[0] + "//" + curr_archive_name + '/' + dataset_name + '/' \
+                                 + 'df_metrics.csv'
                     if not os.path.exists(output_dir):
                         continue
                     df_metrics = pd.read_csv(output_dir)

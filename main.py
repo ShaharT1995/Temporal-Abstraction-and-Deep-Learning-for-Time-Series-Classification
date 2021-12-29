@@ -99,7 +99,7 @@ config = ConfigClass()
 root_dir = config.get_path()
 
 
-def run_all():
+def run_all(params=""):
     for classifier_name in CLASSIFIERS:
         print('\tclassifier_name', classifier_name)
 
@@ -108,7 +108,7 @@ def run_all():
 
             # The third parameter is the number of the transformation we want, the fourth parameter is to read the data
             # after TA (TRUE) or not (FALSE)
-            datasets_dict = read_all_datasets(root_dir, archive_name, "1", True)
+            datasets_dict = read_all_datasets(root_dir, archive_name, "1", False)
 
             for iter in range(ITERATIONS):
                 print('\t\t\titer', iter)
@@ -117,7 +117,8 @@ def run_all():
                 if iter != 0:
                     trr = 'itr' + str(iter)
 
-                tmp_output_directory = root_dir + archive_name + '/results/' + classifier_name + '/' + archive_name + trr + '/'
+                tmp_output_directory = root_dir + archive_name + '/results/' + classifier_name + '/' + \
+                                       config.get_method()[0] + "/" + trr + ", " + params + '/'
 
                 for dataset_name in utils_folder.constants.dataset_names_for_archive[archive_name]:
                     print('\t\t\t\tdataset_name: ', dataset_name)
