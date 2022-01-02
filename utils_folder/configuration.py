@@ -1,12 +1,14 @@
 class ConfigClass:
+    method = []
+    CLASSIFIERS = []
+
     def __init__(self):
         self.path = "/sise/robertmo-group/TA-DL-TSC/"
-        # Shahar
         self.mts_path = self.path + "mtsdata//archives//mts_archive/"
         self.ucr_path = self.path + "UCRArchive_2018//archives//UCRArchive_2018/"
         self.properties_path = self.path + "SyncProject//TA//"
 
-        self.method = ["sax"]
+        self.method = ConfigClass.method
         self.nb_bin = [2, 5, 10, 20]
         self.std_coefficient = [-1]
         self.max_gap = [1, 2]
@@ -53,6 +55,16 @@ class ConfigClass:
 
     def get_method(self):
         return self.method
+
+    def set_method(self, method):
+        ConfigClass.method = method
+        self.method = method
+
+    def set_classifier(self, cf):
+        ConfigClass.CLASSIFIERS = cf
+
+    def get_classifier(self):
+        return ConfigClass.CLASSIFIERS
 
     def get_max_gap(self):
         return self.max_gap

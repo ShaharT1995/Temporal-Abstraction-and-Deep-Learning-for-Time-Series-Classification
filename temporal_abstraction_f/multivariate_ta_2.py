@@ -5,6 +5,9 @@ from utils_folder.utils import open_pickle
 from utils_folder.constants import MTS_DATASET_NAMES, ARCHIVE_NAMES, CLASSIFIERS
 from utils_folder.configuration import ConfigClass
 
+config = ConfigClass()
+CLASSIFIERS = config.get_classifier()
+
 
 def new_mts_files(cur_root_dir):
     """
@@ -16,8 +19,6 @@ def new_mts_files(cur_root_dir):
     # Dictionary that contains the following data for each database: number_of_entities_train, number_of_entities_test
     # time_serious_length and number_of_attributes
     mts_dict = open_pickle("MTS_Dictionary")
-
-    config = ConfigClass()
 
     for index, dataset_name in enumerate(MTS_DATASET_NAMES):
         print("\t" + dataset_name)

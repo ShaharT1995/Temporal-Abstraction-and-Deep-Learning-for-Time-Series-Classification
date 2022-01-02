@@ -7,6 +7,9 @@ from utils_folder.utils import open_pickle
 from utils_folder.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018, ARCHIVE_NAMES, CLASSIFIERS
 from utils_folder.configuration import ConfigClass
 
+config = ConfigClass()
+CLASSIFIERS = config.get_classifier()
+
 
 def new_uts_files(cur_root_dir):
     """
@@ -17,7 +20,6 @@ def new_uts_files(cur_root_dir):
     files_type = ["Train", "Test"]
 
     univariate_dict = open_pickle("univariate_dict")
-    config = ConfigClass()
 
     for index, dataset_name in enumerate(DATASET_NAMES_2018):
         root_dir_dataset = cur_root_dir + dataset_name

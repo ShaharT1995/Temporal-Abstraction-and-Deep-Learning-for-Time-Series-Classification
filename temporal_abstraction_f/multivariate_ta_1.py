@@ -8,6 +8,10 @@ from utils_folder.constants import MTS_DATASET_NAMES, ARCHIVE_NAMES, CLASSIFIERS
 from utils_folder.utils import write_pickle
 
 
+config = ConfigClass()
+CLASSIFIERS = config.get_classifier()
+
+
 class MultivariateTA1:
     def __init__(self, cur_root_dir, next_attribute, attributes_dict):
         """
@@ -69,8 +73,6 @@ class MultivariateTA1:
         """
         :return: the function return the count of the time series
         """
-        config = ConfigClass()
-
         for dataset_name in MTS_DATASET_NAMES:
             output_path = config.get_prop_path() + ARCHIVE_NAMES[0] + "//" + CLASSIFIERS[0] + "//" + \
                           config.get_method()[0] + "//"

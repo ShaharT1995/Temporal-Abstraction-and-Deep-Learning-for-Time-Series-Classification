@@ -1,41 +1,4 @@
-
-
-import os
-import sys
-
-import numpy as np
-
-import main
-
-# todo
-sys.path.insert(0, '/sise/robertmo-group/TA-DL-TSC/SyncProject/')
-
-from utils_folder.configuration import ConfigClass
-from temporal_abstraction_f.multivariate_ta_1 import MultivariateTA1
-from temporal_abstraction_f.univariate_ta_1 import UnivariateTA1
-from temporal_abstraction_f.set_parameters import create_three_files
-from temporal_abstraction_f.multivariate_ta_2 import new_mts_files
-from temporal_abstraction_f.univariate_ta_2 import new_uts_files
-
-from utils_folder.utils import write_pickle, open_pickle, results_table_by_dataset_lengths, create_graphs
-
-# todo
-sys.path.insert(0, '/sise/robertmo-group/TA-DL-TSC/SyncProject/Hugobot')
-
-from Hugobot.cli import run_cli
-
-from utils_folder.utils import generate_results_csv
-from utils_folder.constants import MTS_DATASET_NAMES
-from utils_folder.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018
-from utils_folder.constants import ARCHIVE_NAMES as ARCHIVE_NAMES
-from utils_folder.constants import CLASSIFIERS
-
-from utils_folder.utils import compare_results
-
-
-
 def run():
-    config = ConfigClass()
     prop_path = config.get_prop_path() + ARCHIVE_NAMES[0] + "//" + CLASSIFIERS[0] + "//" + config.get_method()[0] + "//"
     if not os.path.exists(prop_path):
         os.makedirs(prop_path)
@@ -142,7 +105,47 @@ def execute_running(config, running_dict, max_gap, method, nb_bin, paa, std, gra
         write_pickle("running_dict", running_dict)
         return running_dict
 
-run()
+print()
+
+if __name__ == '__main__':
+    import os
+    import sys
+
+    import numpy as np
+
+    import main
+
+    # todo
+    sys.path.insert(0, '/sise/robertmo-group/TA-DL-TSC/SyncProject/')
+
+    from utils_folder.configuration import ConfigClass
+    config = ConfigClass()
+
+    config.set_classifier([sys.argv[1]])
+    config.set_method([sys.argv[2]])
+
+    from temporal_abstraction_f.multivariate_ta_1 import MultivariateTA1
+    from temporal_abstraction_f.univariate_ta_1 import UnivariateTA1
+    from temporal_abstraction_f.set_parameters import create_three_files
+    from temporal_abstraction_f.multivariate_ta_2 import new_mts_files
+    from temporal_abstraction_f.univariate_ta_2 import new_uts_files
+
+    from utils_folder.utils import write_pickle, open_pickle, results_table_by_dataset_lengths, create_graphs
+
+    # todo
+    sys.path.insert(0, '/sise/robertmo-group/TA-DL-TSC/SyncProject/Hugobot')
+
+    from Hugobot.cli import run_cli
+
+    from utils_folder.utils import generate_results_csv
+    from utils_folder.constants import MTS_DATASET_NAMES
+    from utils_folder.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018
+    from utils_folder.constants import ARCHIVE_NAMES as ARCHIVE_NAMES
+    from utils_folder.constants import CLASSIFIERS
+
+    from utils_folder.utils import compare_results
+
+    run()
 
 # univariate_dict = open_pickle("univariate_dict")
 # print(univariate_dict[('SmoothSubspace', 'train')]["classes"])

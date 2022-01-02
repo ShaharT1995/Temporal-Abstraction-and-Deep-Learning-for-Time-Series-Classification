@@ -42,16 +42,17 @@ os.environ['TF_DETERMINISTIC_OPS'] = '1'
 np.random.seed(37)
 rn.seed(1254)
 
+config = ConfigClass()
+CLASSIFIERS = config.get_classifier()
+
 
 def open_pickle(name):
-    config = ConfigClass()
     file = open(config.get_path() + "/SyncProject/temporal_abstraction_f/pickle_files//" + name + ".pkl", "rb")
     data = pickle.load(file)
     return data
 
 
 def write_pickle(name, data):
-    config = ConfigClass()
     file = open(config.get_path() + "/SyncProject/temporal_abstraction_f/pickle_files//" + name + ".pkl", "wb")
     pickle.dump(data, file)
     file.close()
@@ -144,7 +145,6 @@ def read_all_datasets(root_dir, archive_name, transformation_name=-1, after_ta=F
     datasets_dict = {}
     cur_root_dir = root_dir.replace('-temp', '')
     dataset_names_to_sort = []
-    config = ConfigClass()
 
     # todo
     if archive_name == 'mts_archive':
@@ -282,7 +282,6 @@ def transform_to_same_length(x, n_var, max_length):
 
 
 def transform_mts_to_ucr_format():
-    config = ConfigClass()
     mts_root_dir = config.get_mts_path()
     mts_out_dir = config.get_mts_path()
 
@@ -376,7 +375,6 @@ def generate_results_csv(output_file_name, root_dir, classifier, params="", afte
     res = pd.DataFrame(data=np.zeros((0, 7), dtype=np.float), index=[],
                        columns=['classifier_name', 'archive_name', 'dataset_name',
                                 'precision', 'accuracy', 'recall', 'duration'])
-    config = ConfigClass()
 
     for classifier_name in CLASSIFIERS:
         for archive_name in ARCHIVE_NAMES:
@@ -470,7 +468,6 @@ def compare_results(path_raw_data_file, path_ta_dir):
                         else:
                             print("The two files contains different number of datasets")
 
-    config = ConfigClass()
     if os.path.exists(config.get_path() + '//results.csv'):
         df.to_csv(config.get_path() + "//results.csv", index=False, mode='a', header=0)
     else:

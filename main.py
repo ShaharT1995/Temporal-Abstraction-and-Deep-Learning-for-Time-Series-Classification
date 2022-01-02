@@ -17,7 +17,8 @@ from utils_folder.utils import read_all_datasets
 import random as rn
 from utils_folder.configuration import ConfigClass
 
-
+config = ConfigClass()
+CLASSIFIERS = config.get_classifier()
 
 
 def fit_classifier(iter, datasets_dict, dataset_name, classifier_name, output_directory):
@@ -91,7 +92,6 @@ def create_classifier(classifier_name, input_shape, nb_classes, output_directory
 
 
 # change this directory for your machine
-config = ConfigClass()
 root_dir = config.get_path()
 
 

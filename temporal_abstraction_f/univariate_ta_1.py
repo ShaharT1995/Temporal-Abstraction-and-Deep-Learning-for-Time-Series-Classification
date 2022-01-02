@@ -3,9 +3,14 @@ import os
 import numpy as np
 import pandas as pd
 
-from utils_folder.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018, ARCHIVE_NAMES, CLASSIFIERS
+from utils_folder.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018, ARCHIVE_NAMES
+# todo from utils_folder.constants import CLASSIFIERS
 from utils_folder.utils import write_pickle
 from utils_folder.utils import ConfigClass
+
+
+config = ConfigClass()
+CLASSIFIERS = config.get_classifier()
 
 
 class UnivariateTA1:
@@ -71,7 +76,6 @@ class UnivariateTA1:
         :return: the function return the count of the time series
         """
         file_types = ["TRAIN", "TEST"]
-        config = ConfigClass()
 
         attributes_dict = {}
 
