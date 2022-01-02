@@ -861,8 +861,8 @@ def results_table_by_dataset_lengths(root_dir, path_file_raw_data, path_file_dat
     mts_df = mts_df.pivot(index="groups_lengths", columns="classifier_name", values="res").reset_index()
     ucr_df = ucr_df.pivot(index="groups_lengths", columns="classifier_name", values="res").reset_index()
 
-    mts_df.to_csv(root_dir + "/Results/mts_archive/results_by_ds_length.csv", index=False)
-    ucr_df.to_csv(root_dir + "/Results/UCRArchive_2018/results_by_ds_length.csv", index=False)
+    #mts_df.to_csv(root_dir + "/Results/mts_archive/results_by_ds_length.csv", index=False)
+    ucr_df.to_csv(root_dir + "//Results//UCRArchive_2018//results_by_ds_length.csv", index=False)
 
 
 def set_df_for_graphs_and_tables(path_file_data_ta, path_file_raw_data):

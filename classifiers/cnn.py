@@ -19,6 +19,7 @@ import os
 def create_seed():
     os.environ['PYTHONHASHSEED'] = '0'
     os.environ['TF_DETERMINISTIC_OPS'] = '1'
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 
     # Setting the seed for numpy-generated random numbers
     np.random.seed(37)

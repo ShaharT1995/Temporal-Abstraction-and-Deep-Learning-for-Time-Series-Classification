@@ -17,11 +17,7 @@ from utils_folder.utils import read_all_datasets
 import random as rn
 from utils_folder.configuration import ConfigClass
 
-os.environ['PYTHONHASHSEED'] = '0'
-os.environ['TF_DETERMINISTIC_OPS'] = '1'
 
-np.random.seed(37)
-rn.seed(1254)
 
 
 def fit_classifier(iter, datasets_dict, dataset_name, classifier_name, output_directory):
@@ -100,6 +96,12 @@ root_dir = config.get_path()
 
 
 def run_all(params=""):
+    os.environ['PYTHONHASHSEED'] = '0'
+    os.environ['TF_DETERMINISTIC_OPS'] = '1'
+
+    np.random.seed(37)
+    rn.seed(1254)
+
     for classifier_name in CLASSIFIERS:
         print('\tclassifier_name', classifier_name)
 
@@ -108,7 +110,7 @@ def run_all(params=""):
 
             # The third parameter is the number of the transformation we want, the fourth parameter is to read the data
             # after TA (TRUE) or not (FALSE)
-            datasets_dict = read_all_datasets(root_dir, archive_name, "1", False)
+            datasets_dict = read_all_datasets(root_dir, archive_name, "1", True)
 
             for iter in range(ITERATIONS):
                 print('\t\t\titer', iter)

@@ -6,7 +6,7 @@ class ConfigClass:
         self.ucr_path = self.path + "UCRArchive_2018//archives//UCRArchive_2018/"
         self.properties_path = self.path + "SyncProject//TA//"
 
-        self.method = ["gradient"]
+        self.method = ["sax"]
         self.nb_bin = [2, 5, 10, 20]
         self.std_coefficient = [-1]
         self.max_gap = [1, 2]
