@@ -9,11 +9,22 @@ class ConfigClass:
         self.properties_path = self.path + "SyncProject//TA//"
 
         self.method = ConfigClass.method
-        self.nb_bin = [2, 5, 10, 20]
+
+        self.nb_bin = [2]
         self.std_coefficient = [-1]
-        self.max_gap = [1, 2]
-        self.paa_window_size = [1, 2, 5, 10, 20]
-        self.gradient_window_size = [1, 2, 5, 10, 20]
+        self.max_gap = [2]
+        self.paa_window_size = [1]
+        self.gradient_window_size = [1]
+
+        # self.nb_bin = [2, 5, 10, 20]
+        # self.std_coefficient = [-1]
+        # self.max_gap = [1, 2]
+        # self.paa_window_size = [1, 2, 5, 10, 20]
+        # self.gradient_window_size = [1, 2, 5, 10, 20]
+
+
+
+
 
         # self.nb_bin = [5]
         # self.max_gap = [5]
@@ -54,7 +65,7 @@ class ConfigClass:
         return self.properties_path
 
     def get_method(self):
-        return self.method
+        return ConfigClass.method
 
     def set_method(self, method):
         ConfigClass.method = method

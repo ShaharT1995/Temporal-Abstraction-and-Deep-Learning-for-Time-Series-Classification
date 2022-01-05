@@ -42,11 +42,6 @@ class MultivariateTA1:
 
         out_df = pd.DataFrame(out_arr, columns=['EntityID'] + list(range(self.next_attribute, r + self.next_attribute)))
 
-        # Set the NEXT_ATTRIBUTE_ID variable
-        if dataset_name not in self.attributes_dict.keys():
-            self.attributes_dict[dataset_name] = [i for i in range(self.next_attribute, self.next_attribute + r)]
-            self.next_attribute += r
-
         out_df["TimeStamp"] = timestamps
 
         # Set the DF to the input format
@@ -69,6 +64,8 @@ class MultivariateTA1:
             os.makedirs(path + dataset_name + "/" + dataset_name + "/")
         merged.to_csv(path + dataset_name + "/" + dataset_name + '/M-transformation1_' + file_type + '.csv', index=False)
 
+        return r
+
     def convert_all_MTS(self):
         """
         :return: the function return the count of the time series
@@ -79,7 +76,11 @@ class MultivariateTA1:
             root_dir_dataset = self.cur_root_dir + dataset_name + '/'
 
             self.input_to_csv(root_dir_dataset, dataset_name, "train", output_path)
-            self.input_to_csv(root_dir_dataset, dataset_name, "test", output_path)
+            r = self.input_to_csv(root_dir_dataset, dataset_name, "test", output_path)
+
+            # Set the NEXT_ATTRIBUTE_ID variable
+            self.attributes_dict[dataset_name] = [i for i in range(self.next_attribute, self.next_attribute + r)]
+            self.next_attribute += r
 
         write_pickle("attributes_dict", self.attributes_dict)
 

@@ -96,6 +96,8 @@ root_dir = config.get_path()
 
 
 def run_all(params=""):
+    CLASSIFIERS = config.get_classifier()
+
     os.environ['PYTHONHASHSEED'] = '0'
     os.environ['TF_DETERMINISTIC_OPS'] = '1'
 

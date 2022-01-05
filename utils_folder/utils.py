@@ -142,6 +142,7 @@ def read_dataset(root_dir, archive_name, dataset_name):
 
 
 def read_all_datasets(root_dir, archive_name, transformation_name=-1, after_ta=False, split_val=False):
+    CLASSIFIERS = config.get_classifier()
     datasets_dict = {}
     cur_root_dir = root_dir.replace('-temp', '')
     dataset_names_to_sort = []
@@ -375,6 +376,8 @@ def generate_results_csv(output_file_name, root_dir, classifier, params="", afte
     res = pd.DataFrame(data=np.zeros((0, 7), dtype=np.float), index=[],
                        columns=['classifier_name', 'archive_name', 'dataset_name',
                                 'precision', 'accuracy', 'recall', 'duration'])
+
+    CLASSIFIERS = config.get_classifier()
 
     for classifier_name in CLASSIFIERS:
         for archive_name in ARCHIVE_NAMES:

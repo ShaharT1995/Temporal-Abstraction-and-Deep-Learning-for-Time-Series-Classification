@@ -84,7 +84,7 @@ class Classifier_MCDCNN:
 
         # init = tf.keras.initializers.GlorotNormal(seed=123)
         # kernel_initializer = init
-        fully_connected = keras.layers.Dense(units=732,activation='tanh')(concat_layer)
+        fully_connected = keras.layers.Dense(units=732, activation='tanh')(concat_layer)
 
         output_layer = keras.layers.Dense(nb_classes, activation='softmax')(fully_connected)
 

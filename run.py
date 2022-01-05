@@ -1,9 +1,11 @@
 def run():
+    CLASSIFIERS = config.get_classifier()
+
     prop_path = config.get_prop_path() + ARCHIVE_NAMES[0] + "//" + CLASSIFIERS[0] + "//" + config.get_method()[0] + "//"
     if not os.path.exists(prop_path):
         os.makedirs(prop_path)
 
-    #Make the first temporal abstraction -> original data sets to hugobot format
+    # Make the first temporal abstraction -> original data sets to hugobot format
     print("Step 1: transformation 1")
 
     print("\t Univariate")
@@ -35,16 +37,18 @@ def run():
                         else:
                             running_dict = execute_running(config, running_dict, max_gap, method, nb_bin, paa, std)
 
-    print("Compare the results between running on the raw data and the data after the TA")
-    # path_raw_data_file = config.get_path() + "Results//raw_data_results.csv"
-    path_raw_data_file= '/sise/robertmo-group/TA-DL-TSC/Results/mcdcnn/results.csv'
-    path_ta_dir = config.get_path() + "//Results//ResultsAfterTA"
-
-    compare_results(path_raw_data_file, path_ta_dir)
+    # print("Compare the results between running on the raw data and the data after the TA")
+    # # path_raw_data_file = config.get_path() + "Results//raw_data_results.csv"
+    # path_raw_data_file= '/sise/robertmo-group/TA-DL-TSC/Results/mcdcnn/results.csv'
+    # path_ta_dir = config.get_path() + "//Results//ResultsAfterTA"
+    #
+    # compare_results(path_raw_data_file, path_ta_dir)
     print("Done")
 
 
 def execute_running(config, running_dict, max_gap, method, nb_bin, paa, std, gradient_window=None):
+    CLASSIFIERS = config.get_classifier()
+
     # todo - Add gradient to the print
     print("-------------------------------------------------------------------------------------")
     print("Method: " + method + ", Bins: " + str(nb_bin) + ", PAA: " + str(paa) + ", STD: " +
@@ -105,7 +109,6 @@ def execute_running(config, running_dict, max_gap, method, nb_bin, paa, std, gra
         write_pickle("running_dict", running_dict)
         return running_dict
 
-print()
 
 if __name__ == '__main__':
     import os

@@ -25,7 +25,7 @@ dataset_names_for_archive = {'UCRArchive_2018': UNIVARIATE_DATASET_NAMES_2018}
 # ITERATIONS = 10
 
 #CLASSIFIERS = ['mcdcnn', 'fcn', 'mlp', 'resnet', 'tlenet', 'mcnn', 'twiesn', 'encoder', 'cnn', 'inception']
-CLASSIFIERS = ['mlp']
+CLASSIFIERS = []
 #CLASSIFIERS = ['mcdcnn', 'fcn', 'mlp', 'twiesn', 'cnn']
 
 
