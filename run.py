@@ -57,10 +57,18 @@ def execute_running(config, running_dict, max_gap, method, nb_bin, paa, std, gra
     print()
 
     key = (ARCHIVE_NAMES[0], CLASSIFIERS[0], method, nb_bin, paa, std, max_gap, gradient_window)
+
     if key in running_dict:
         print("Already Done!")
         print()
 
+        params = "res_" + str(method) + "" + str(nb_bin) + "" + str(paa) + "_" + str(std) \
+                 + "" + str(max_gap) + "" + str(gradient_window)
+
+        for classifier in CLASSIFIERS:
+            file_name = "res_" + str(method) + "" + str(nb_bin) + "" + str(paa) + "_" + str(std) \
+                        + "" + str(max_gap) + "" + str(gradient_window) + ".csv"
+            generate_results_csv(file_name, config.get_path(), classifier, params, True)
         return running_dict
 
     else:
