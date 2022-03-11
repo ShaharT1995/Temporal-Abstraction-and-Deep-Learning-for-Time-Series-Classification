@@ -141,7 +141,8 @@ if __name__ == '__main__':
     from temporal_abstraction_f.multivariate_ta_2 import new_mts_files
     from temporal_abstraction_f.univariate_ta_2 import new_uts_files
 
-    from utils_folder.utils import write_pickle, open_pickle, results_table_by_dataset_lengths, create_graphs
+    from utils_folder.utils import write_pickle, open_pickle, results_table_by_dataset_lengths, create_graphs, \
+    create_df_for_rank_graph
 
     # todo
     sys.path.insert(0, '/sise/robertmo-group/TA-DL-TSC/SyncProject/Hugobot')
@@ -161,12 +162,12 @@ if __name__ == '__main__':
 # univariate_dict = open_pickle("univariate_dict")
 # print(univariate_dict[('SmoothSubspace', 'train')]["classes"])
 
-# file_path = '/sise/robertmo-group/TA-DL-TSC/Results/mcdcnn/results.csv'
-# file_path1 = "/sise/robertmo-group/TA-DL-TSC//Results//ResultsAfterTA/mcdcnn/res_gradient_2_1_-1_1_1.csv"
+#file_path = '/sise/robertmo-group/TA-DL-TSC/Results/mcdcnn/results.csv'
+#file_path1 = "/sise/robertmo-group/TA-DL-TSC//Results//ResultsAfterTA/mcdcnn/res_gradient_2_1_-1_1_1.csv"
 
 # results_table_by_dataset_lengths("/sise/robertmo-group//TA-DL-TSC/", file_path, file_path1)
-#
-# create_df_for_rank_graph(file_path)
+
+# create_df_for_rank_graph("C:\\Users\\Shaha\Desktop\\results_new.csv")
 # print("SHAHAR")
 # config = ConfigClass()
-# create_graphs(config.get_path(), file_path, file_path1)
+#create_graphs(config.get_path(), file_path, file_path1)

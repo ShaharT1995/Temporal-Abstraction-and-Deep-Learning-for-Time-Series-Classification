@@ -421,6 +421,55 @@ def generate_results_csv(output_file_name, root_dir, classifier, params="", afte
     return res
 
 
+def generate_results_csv_2(output_file_name, root_dir, classifier, params="", after_ta=False):
+    res = pd.DataFrame(data=np.zeros((0, 7), dtype=np.float), index=[],
+                       columns=['classifier_name', 'archive_name', 'dataset_name',
+                                'precision', 'accuracy', 'recall', 'duration'])
+
+    CLASSIFIERS = ['mcdcnn', 'fcn', 'mlp', 'twiesn', 'cnn']
+    METHODS = ['sax', 'gradient', 'equal-frequency', 'equal-width', 'td4c-cosine']
+
+    for classifier_name in CLASSIFIERS:
+        for archive_name in ARCHIVE_NAMES:
+            for method in METHODS:
+                for it in range(ITERATIONS):
+                    if it != 0:
+                        curr_archive_name = 'itr' + str(it) + ", " + params + '/'
+                    else:
+                        curr_archive_name = ", " + params + '/'
+
+                    for dataset_name in dataset_names_for_archive[archive_name]:
+                        output_dir = root_dir + '/' + archive_name + '/results/' + classifier_name + '/' + \
+                                     method + "//" + curr_archive_name + '/' + dataset_name + '/' \
+                                     + 'df_metrics.csv'
+                        if not os.path.exists(output_dir):
+                            continue
+                        df_metrics = pd.read_csv(output_dir)
+                        df_metrics['classifier_name'] = classifier_name
+                        df_metrics['archive_name'] = archive_name
+                        df_metrics['dataset_name'] = dataset_name
+                        df_metrics['iteration'] = it
+                        res = pd.concat((res, df_metrics), axis=0, sort=False)
+
+    # todo
+    path = root_dir + "Results2_11.02//"
+    if after_ta:
+        path += "ResultsAfterTA"
+
+    if not os.path.exists(path + "//" + classifier + "//"):
+        os.makedirs(path + "//" + classifier + "//")
+
+    res.to_csv(path + "//" + classifier + "//" + output_file_name, index=False)
+
+    # aggregate the accuracy for iterations on same dataset
+    res = pd.DataFrame({
+        'accuracy': res.groupby(
+            ['classifier_name', 'archive_name', 'dataset_name'])['accuracy'].mean()
+    }).reset_index()
+
+    return res
+
+
 def compare_results(path_raw_data_file, path_ta_dir):
     res_raw_data = pd.read_csv(path_raw_data_file, sep=',', header=0, encoding="utf-8")
 
@@ -904,7 +953,7 @@ def create_df_for_rank_graph(path):
     ucr_df.drop("archive_name", axis=1, inplace=True)
 
     draw_cd_diagram(df_perf=mts_df, title='Accuracy', labels=True)
-    draw_cd_diagram(df_perf=ucr_df, title='Accuracy', labels=True)
+    #draw_cd_diagram(df_perf=ucr_df, title='Accuracy', labels=True)
 
 
 def create_graphs(root_dir, path_before, path_after):

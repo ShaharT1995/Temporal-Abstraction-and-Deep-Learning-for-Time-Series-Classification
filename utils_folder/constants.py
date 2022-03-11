@@ -25,8 +25,8 @@ dataset_names_for_archive = {'UCRArchive_2018': UNIVARIATE_DATASET_NAMES_2018}
 # ITERATIONS = 10
 
 #CLASSIFIERS = ['mcdcnn', 'fcn', 'mlp', 'resnet', 'tlenet', 'mcnn', 'twiesn', 'encoder', 'cnn', 'inception']
-CLASSIFIERS = []
-#CLASSIFIERS = ['mcdcnn', 'fcn', 'mlp', 'twiesn', 'cnn']
+#CLASSIFIERS = []
+CLASSIFIERS = ['mcdcnn', 'fcn', 'mlp', 'twiesn', 'cnn']
 
 
 dataset_types = {'ElectricDevices': 'DEVICE', 'FordB': 'SENSOR',
