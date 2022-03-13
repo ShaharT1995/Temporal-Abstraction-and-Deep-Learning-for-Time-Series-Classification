@@ -1,26 +1,20 @@
 import os
-
 import numpy as np
 import pandas as pd
 
-from utils_folder.configuration import ConfigClass
-from utils_folder.constants import MTS_DATASET_NAMES, ARCHIVE_NAMES, CLASSIFIERS
-from utils_folder.utils import write_pickle
-
-
-config = ConfigClass()
-CLASSIFIERS = config.get_classifier()
+from utils_folder.utils import write_pickle, create_directory
 
 
 class MultivariateTA1:
-    def __init__(self, cur_root_dir, next_attribute, attributes_dict):
+    def __init__(self, config, next_attribute):
         """
         :param cur_root_dir: the location in which all the databases are saved
         :param next_attribute: the count of the time series
         """
-        self.cur_root_dir = cur_root_dir
+        self.config = config
+        self.cur_root_dir = self.config.mts_path
         self.next_attribute = next_attribute
-        self.attributes_dict = attributes_dict
+        self.attributes_dict = {}
 
     def input_to_csv(self, path, dataset_name, file_type, output_path):
         """
@@ -60,9 +54,9 @@ class MultivariateTA1:
         # Merging between the two data frames
         merged = pd.concat([df, df_classifier])
 
-        if not os.path.exists(path + dataset_name + "/" + dataset_name + "/"):
-            os.makedirs(path + dataset_name + "/" + dataset_name + "/")
-        merged.to_csv(path + dataset_name + "/" + dataset_name + '/M-transformation1_' + file_type + '.csv', index=False)
+        create_directory(output_path)
+
+        merged.to_csv(output_path + '/transformation1_' + file_type + '.csv', index=False)
 
         return r
 
@@ -70,12 +64,14 @@ class MultivariateTA1:
         """
         :return: the function return the count of the time series
         """
-        for dataset_name in MTS_DATASET_NAMES:
-            output_path = config.get_prop_path() + ARCHIVE_NAMES[0] + "//" + CLASSIFIERS[0] + "//" + \
-                          config.get_method()[0] + "//"
+        for dataset_name in self.config.MTS_DATASET_NAMES:
+            print("\t\t" + dataset_name + ":")
+            output_path = self.config.path_transformation1 + dataset_name + "//"
             root_dir_dataset = self.cur_root_dir + dataset_name + '/'
 
+            print("\t\t\tTrain")
             self.input_to_csv(root_dir_dataset, dataset_name, "train", output_path)
+            print("\t\t\tTest")
             r = self.input_to_csv(root_dir_dataset, dataset_name, "test", output_path)
 
             # Set the NEXT_ATTRIBUTE_ID variable

@@ -23,59 +23,50 @@ if __name__ == '__main__':
     pass
 
 
-def run_cli(prop_path, ds_dict, dataset_type, method, max_gap):
-    data_types = ["train", "test"]
-    for dataset_name in ds_dict:
+def run_cli(config, prop_path, max_gap):
+    ds_list = config.UNIVARIATE_DATASET_NAMES_2018 if config.archive == "UCR" else config.MTS_DATASET_NAMES
+
+    for dataset_name in ds_list:
         print("\t" + dataset_name + ":")
 
-        for file_type in data_types:
-            if dataset_type == "mtsdata":
-                raw_data_path = prop_path + dataset_name + "/" + dataset_name + "/M-transformation1_" +\
-                                file_type + ".csv"
-            else:
-                raw_data_path = prop_path + dataset_name + "/" + dataset_name + "_U-transformation1_" + \
-                                file_type.upper() + ".csv"
-            output_folder = prop_path + dataset_name + "/output/" + file_type + "/"
+        for file_type in ["train", "test"]:
+            raw_data_path = config.path_transformation1 + dataset_name + "/transformation1_" + file_type + ".csv"
 
+            output_folder = prop_path + dataset_name + "/" + file_type + "/"
             if not os.path.exists(output_folder):
                 os.makedirs(output_folder)
 
             print("\t\t" + file_type)
 
-            pp_path = prop_path + "pp.csv"
-            ta_path = prop_path + "ta.csv"
-
-            if method == "gradient":
-                gkb_path = prop_path + "gkb.csv"
-
+            if config.method == "gradient":
                 cli(['temporal-abstraction',
                      f'{raw_data_path}',  # 'Path to data set file'
                      output_folder,  # 'Path to output dir'
                      'per-property',  # per-property
                      '-s',  # -s (when using Gradient or KnowledgeBased)
-                     gkb_path,  # 'Path to states file' (when using Gradient or KnowledgeBased)
-                     pp_path,  # 'Path to pre-processing file'
-                     ta_path],  # 'Path to Temporal Abstraction file'
+                     prop_path + "gkb.csv",  # 'Path to states file' (when using Gradient or KnowledgeBased)
+                     prop_path + "pp.csv",  # 'Path to pre-processing file'
+                     prop_path + "ta.csv"],  # 'Path to Temporal Abstraction file'
                     standalone_mode=False)
 
-            # method != gradient
+            # Method is not gradient
             else:
                 if file_type == "train":
                     cli(['temporal-abstraction',
                          f'{raw_data_path}',  # 'Path to data set file'
                          output_folder,  # 'Path to output dir'
                          'per-property',  # per-property
-                         pp_path,  # 'Path to pre-processing file'
-                         ta_path],  # 'Path to Temporal Abstraction file'
+                         prop_path + "pp.csv",  # 'Path to pre-processing file'
+                         prop_path + "ta.csv"],  # 'Path to Temporal Abstraction file'
                         standalone_mode=False)
 
-                # file type == test
+                # Test
                 else:
-                    train_gkb_path = prop_path + dataset_name + "//output//train//states.csv"
+                    train_gkb_path = prop_path + dataset_name + "//train//states.csv"
                     df = pd.read_csv(train_gkb_path)
                     df["Method"] = "knowledge-based"
 
-                    test_gkb_path = prop_path + dataset_name + "//output//test//states.csv"
+                    test_gkb_path = prop_path + dataset_name + "//test//states.csv"
                     df.to_csv(test_gkb_path, index=False)
 
                     cli(['temporal-abstraction',

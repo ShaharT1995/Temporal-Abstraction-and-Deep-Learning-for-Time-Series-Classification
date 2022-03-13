@@ -1,37 +1,28 @@
-import markdown
-import re
 import pandas as pd
 import numpy as np
 
-from utils_folder.utils import open_pickle
-from utils_folder.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018, ARCHIVE_NAMES, CLASSIFIERS
-from utils_folder.configuration import ConfigClass
-
-config = ConfigClass()
-CLASSIFIERS = config.get_classifier()
+from utils_folder.utils import open_pickle, create_directory
 
 
-def new_uts_files(cur_root_dir):
+def new_ucr_files(config, prop_path):
     """
-    :param datasets:
-    :param cur_root_dir: the location in which all the databases are saved
     :return: the function create all the transformations
     """
     files_type = ["Train", "Test"]
 
     univariate_dict = open_pickle("univariate_dict")
 
-    for index, dataset_name in enumerate(DATASET_NAMES_2018):
-        root_dir_dataset = cur_root_dir + dataset_name
-
+    for index, dataset_name in enumerate(config.UNIVARIATE_DATASET_NAMES_2018):
         transformation_dict = {"1": transformation_1, "2": transformation_2, "3": transformation_3}
+
+        path = prop_path + dataset_name + "//"
+        output_path = config.path_transformation2 + dataset_name + "//"
+
+        create_directory(output_path)
 
         print("\t" + dataset_name + ":")
 
         for file_type in files_type:
-            path = config.get_prop_path() + ARCHIVE_NAMES[0] + "//" + CLASSIFIERS[0] + "//" + \
-                   config.get_method()[0] + "//" + dataset_name + "//"
-
             # Get from the read me file the number of rows, number of columns and number of
             classes = univariate_dict[(dataset_name, file_type.lower())]["classes"]
             number_of_rows = univariate_dict[(dataset_name, file_type.lower())]["rows"]
@@ -39,13 +30,13 @@ def new_uts_files(cur_root_dir):
 
             # Run the three transformation on the Train and Test files
             for key in transformation_dict.keys():
-                transformation_dict[key](path, file_type, number_of_rows, number_of_columns, classes)
+                transformation_dict[key](path, output_path, file_type, number_of_rows, number_of_columns, classes)
                 print("\t\ttransformation_" + key + ", " + file_type.lower())
 
         print("")
 
 
-def transformation_1(path, file_type, number_of_rows, number_of_columns, classes):
+def transformation_1(path, output_path, file_type, number_of_rows, number_of_columns, classes):
     """
     :param path: the location of the hugobot output
     :param file_type: train/test
@@ -59,11 +50,12 @@ def transformation_1(path, file_type, number_of_rows, number_of_columns, classes
     arr = np.zeros((number_of_rows, number_of_columns), int)
 
     for class_id in classes:
+        ta_output = path + file_type.lower() + "//KL-class-"
         # Read the hugobot output file for class_id
         if "Chinatown" in path or "HouseTwenty" in path:
-            ta_output = path + "//output//" + file_type.lower() + "//KL-class-" + str(int(class_id)) + ".txt"
+            ta_output += str(int(class_id)) + ".txt"
         else:
-            ta_output = path + "//output//" + file_type.lower() + "//KL-class-" + str(float(class_id)) + ".txt"
+            ta_output += str(float(class_id)) + ".txt"
 
         with open(ta_output) as file:
             lines = file.readlines()
@@ -83,10 +75,10 @@ def transformation_1(path, file_type, number_of_rows, number_of_columns, classes
                     arr[int(entity_id), int(parse_data[0]): int(parse_data[1])] = parse_data[2]
 
     # Save the file
-    pd.DataFrame(arr).to_csv(path + '//transformation2_type1_' + file_type + '.csv', index=False, header=None)
+    pd.DataFrame(arr).to_csv(output_path + 'type1_' + file_type + '.csv', index=False, header=None)
 
 
-def transformation_2(path, file_type, number_of_rows, number_of_columns, classes):
+def transformation_2(path, output_path, file_type, number_of_rows, number_of_columns, classes):
     """
     :param path: the location of the hugobot output
     :param file_type: train/test
@@ -95,7 +87,7 @@ def transformation_2(path, file_type, number_of_rows, number_of_columns, classes
     :param classes: the classes in the database
     :return: the function do the transformation and save the data after it
     """
-    states_path = path + "//output//train//states.csv"
+    states_path = path + "//train//states.csv"
 
     # Get the number of state from state.csv file
     states_df = pd.read_csv(states_path, header=0)
@@ -117,9 +109,9 @@ def transformation_2(path, file_type, number_of_rows, number_of_columns, classes
     for class_id in classes:
         # Read the hugobot output file for class_id
         if "Chinatown" in path or "HouseTwenty" in path:
-            ta_output = path + "//output//" + file_type.lower() + "//KL-class-" + str(int(class_id)) + ".txt"
+            ta_output = path + file_type.lower() + "//KL-class-" + str(int(class_id)) + ".txt"
         else:
-            ta_output = path + "//output//" + file_type.lower() + "//KL-class-" + str(float(class_id)) + ".txt"
+            ta_output = path + file_type.lower() + "//KL-class-" + str(float(class_id)) + ".txt"
 
         with open(ta_output) as file:
             lines = file.readlines()
@@ -144,10 +136,10 @@ def transformation_2(path, file_type, number_of_rows, number_of_columns, classes
     df.iloc[:, 0] = df.iloc[:, 0].astype(int)
 
     # Save the file
-    df.to_csv(path + '//transformation2_type2_' + file_type + '.csv', index=False, header=None)
+    df.to_csv(output_path + 'type2_' + file_type + '.csv', index=False, header=None)
 
 
-def transformation_3(path, file_type, number_of_rows, number_of_columns, classes):
+def transformation_3(path, output_path, file_type, number_of_rows, number_of_columns, classes):
     """
     :param path: the location of the hugobot output
     :param file_type: train/test
@@ -156,7 +148,7 @@ def transformation_3(path, file_type, number_of_rows, number_of_columns, classes
     :param classes: the classes in the database
     :return: the function do the transformation and save the data after it
     """
-    states_path = path + "//output//train//states.csv"
+    states_path = path + "train//states.csv"
 
     # Get the number of state from state.csv file
     states_df = pd.read_csv(states_path, header=0)
@@ -179,9 +171,9 @@ def transformation_3(path, file_type, number_of_rows, number_of_columns, classes
     for class_id in classes:
         # Read the hugobot output file for class_id
         if "Chinatown" in path or "HouseTwenty" in path:
-            ta_output = path + "//output//" + file_type.lower() + "//KL-class-" + str(int(class_id)) + ".txt"
+            ta_output = path + file_type.lower() + "//KL-class-" + str(int(class_id)) + ".txt"
         else:
-            ta_output = path + "//output//" + file_type.lower() + "//KL-class-" + str(float(class_id)) + ".txt"
+            ta_output = path + file_type.lower() + "//KL-class-" + str(float(class_id)) + ".txt"
 
         with open(ta_output) as file:
             lines = file.readlines()
@@ -210,4 +202,4 @@ def transformation_3(path, file_type, number_of_rows, number_of_columns, classes
     df.iloc[:, 0] = df.iloc[:, 0].astype(int)
 
     # Save the file
-    df.to_csv(path + '//transformation2_type3_' + file_type + '.csv', index=False, header=None)
+    df.to_csv(output_path + 'type3_' + file_type + '.csv', index=False, header=None)

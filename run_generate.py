@@ -42,7 +42,7 @@ if __name__ == '__main__':
     from temporal_abstraction_f.univariate_ta_1 import UnivariateTA1
     from temporal_abstraction_f.set_parameters import create_three_files
     from temporal_abstraction_f.multivariate_ta_2 import new_mts_files
-    from temporal_abstraction_f.univariate_ta_2 import new_uts_files
+    from temporal_abstraction_f.univariate_ta_2 import new_ucr_files
 
     from utils_folder.utils import write_pickle, open_pickle, results_table_by_dataset_lengths, create_graphs, \
     create_df_for_rank_graph

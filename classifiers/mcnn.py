@@ -1,45 +1,24 @@
 # MCNN model
 import tensorflow.keras as keras
 import tensorflow as tf
+
 import numpy as np
 import time
 
-from utils_folder.utils import calculate_metrics
-from utils_folder.utils import create_directory
+from utils_folder.utils import create_directory, calculate_metrics
+from utils_folder.configuration import ConfigClass
 
-import numpy as np
-from sklearn.model_selection import train_test_split
-import time
-
-from tensorflow.python.keras import backend as K
-from utils_folder.utils import save_logs
-from utils_folder.utils import calculate_metrics
-import os
-import random as rn
-
-
-def create_seed():
-    os.environ['PYTHONHASHSEED'] = '0'
-    os.environ['TF_DETERMINISTIC_OPS'] = '1'
-
-    # Setting the seed for numpy-generated random numbers
-    np.random.seed(37)
-
-    # Setting the seed for python random numbers
-    rn.seed(1254)
-
-    # Setting the graph-level random seed.
-    tf.random.set_seed(89)
-
-    session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
-    sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
-    K.set_session(sess)
+# TODO - Nevo: There is no ModelCheckpoint!
 
 
 class Classifier_MCNN:
 
-    def __init__(self, output_directory, verbose, build=True):
-        create_seed()
+    def __init__(self, output_directory, verbose):
+        config = ConfigClass()
+        config.set_seed()
+
+        self.output_directory = output_directory
+        self.callbacks = None
 
         self.output_directory = output_directory
         self.verbose = verbose

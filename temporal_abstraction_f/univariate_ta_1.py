@@ -3,23 +3,17 @@ import os
 import numpy as np
 import pandas as pd
 
-from utils_folder.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018, ARCHIVE_NAMES
-# todo from utils_folder.constants import CLASSIFIERS
-from utils_folder.utils import write_pickle
-from utils_folder.utils import ConfigClass
-
-
-config = ConfigClass()
-CLASSIFIERS = config.get_classifier()
+from utils_folder.utils import write_pickle, create_directory
 
 
 class UnivariateTA1:
-    def __init__(self, cur_root_dir, next_attribute):
+    def __init__(self, config, next_attribute):
         """
         :param cur_root_dir: the location in which all the databases are saved
         :param next_attribute: the count of the time series
         """
-        self.cur_root_dir = cur_root_dir
+        self.config = config
+        self.cur_root_dir = config.ucr_path
         self.next_attribute = next_attribute
 
         self.univariate_dict = {}
@@ -49,8 +43,8 @@ class UnivariateTA1:
         classifier_data = tsv_data.values[:, 0]
 
         self.univariate_dict[(dataset_name, file_type.lower())] = {"classes": np.unique(classifier_data),
-                                                         "rows": tsv_data.shape[0],
-                                                         "columns": tsv_data.shape[1]}
+                                                                   "rows": tsv_data.shape[0],
+                                                                   "columns": tsv_data.shape[1]}
 
         df_classifier = pd.DataFrame(classifier_data).reset_index().melt('index')
         df_classifier.columns = ["EntityID", "TimeStamp", "TemporalPropertyValue"]
@@ -62,28 +56,22 @@ class UnivariateTA1:
         merged = pd.concat([df, df_classifier])
         merged = merged[['EntityID', 'TemporalPropertyID', 'TimeStamp', 'TemporalPropertyValue']]
 
-        if not os.path.exists(output_path + dataset_name + "/"):
-            os.makedirs(output_path + dataset_name + "/")
+        create_directory(output_path)
 
-        merged.to_csv(output_path + dataset_name + "/" + dataset_name + '_U-transformation1_' +
-                      file_type + '.csv', index=False)
-
+        merged.to_csv(output_path + "/transformation1_" + file_type.lower() + '.csv', index=False)
 
     def convert_all_UTS(self):
         """
-        :param cur_root_dir: the location in which all the databases are saved
-        :param next_attribute: the count of the time series
         :return: the function return the count of the time series
         """
         file_types = ["TRAIN", "TEST"]
 
         attributes_dict = {}
 
-        for dataset_name in DATASET_NAMES_2018:
+        for dataset_name in self.config.UNIVARIATE_DATASET_NAMES_2018:
             print("\t\t" + dataset_name + ":")
             for file_type in file_types:
-                output_path = config.get_prop_path() + ARCHIVE_NAMES[0] + "//" + CLASSIFIERS[0] + "//" + \
-                              config.get_method()[0] + "//"
+                output_path = self.config.path_transformation1 + dataset_name + "//"
                 root_dir_dataset = self.cur_root_dir + dataset_name + '/' + dataset_name
 
                 self.input_to_csv(root_dir_dataset, file_type, dataset_name, output_path)
@@ -95,4 +83,4 @@ class UnivariateTA1:
             print("")
 
         write_pickle("univariate_dict", self.univariate_dict)
-        return self.next_attribute, attributes_dict
+        return self.next_attribute

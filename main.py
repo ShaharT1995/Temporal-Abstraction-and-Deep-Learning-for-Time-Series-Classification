@@ -1,195 +1,134 @@
-import sys
-from utils_folder.utils import generate_results_csv
-from utils_folder.utils import create_directory
-from utils_folder.utils import read_dataset
-from utils_folder.utils import transform_mts_to_ucr_format
-from utils_folder.utils import visualize_filter
-from utils_folder.utils import viz_for_survey_paper
-from utils_folder.utils import viz_cam
 import os
-import numpy as np
-import sklearn
-import utils_folder
-from utils_folder.constants import CLASSIFIERS
-from utils_folder.constants import ARCHIVE_NAMES
-from utils_folder.constants import ITERATIONS
-from utils_folder.utils import read_all_datasets
-import random as rn
-from utils_folder.configuration import ConfigClass
-
-config = ConfigClass()
-CLASSIFIERS = config.get_classifier()
 
 
-def fit_classifier(iter, datasets_dict, dataset_name, classifier_name, output_directory):
-    x_train = datasets_dict[dataset_name][0]
-    y_train = datasets_dict[dataset_name][1]
-    x_test = datasets_dict[dataset_name][2]
-    y_test = datasets_dict[dataset_name][3]
+def create_files():
+    # Make the first temporal abstraction -> original data sets to hugobot format
+    print("Step 1: transformation 1")
 
-    nb_classes = len(np.unique(np.concatenate((y_train, y_test), axis=0)))
+    if config.archive == "UCR":
+        uni_ta_1 = UnivariateTA1(config, 0)
+        next_attribute = uni_ta_1.convert_all_UTS()
 
-    # transform the labels from integers to one hot vectors
-    enc = sklearn.preprocessing.OneHotEncoder(categories='auto')
-    enc.fit(np.concatenate((y_train, y_test), axis=0).reshape(-1, 1))
-    y_train = enc.transform(y_train.reshape(-1, 1)).toarray()
-    y_test = enc.transform(y_test.reshape(-1, 1)).toarray()
+    # config.archive == "MTS"
+    else:
+        multi_ta_1 = MultivariateTA1(config, 0)
+        next_attribute = multi_ta_1.convert_all_MTS()
 
-    # save orignal y because later we will use binary
-    y_true = np.argmax(y_test, axis=1)
-
-    if len(x_train.shape) == 2:  # if univariate
-        # add a dimension to make it multivariate with one dimension
-        x_train = x_train.reshape((x_train.shape[0], x_train.shape[1], 1))
-        x_test = x_test.reshape((x_test.shape[0], x_test.shape[1], 1))
-
-    input_shape = x_train.shape[1:]
-    classifier = create_classifier(classifier_name, input_shape, nb_classes, output_directory)
-
-    classifier.fit(x_train, y_train, x_test, y_test, y_true, iter)
+    write_pickle("next_property_index" + config.archive, {"ID": next_attribute})
+    print()
 
 
-def create_classifier(classifier_name, input_shape, nb_classes, output_directory, verbose=False):
-    if classifier_name == 'fcn':
-        from classifiers import fcn
-        return fcn.Classifier_FCN(output_directory, input_shape, nb_classes, verbose)
+def run():
+    prop_path = config.path_files_for_TA + config.archive + "//" + config.classifier + "//" + config.method + "//"
+    create_directory(prop_path)
 
-    if classifier_name == 'mlp':
-        from classifiers import mlp
-        return mlp.Classifier_MLP(output_directory, input_shape, nb_classes, verbose)
+    # Make the 3 files - gkb.csv, ta.csv and ppa.csv
+    print("Step 2: make the gkb.csv, ta.csv and ppa.csv \n")
 
-    if classifier_name == 'resnet':
-        from classifiers import resnet
-        return resnet.Classifier_RESNET(output_directory, input_shape, nb_classes, verbose)
+    if not check_pickle_exists("running_dict" + config.archive):
+        write_pickle("running_dict" + config.archive, {})
 
-    if classifier_name == 'mcnn':
-        from classifiers import mcnn
-        return mcnn.Classifier_MCNN(output_directory, verbose)
+    running_dict = open_pickle("running_dict" + config.archive)
 
-    if classifier_name == 'tlenet':
-        from classifiers import tlenet
-        return tlenet.Classifier_TLENET(output_directory, verbose)
-
-    if classifier_name == 'twiesn':
-        from classifiers import twiesn
-        return twiesn.Classifier_TWIESN(output_directory, verbose)
-
-    if classifier_name == 'encoder':
-        from classifiers import encoder
-        return encoder.Classifier_ENCODER(output_directory, input_shape, nb_classes, verbose)
-
-    if classifier_name == 'mcdcnn':
-        from classifiers import mcdcnn
-        return mcdcnn.Classifier_MCDCNN(output_directory, input_shape, nb_classes, verbose)
-
-    if classifier_name == 'cnn':  # Time-CNN
-        from classifiers import cnn
-        return cnn.Classifier_CNN(output_directory, input_shape, nb_classes, verbose)
-
-    if classifier_name == 'inception':
-        from classifiers import inception
-        return inception.Classifier_INCEPTION(output_directory, input_shape, nb_classes, verbose)
+    for nb_bin in config.nb_bin:
+        for std in config.std_coefficient:
+            for max_gap in config.max_gap:
+                if config.method == "gradient":
+                    for gradient_window in config.gradient_window_size:
+                        running_dict = execute_running(config, prop_path, running_dict, max_gap, config.method, nb_bin,
+                                                       config.paa_window_size, std, gradient_window)
+                else:
+                    running_dict = execute_running(config, prop_path, running_dict, max_gap, config.method, nb_bin,
+                                                   config.paa_window_size, std)
+    print("Done")
 
 
-# change this directory for your machine
-root_dir = config.get_path()
+def execute_running(config, prop_path, running_dict, max_gap, method, nb_bin, paa, std, gradient_window=None):
+    # todo - Add gradient to the print
+    print("-------------------------------------------------------------------------------------")
+    print("Method: " + method + ", Bins: " + str(nb_bin) + ", PAA: " + str(paa) + ", STD: " +
+          str(std) + ", Max_Gap: " + str(max_gap))
+    print("------------------------------------------------------------------------------------- \n")
 
+    key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window)
 
-def run_all(params=""):
-    CLASSIFIERS = config.get_classifier()
+    if key in running_dict:
+        print("Already Done! \n")
 
-    os.environ['PYTHONHASHSEED'] = '0'
-    os.environ['TF_DETERMINISTIC_OPS'] = '1'
+        return running_dict
 
-    np.random.seed(37)
-    rn.seed(1254)
+    else:
+        create_three_files(config=config,
+                           path=prop_path,
+                           method=method,
+                           nb_bins=nb_bin,
+                           paa_window_size=paa,
+                           std_coefficient=std,
+                           max_gap=max_gap,
+                           gradient_window_size=gradient_window)
 
-    for classifier_name in CLASSIFIERS:
-        print('\tclassifier_name', classifier_name)
+        print("Step 3: run hugobot")
+        run_cli(config, prop_path, max_gap)
 
-        for archive_name in ARCHIVE_NAMES:
-            print('\t\tarchive_name', archive_name)
+        # Make the second temporal abstraction -> hugobot output files to original format
+        print("Step 4: transformation 2")
+        new_ucr_files(config, prop_path) if config.archive == "UCR" else new_mts_files(config, prop_path)
 
-            # The third parameter is the number of the transformation we want, the fourth parameter is to read the data
-            # after TA (TRUE) or not (FALSE)
-            datasets_dict = read_all_datasets(root_dir, archive_name, "1", True)
+        print("Step 5: Run all:")
+        params = "res_" + str(method) + "_" + str(nb_bin) + "_" + str(paa) + "_" + str(std) \
+                        + "_" + str(max_gap) + "_" + str(gradient_window)
+        run_models.run_all(config, params)
+        print("")
 
-            for iter in range(ITERATIONS):
-                print('\t\t\titer', iter)
+        print("Step 6: Generate Results to CSV")
+        generate_results_csv(config, params)
 
-                trr = ''
-                if iter != 0:
-                    trr = 'itr' + str(iter)
-
-                tmp_output_directory = root_dir + archive_name + '/results/' + classifier_name + '/' + \
-                                       config.get_method()[0] + "/" + trr + ", " + params + '/'
-
-                for dataset_name in utils_folder.constants.dataset_names_for_archive[archive_name]:
-                    print('\t\t\t\tdataset_name: ', dataset_name)
-
-                    output_directory = tmp_output_directory + dataset_name + '/'
-
-                    # if os.path.exists(output_directory + "/DONE"):
-                    #     print("Already Done")
-                    #     continue
-
-                    create_directory(output_directory)
-
-                    fit_classifier(iter, datasets_dict, dataset_name, classifier_name, output_directory)
-
-                    print('\t\t\t\t\tDONE')
-
-                    # the creation of this directory means
-                    create_directory(output_directory + '/DONE')
+        running_dict[key] = True
+        write_pickle("running_dict" + config.archive, running_dict)
+        return running_dict
 
 
 if __name__ == '__main__':
+    import sys
+    import run_models
+
+    sys.path.insert(0, '/sise/robertmo-group/TA-DL-TSC/Project/')
+
+    from utils_folder.configuration import ConfigClass
+    from utils_folder.utils import generate_results_csv, write_pickle, open_pickle, transform_mts_to_ucr_format, \
+        create_directory, check_pickle_exists
+
+    config = ConfigClass()
+    config.set_archive(sys.argv[2])
+
+    from temporal_abstraction_f.multivariate_ta_1 import MultivariateTA1
+    from temporal_abstraction_f.univariate_ta_1 import UnivariateTA1
+    from temporal_abstraction_f.set_parameters import create_three_files
+    from temporal_abstraction_f.multivariate_ta_2 import new_mts_files
+    from temporal_abstraction_f.univariate_ta_2 import new_ucr_files
+
+    sys.path.insert(0, '/sise/robertmo-group/TA-DL-TSC/Project/Hugobot')
+    from Hugobot.cli import run_cli
+
+    if sys.argv[1] == 'create_files_for_hugobot':
+        config.set_path_transformations()
+        create_files()
+
     if sys.argv[1] == 'run_all':
-        run_all()
+        config.set_classifier(sys.argv[3])
+        config.set_afterTA(sys.argv[4])
+        config.set_method(sys.argv[5])
+        config.set_path_transformations()
+
+        run() if config.afterTA else run_models.run_all(config, "RawData")
 
     elif sys.argv[1] == 'transform_mts_to_ucr_format':
         transform_mts_to_ucr_format()
 
-    elif sys.argv[1] == 'visualize_filter':
-        visualize_filter(root_dir)
-
-    elif sys.argv[1] == 'viz_for_survey_paper':
-        viz_for_survey_paper(root_dir)
-
-    elif sys.argv[1] == 'viz_cam':
-        viz_cam(root_dir)
-
     elif sys.argv[1] == 'generate_results_csv':
-        for classifier in CLASSIFIERS:
-            res = generate_results_csv('results.csv', config.get_path(), classifier)
-            print(res.to_string())
+        config.set_classifier(sys.argv[3])
+        config.set_afterTA(sys.argv[4])
+        config.set_method(sys.argv[5])
+        config.set_path_transformations()
 
-    else:
-        # this is the code used to launch an experiment on a dataset
-        archive_name = sys.argv[1]
-        dataset_name = sys.argv[2]
-        classifier_name = sys.argv[3]
-        itr = sys.argv[4]
-
-        if itr == '_itr_0':
-            itr = ''
-
-        output_directory = root_dir + '/results/' + classifier_name + '/' + archive_name + itr + '/' + dataset_name + '/'
-
-        test_dir_df_metrics = output_directory + 'df_metrics.csv'
-
-        print('Method: ', archive_name, dataset_name, classifier_name, itr)
-
-        if os.path.exists(test_dir_df_metrics):
-            print('Already done')
-        else:
-
-            create_directory(output_directory)
-            datasets_dict = read_dataset(root_dir, archive_name, dataset_name)
-
-            fit_classifier()
-
-            print('DONE')
-
-            # the creation of this directory means
-            create_directory(output_directory + '/DONE')
+        generate_results_csv(config, "RawData")

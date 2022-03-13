@@ -1,45 +1,23 @@
-# FCN model
-# when tuning start with learning rate->mini_batch_size ->
-# momentum-> #hidden_units -> # learning_rate_decay -> #layers
-import tensorflow.keras as keras
+# CNN model
 import tensorflow as tf
+import tensorflow.keras as keras
 import numpy as np
 import time
 
 from sklearn.model_selection import train_test_split
+from tensorflow.python.keras.callbacks import EarlyStopping
 
-from utils_folder.utils import save_logs
-from utils_folder.utils import calculate_metrics
-from tensorflow.python.keras import backend as K
-import tensorflow as tf
-import random as rn
-import os
-
-
-def create_seed():
-    os.environ['PYTHONHASHSEED'] = '0'
-    os.environ['TF_DETERMINISTIC_OPS'] = '1'
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
-
-    # Setting the seed for numpy-generated random numbers
-    np.random.seed(37)
-
-    # Setting the seed for python random numbers
-    rn.seed(1254)
-
-    # Setting the graph-level random seed.
-    tf.random.set_seed(89)
-
-    session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
-    sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
-    K.set_session(sess)
+from utils_folder.utils import save_logs, calculate_metrics
+from utils_folder.configuration import ConfigClass
 
 
 class Classifier_CNN:
     def __init__(self, output_directory, input_shape, nb_classes, verbose=False, build=True):
-        create_seed()
+        config = ConfigClass()
+        config.set_seed()
 
         self.output_directory = output_directory
+        self.callbacks = None
 
         if build:
             self.model = self.build_model(input_shape, nb_classes)
@@ -54,7 +32,8 @@ class Classifier_CNN:
         padding = 'valid'
         input_layer = keras.layers.Input(input_shape)
 
-        if input_shape[0] < 60: # for italypowerondemand dataset
+        # for italy power on demand dataset
+        if input_shape[0] < 60:
             padding = 'same'
 
         conv1 = keras.layers.Conv1D(filters=6,kernel_size=7,padding=padding,activation='sigmoid')(input_layer)
@@ -69,19 +48,19 @@ class Classifier_CNN:
 
         model = keras.models.Model(inputs=input_layer, outputs=output_layer)
 
-        model.compile(loss='mean_squared_error', optimizer=keras.optimizers.Adam(),
-                      metrics=['accuracy'])
+        model.compile(loss='mean_squared_error', optimizer=keras.optimizers.Adam(), metrics=['accuracy'])
 
         file_path = self.output_directory + 'best_model.hdf5'
 
-        model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='loss',
+        es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=30, min_delta=0)
+        model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='val_loss',
                                                            save_best_only=True)
 
-        self.callbacks = [model_checkpoint]
-
+        self.callbacks = [es, model_checkpoint]
         return model
 
-    def fit(self, x_train, y_train, x_test, y_val, y_true,  iteration):
+    # TODO - Ask Nevo - about y true
+    def fit(self, x_train, y_train, x_test, y_test, y_true,  iteration):
         if not tf.test.is_gpu_available:
             print('error')
             exit()
@@ -110,11 +89,11 @@ class Classifier_CNN:
         # convert the predicted from binary to integer
         y_pred = np.argmax(y_pred, axis=1)
 
-        save_logs(self.output_directory, hist, y_pred, y_true, duration,lr=False)
+        save_logs(self.output_directory, hist, y_pred, y_true, duration, lr=False)
 
         keras.backend.clear_session()
 
-    def predict(self, x_test,y_true,x_train,y_train,y_test,return_df_metrics = True):
+    def predict(self, x_test, y_true, x_train, y_train, y_test, return_df_metrics=True):
         model_path = self.output_directory + 'best_model.hdf5'
         model = keras.models.load_model(model_path)
         y_pred = model.predict(x_test)

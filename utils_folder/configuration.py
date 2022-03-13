@@ -1,89 +1,83 @@
+import os
+import numpy as np
+import random as rn
+import tensorflow as tf
+from tensorflow.python.keras import backend as K
+
+
 class ConfigClass:
-    method = []
-    CLASSIFIERS = []
+    method = ""
+    classifier = ""
+    archive = ""
+    afterTA = False
+
+    # TODO - Maybe we want to get it from the user
+    transformation_number = "1"
 
     def __init__(self):
         self.path = "/sise/robertmo-group/TA-DL-TSC/"
-        self.mts_path = self.path + "mtsdata//archives//mts_archive/"
-        self.ucr_path = self.path + "UCRArchive_2018//archives//UCRArchive_2018/"
-        self.properties_path = self.path + "SyncProject//TA//"
+        self.mts_path = self.path + "mtsdata/archives/mts_archive/"
+        self.ucr_path = self.path + "UCRArchive_2018/archives/UCRArchive_2018/"
+        self.path_after_TA = self.path + "Data/AfterTA/"
+        self.path_files_for_TA = self.path + "Data/FilesForTA/"
 
-        self.method = ConfigClass.method
-
-        # self.nb_bin = [2]
-        # self.std_coefficient = [-1]
-        # self.max_gap = [2]
-        # self.paa_window_size = [1]
-        # self.gradient_window_size = [1]
+        self.path_transformation1 = ""
+        self.path_transformation2 = ""
 
         self.nb_bin = [2, 5, 10, 20]
         self.std_coefficient = [-1]
         self.max_gap = [1, 2]
-        self.paa_window_size = [1]
+        self.paa_window_size = 1
         self.gradient_window_size = [1, 2, 5, 10, 20]
 
-        # self.nb_bin = [5]
-        # self.max_gap = [5]
-        # self.paa_window_size = [1]
+        self.UNIVARIATE_DATASET_NAMES_2018 = ['SmoothSubspace', 'Crop', 'Adiac', 'BME', 'Coffee', 'Yoga', 'BeetleFly',
+                                              'Car', 'Computers', 'Worms', 'PLAID', 'ACSF1']
 
-        # self.paa_window_size = {1: [1, 2],
-        #                         2: [1, 2, 5],
-        #                         3: [1, 2, 5, 10],
-        #                         4: [1, 2, 5, 10, 20],
-        #                         5: [1, 2, 5, 10, 20, 50],
-        #                         6: [1, 2, 5, 10, 20, 50, 100]}
+        #self.UNIVARIATE_DATASET_NAMES_2018 = ['SmoothSubspace']
 
-        # self.gradient_window_size = {1: [-1, 2],
-        #                              2: [-1, 2, 5],
-        #                              3: [-1, 2, 5, 10],
-        #                              4: [-1, 2, 5, 10, 20],
-        #                              5: [-1, 2, 5, 10, 20, 50],
-        #                              6: [-1, 2, 5, 10, 20, 50, 100]}
+        self.MTS_DATASET_NAMES = ['Libras', 'JapaneseVowels', 'ECG', 'Wafer', 'CMUsubject16', 'KickvsPunch', 'NetFlow',
+                                  'WalkvsRun']
 
-        # # interpolation_gap
-        # self.max_gap = {1: [-1, 1, 2],
-        #                 2: [-1, 2, 5],
-        #                 3: [-1, 2, 5, 10],
-        #                 4: [-1, 2, 5, 10, 20],
-        #                 5: [-1, 2, 5, 10, 20, 50],
-        #                 6: [-1, 2, 5, 10, 20, 50, 100]}
+        # self.MTS_DATASET_NAMES = ['Libras']
 
-    def get_path(self):
-        return self.path
+    def set_path_transformations(self):
+        self.path_transformation1 = self.path_files_for_TA + "Transformation1//" + self.archive + "//"
+        self.path_transformation2 = self.path_after_TA + self.archive + "//" + self.classifier + "//" + self.method \
+                                    + "//"
 
-    def get_mts_path(self):
-        return self.mts_path
-
-    def get_ucr_path(self):
-        return self.ucr_path
-
-    def get_prop_path(self):
-        return self.properties_path
-
-    def get_method(self):
-        return ConfigClass.method
-
-    def set_method(self, method):
+    @staticmethod
+    def set_method(method):
         ConfigClass.method = method
-        self.method = method
 
-    def set_classifier(self, cf):
-        ConfigClass.CLASSIFIERS = cf
+    @staticmethod
+    def set_classifier(cf):
+        ConfigClass.classifier = cf
 
-    def get_classifier(self):
-        return ConfigClass.CLASSIFIERS
+    @staticmethod
+    def set_archive(archive):
+        ConfigClass.archive = archive
+        ConfigClass.ITERATIONS = 10 if (ConfigClass.archive == "MTS") else 5
 
-    def get_max_gap(self):
-        return self.max_gap
+    @staticmethod
+    def set_afterTA(after_TA):
+        ConfigClass.afterTA = eval(after_TA)
 
-    def get_std_coefficient(self):
-        return self.std_coefficient
+    @staticmethod
+    def set_seed():
+        os.environ['PYTHONHASHSEED'] = '0'
+        os.environ['TF_DETERMINISTIC_OPS'] = '1'
+        os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 
-    def get_paa_window_size(self):
-        return self.paa_window_size
+        # Setting the seed for numpy-generated random numbers
+        np.random.seed(37)
 
-    def get_gradient_window_size(self):
-        return self.gradient_window_size
+        # Setting the seed for python random numbers
+        rn.seed(1254)
 
-    def get_nb_bin(self):
-        return self.nb_bin
+        # Setting the graph-level random seed.
+        tf.random.set_seed(89)
+
+        session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
+        sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
+        K.set_session(sess)
+

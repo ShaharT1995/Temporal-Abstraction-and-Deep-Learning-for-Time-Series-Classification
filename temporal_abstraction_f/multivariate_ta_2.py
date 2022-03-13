@@ -1,15 +1,10 @@
 import pandas as pd
 import numpy as np
 
-from utils_folder.utils import open_pickle
-from utils_folder.constants import MTS_DATASET_NAMES, ARCHIVE_NAMES, CLASSIFIERS
-from utils_folder.configuration import ConfigClass
-
-config = ConfigClass()
-CLASSIFIERS = config.get_classifier()
+from utils_folder.utils import open_pickle, create_directory
 
 
-def new_mts_files(cur_root_dir):
+def new_mts_files(config, prop_path):
     """
     :param cur_root_dir: the location in which all the databases are saved
     :return: the function create all the transformations
@@ -20,10 +15,13 @@ def new_mts_files(cur_root_dir):
     # time_serious_length and number_of_attributes
     mts_dict = open_pickle("MTS_Dictionary")
 
-    for index, dataset_name in enumerate(MTS_DATASET_NAMES):
+    for index, dataset_name in enumerate(config.MTS_DATASET_NAMES):
         print("\t" + dataset_name)
 
-        root_dir_dataset = cur_root_dir + dataset_name + "/"
+        path = prop_path + dataset_name + "/"
+        output_path = config.path_transformation2 + dataset_name + "//"
+
+        create_directory(output_path)
 
         transformation_dict = {"1": transformation_1, "2": transformation_2, "3": transformation_3}
 
@@ -32,28 +30,26 @@ def new_mts_files(cur_root_dir):
         time_serious_length = mts_dict[dataset_name]["time_serious_length"]
         number_of_attributes = mts_dict[dataset_name]["number_of_attributes"]
 
-        y = np.load(root_dir_dataset + 'y_train.npy')
+        y = np.load(config.mts_path + dataset_name + '//y_train.npy')
         classes = np.unique(y)
 
         for file_type in files_type:
             # Run the three transformation on the Train and Test files
             for key in transformation_dict.keys():
-                path = config.get_prop_path() + ARCHIVE_NAMES[0] + "//" + CLASSIFIERS[0] + "//" + \
-                       config.get_method()[0] + "//" + dataset_name + "//"
 
                 if file_type == "train":
-                    transformation_dict[key](path, file_type, number_of_entities_train, time_serious_length,
+                    transformation_dict[key](path, output_path, file_type, number_of_entities_train, time_serious_length,
                                              number_of_attributes, classes)
                     print("\t\ttransformation_" + key + ", train")
                 else:
-                    transformation_dict[key](path, file_type, number_of_entities_test, time_serious_length,
+                    transformation_dict[key](path, output_path, file_type, number_of_entities_test, time_serious_length,
                                              number_of_attributes, classes)
                     print("\t\ttransformation_" + key + ", test")
 
         print("")
 
 
-def transformation_1(path, file_type, number_of_entities, time_serious_length, number_of_attributes, classes):
+def transformation_1(path, output_path, file_type, number_of_entities, time_serious_length, number_of_attributes, classes):
     """
     :param path: the location of the hugobot output
     :param file_type: train/test
@@ -63,7 +59,7 @@ def transformation_1(path, file_type, number_of_entities, time_serious_length, n
     :param classes: the classes in the database
     :return: the function do the transformation and save the data after it
     """
-    states_path = path + "//output//train//states.csv"
+    states_path = path + "train//states.csv"
 
     # Get the number of state from state.csv file
     states_df = pd.read_csv(states_path, header=0)
@@ -74,7 +70,8 @@ def transformation_1(path, file_type, number_of_entities, time_serious_length, n
 
     for class_id in classes:
         # Read the hugobot output file for class_id
-        ta_output = path + "//output//" + file_type + "//KL-class-" + str(float(class_id)) + ".txt"
+        ta_output = path + file_type + "//KL-class-" + str(float(class_id)) + ".txt"
+        ta_output = path + file_type + "//KL-class-" + str(float(class_id)) + ".txt"
 
         with open(ta_output) as file:
             lines = file.readlines()
@@ -94,10 +91,10 @@ def transformation_1(path, file_type, number_of_entities, time_serious_length, n
                                                                                         min_property] = parse_data[2]
 
     # Save the file
-    np.save(path + '//transformation2_type1_' + file_type + '.npy', arr)
+    np.save(output_path + 'type1_' + file_type + '.npy', arr)
 
 
-def transformation_2(path, file_type, number_of_entities, time_serious_length, number_of_attributes, classes):
+def transformation_2(path, output_path, file_type, number_of_entities, time_serious_length, number_of_attributes, classes):
     """
     :param path: the location of the hugobot output
     :param file_type: train/test
@@ -107,7 +104,7 @@ def transformation_2(path, file_type, number_of_entities, time_serious_length, n
     :param classes: the classes in the database
     :return: the function do the transformation and save the data after it
     """
-    states_path = path + "//output//train//states.csv"
+    states_path = path + "train//states.csv"
 
     # Get the number of state from state.csv file
     states_df = pd.read_csv(states_path, header=0)
@@ -118,7 +115,7 @@ def transformation_2(path, file_type, number_of_entities, time_serious_length, n
 
     for class_id in classes:
         # Read the hugobot output file for class_id
-        ta_output = path + "//output//" + file_type + "//KL-class-" + str(float(class_id)) + ".txt"
+        ta_output = path + file_type + "//KL-class-" + str(float(class_id)) + ".txt"
 
         with open(ta_output) as file:
             lines = file.readlines()
@@ -135,10 +132,10 @@ def transformation_2(path, file_type, number_of_entities, time_serious_length, n
                     arr[int(entity_id)][int(parse_data[0]) - 1: int(parse_data[1]) - 1, int(parse_data[2]) - 1] = True
 
     # Save the file
-    np.save(path + '//transformation2_type2_' + file_type + '.npy', arr)
+    np.save(output_path + 'type2_' + file_type + '.npy', arr)
 
 
-def transformation_3(path, file_type, number_of_entities, time_serious_length, number_of_attributes, classes):
+def transformation_3(path, output_path, file_type, number_of_entities, time_serious_length, number_of_attributes, classes):
     """
     :param path: the location of the hugobot output
     :param file_type: train/test
@@ -148,7 +145,7 @@ def transformation_3(path, file_type, number_of_entities, time_serious_length, n
     :param classes: the classes in the database
     :return: the function do the transformation and save the data after it
     """
-    states_path = path + "//output//train//states.csv"
+    states_path = path + "train//states.csv"
 
     # Get the number of state from state.csv file
     states_df = pd.read_csv(states_path, header=0)
@@ -169,7 +166,7 @@ def transformation_3(path, file_type, number_of_entities, time_serious_length, n
 
     for class_id in classes:
         # Read the hugobot output file for class_id
-        ta_output = path + "//output//" + file_type + "//KL-class-" + str(float(class_id)) + ".txt"
+        ta_output = path + file_type + "//KL-class-" + str(float(class_id)) + ".txt"
 
         with open(ta_output) as file:
             lines = file.readlines()
@@ -191,4 +188,4 @@ def transformation_3(path, file_type, number_of_entities, time_serious_length, n
                     arr[int(entity_id)][int(parse_data[1]) - 2][dict_value_2] = True
 
     # Save the file
-    np.save(path + '//transformation2_type3_' + file_type + '.npy', arr)
+    np.save(output_path + 'type3_' + file_type + '.npy', arr)

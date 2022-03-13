@@ -1,45 +1,23 @@
-# FCN model
-# when tuning start with learning rate->mini_batch_size ->
-# momentum-> #hidden_units -> # learning_rate_decay -> #layers
-
 import tensorflow.keras as keras
 import numpy as np
 from sklearn.model_selection import train_test_split
 import time
 
-from tensorflow.python.keras import backend as K
-from utils_folder.utils import save_logs
-from utils_folder.utils import calculate_metrics
-import os
+from tensorflow.python.keras.callbacks import EarlyStopping
 import tensorflow as tf
-import random as rn
 
-
-def create_seed():
-    os.environ['PYTHONHASHSEED'] = '0'
-    os.environ['TF_DETERMINISTIC_OPS'] = '1'
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
-
-    # Setting the seed for numpy-generated random numbers
-    np.random.seed(37)
-
-    # Setting the seed for python random numbers
-    rn.seed(1254)
-
-    # Setting the graph-level random seed.
-    tf.random.set_seed(89)
-
-    session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
-    sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
-    K.set_session(sess)
+from utils_folder.utils import save_logs, calculate_metrics
+from utils_folder.configuration import ConfigClass
 
 
 class Classifier_MCDCNN:
     def __init__(self, output_directory, input_shape, nb_classes, verbose=False, build=True):
-
-        create_seed()
+        config = ConfigClass()
+        config.set_seed()
 
         self.output_directory = output_directory
+        self.callbacks = None
+
         if build:
             if "NetFlow" in output_directory or "Wafer" in output_directory:
                 self.model = self.build_NetFlowAndWafer_model(input_shape, nb_classes)
@@ -57,20 +35,21 @@ class Classifier_MCDCNN:
         n_vars = input_shape[1]
 
         padding = 'valid'
-        if n_t < 60: # for ItalyPowerOndemand
+        # for Italy Power On demand
+        if n_t < 60:
             padding = 'same'
 
         input_layers = []
         conv2_layers = []
 
         for n_var in range(n_vars):
-            input_layer = keras.layers.Input((n_t,1))
+            input_layer = keras.layers.Input((n_t, 1))
             input_layers.append(input_layer)
 
-            conv1_layer = keras.layers.Conv1D(filters=8,kernel_size=5,activation='relu',padding=padding)(input_layer)
+            conv1_layer = keras.layers.Conv1D(filters=8, kernel_size=5, activation='relu', padding=padding)(input_layer)
             conv1_layer = keras.layers.MaxPooling1D(pool_size=2)(conv1_layer)
 
-            conv2_layer = keras.layers.Conv1D(filters=8,kernel_size=5,activation='relu',padding=padding)(conv1_layer)
+            conv2_layer = keras.layers.Conv1D(filters=8, kernel_size=5, activation='relu', padding=padding)(conv1_layer)
             conv2_layer = keras.layers.MaxPooling1D(pool_size=2)(conv2_layer)
             conv2_layer = keras.layers.Flatten()(conv2_layer)
 
@@ -95,10 +74,11 @@ class Classifier_MCDCNN:
 
         file_path = self.output_directory + 'best_model.hdf5'
 
+        es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=30, min_delta=0)
         model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='val_loss',
                                                            save_best_only=True)
 
-        self.callbacks = [model_checkpoint]
+        self.callbacks = [es, model_checkpoint]
 
         return model
 
@@ -107,20 +87,21 @@ class Classifier_MCDCNN:
         n_vars = input_shape[1]
 
         padding = 'valid'
-        if n_t < 60: # for ItalyPowerOndemand
+        # for ItalyPowerOndemand
+        if n_t < 60:
             padding = 'same'
 
         input_layers = []
         conv2_layers = []
 
         for n_var in range(n_vars):
-            input_layer = keras.layers.Input((n_t,1))
+            input_layer = keras.layers.Input((n_t, 1))
             input_layers.append(input_layer)
 
-            conv1_layer = keras.layers.Conv1D(filters=8,kernel_size=5,activation='relu',padding=padding)(input_layer)
+            conv1_layer = keras.layers.Conv1D(filters=8, kernel_size=5, activation='relu', padding=padding)(input_layer)
             conv1_layer = keras.layers.MaxPooling1D(pool_size=2)(conv1_layer)
 
-            conv2_layer = keras.layers.Conv1D(filters=8,kernel_size=5,activation='relu',padding=padding)(conv1_layer)
+            conv2_layer = keras.layers.Conv1D(filters=8, kernel_size=5, activation='relu', padding=padding)(conv1_layer)
             conv2_layer = keras.layers.MaxPooling1D(pool_size=2)(conv2_layer)
             conv2_layer = keras.layers.Flatten()(conv2_layer)
 
@@ -134,26 +115,27 @@ class Classifier_MCDCNN:
 
         # init = tf.keras.initializers.GlorotNormal(seed=123)
         # kernel_initializer = init
-        fully_connected = keras.layers.Dense(units=732,activation='tanh')(concat_layer)
+        fully_connected = keras.layers.Dense(units=732, activation='tanh')(concat_layer)
 
         output_layer = keras.layers.Dense(nb_classes, activation='softmax')(fully_connected)
 
         model = keras.models.Model(inputs=input_layers, outputs=output_layer)
 
-        model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.SGD(lr=0.01,momentum=0.9,decay=0.0005),
+        model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.SGD(lr=0.01, momentum=0.9,
+                                                                                      decay=0.0005),
                       metrics=['accuracy'])
 
         file_path = self.output_directory + 'best_model.hdf5'
 
+        es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=30, min_delta=0)
         model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='val_loss',
                                                            save_best_only=True)
 
-        self.callbacks = [model_checkpoint]
+        self.callbacks = [es, model_checkpoint]
 
         return model
 
     def prepare_input(self, x):
-        n_t = x.shape[1]
         n_vars = x.shape[2]
 
         new_x = []

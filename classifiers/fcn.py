@@ -7,40 +7,21 @@ import numpy as np
 import time
 
 from sklearn.model_selection import train_test_split
+from tensorflow.python.keras.callbacks import EarlyStopping
 
-from utils_folder.utils import save_logs
-from utils_folder.utils import calculate_metrics
-
-import os
-import random as rn
-from tensorflow.python.keras import backend as K
-
-
-def create_seed():
-    os.environ['PYTHONHASHSEED'] = '0'
-    os.environ['TF_DETERMINISTIC_OPS'] = '1'
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
-
-    # Setting the seed for numpy-generated random numbers
-    np.random.seed(37)
-
-    # Setting the seed for python random numbers
-    rn.seed(1254)
-
-    # Setting the graph-level random seed.
-    tf.random.set_seed(89)
-
-    session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
-    sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
-    K.set_session(sess)
+from utils_folder.utils import save_logs, calculate_metrics
+from utils_folder.configuration import ConfigClass
 
 
 class Classifier_FCN:
 
     def __init__(self, output_directory, input_shape, nb_classes, verbose=False, build=True):
-        create_seed()
+        config = ConfigClass()
+        config.set_seed()
 
         self.output_directory = output_directory
+        self.callbacks = None
+
         if build:
             self.model = self.build_model(input_shape, nb_classes)
             if verbose:
@@ -73,15 +54,18 @@ class Classifier_FCN:
         model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(),
                       metrics=['accuracy'])
 
-        reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='loss', factor=0.5, patience=50,
+        # TODO - Nevo
+        # Reduce learning rate when a metric has stopped improving
+        reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=50,
                                                       min_lr=0.0001)
 
         file_path = self.output_directory + 'best_model.hdf5'
 
-        model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='loss',
+        es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=30, min_delta=0)
+        model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='val_loss',
                                                            save_best_only=True)
 
-        self.callbacks = [reduce_lr, model_checkpoint]
+        self.callbacks = [es, reduce_lr, model_checkpoint]
 
         return model
 
@@ -89,6 +73,7 @@ class Classifier_FCN:
         if not tf.test.is_gpu_available:
             print('error')
             exit()
+
         # x_val and y_val are only used to monitor the test loss and NOT for training  
         batch_size = 16
         nb_epochs = 2000

@@ -1,43 +1,24 @@
-import os
-
 import tensorflow.keras as keras
 import tensorflow as tf
 import numpy as np
 import time
-import random as rn
 
 from sklearn.model_selection import train_test_split
-from tensorflow.python.keras import backend as K
 
-from utils_folder.utils import save_logs
-from utils_folder.utils import calculate_metrics
-from utils_folder.utils import save_test_duration
+from tensorflow.python.keras.callbacks import EarlyStopping
 
-
-def create_seed():
-    os.environ['PYTHONHASHSEED'] = '0'
-    os.environ['TF_DETERMINISTIC_OPS'] = '1'
-
-    # Setting the seed for numpy-generated random numbers
-    np.random.seed(37)
-
-    # Setting the seed for python random numbers
-    rn.seed(1254)
-
-    # Setting the graph-level random seed.
-    tf.random.set_seed(89)
-
-    session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
-    sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
-    K.set_session(sess)
+from utils_folder.utils import save_logs, calculate_metrics, save_test_duration
+from utils_folder.configuration import ConfigClass
 
 
 class Classifier_INCEPTION:
     def __init__(self, output_directory, input_shape, nb_classes, verbose=False, build=True, batch_size=64, lr=0.001,
                  nb_filters=32, use_residual=True, use_bottleneck=True, depth=6, kernel_size=41, nb_epochs=1500):
-        create_seed()
+        config = ConfigClass()
+        config.set_seed()
 
         self.output_directory = output_directory
+        self.callbacks = None
 
         self.nb_filters = nb_filters
         self.use_residual = use_residual
@@ -51,9 +32,9 @@ class Classifier_INCEPTION:
         self.lr = lr
         self.verbose = verbose
 
-        if build == True:
+        if build:
             self.model = self.build_model(input_shape, nb_classes)
-            if (verbose == True):
+            if verbose:
                 self.model.summary()
             self.model.save_weights(self.output_directory + 'model_init.hdf5')
 
@@ -119,15 +100,18 @@ class Classifier_INCEPTION:
         model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(self.lr),
                       metrics=['accuracy'])
 
-        reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='loss', factor=0.5, patience=50,
+        # TODO - Nevo
+        # Reduce learning rate when a metric has stopped improving
+        reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=50,
                                                       min_lr=0.0001)
 
         file_path = self.output_directory + 'best_model.hdf5'
 
-        model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='loss',
+        es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=30, min_delta=0)
+        model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='val_loss',
                                                            save_best_only=True)
 
-        self.callbacks = [reduce_lr, model_checkpoint]
+        self.callbacks = [es, reduce_lr, model_checkpoint]
 
         return model
 
@@ -135,8 +119,8 @@ class Classifier_INCEPTION:
         if not tf.test.is_gpu_available:
             print('error no gpu')
             exit()
-        # x_val and y_val are only used to monitor the test loss and NOT for training
 
+        # x_val and y_val are only used to monitor the test loss and NOT for training
         if self.batch_size is None:
             mini_batch_size = int(min(x_train.shape[0] / 10, 16))
         else:

@@ -4,39 +4,23 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 import numpy as np
 import time
-import os
-import random as rn
 
 from sklearn.model_selection import train_test_split
-from utils_folder.utils import save_logs
-from utils_folder.utils import calculate_metrics
-from tensorflow.python.keras import backend as K
+from tensorflow.python.keras.callbacks import EarlyStopping
 
-
-def create_seed():
-    os.environ['PYTHONHASHSEED'] = '0'
-    os.environ['TF_DETERMINISTIC_OPS'] = '1'
-
-    # Setting the seed for numpy-generated random numbers
-    np.random.seed(37)
-
-    # Setting the seed for python random numbers
-    rn.seed(1254)
-
-    # Setting the graph-level random seed.
-    tf.random.set_seed(89)
-
-    session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
-    sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
-    K.set_session(sess)
+from utils_folder.utils import save_logs, calculate_metrics
+from utils_folder.configuration import ConfigClass
 
 
 class Classifier_ENCODER:
 
     def __init__(self, output_directory, input_shape, nb_classes, verbose=False, build=True):
-        create_seed()
+        config = ConfigClass()
+        config.set_seed()
 
         self.output_directory = output_directory
+        self.callbacks = None
+
         if build:
             self.model = self.build_model(input_shape, nb_classes)
             if verbose:
@@ -48,34 +32,50 @@ class Classifier_ENCODER:
         input_layer = keras.layers.Input(input_shape)
 
         # conv block -1
-        conv1 = keras.layers.Conv1D(filters=128,kernel_size=5,strides=1,padding='same')(input_layer)
-        conv1 = tfa.layers.InstanceNormalization()(conv1)
+        conv1 = keras.layers.Conv1D(filters=128, kernel_size=5, strides=1, padding='same')(input_layer)
+
+        # TODO - Nevo
+        # conv1 = tfa.layers.InstanceNormalization()(conv1) - The old line
+        conv1 = tf.keras.layers.BatchNormalization(axis=1)(conv1)
+
         conv1 = keras.layers.PReLU(shared_axes=[1])(conv1)
         conv1 = keras.layers.Dropout(rate=0.2)(conv1)
         conv1 = keras.layers.MaxPooling1D(pool_size=2)(conv1)
         # conv block -2
-        conv2 = keras.layers.Conv1D(filters=256,kernel_size=11,strides=1,padding='same')(conv1)
-        conv2 = tfa.layers.InstanceNormalization()(conv2)
+        conv2 = keras.layers.Conv1D(filters=256, kernel_size=11, strides=1, padding='same')(conv1)
+
+        # TODO - Nevo
+        # conv2 = tfa.layers.InstanceNormalization()(conv2) - The old line
+        conv2 = tf.keras.layers.BatchNormalization(axis=1)(conv2)
+
         conv2 = keras.layers.PReLU(shared_axes=[1])(conv2)
         conv2 = keras.layers.Dropout(rate=0.2)(conv2)
         conv2 = keras.layers.MaxPooling1D(pool_size=2)(conv2)
         # conv block -3
-        conv3 = keras.layers.Conv1D(filters=512,kernel_size=21,strides=1,padding='same')(conv2)
-        conv3 = tfa.layers.InstanceNormalization()(conv3)
+        conv3 = keras.layers.Conv1D(filters=512, kernel_size=21, strides=1, padding='same')(conv2)
+
+        # TODO - Nevo
+        # conv3 = tfa.layers.InstanceNormalization()(conv3) - The old line
+        conv3 = tf.keras.layers.BatchNormalization(axis=1)(conv3)
+
         conv3 = keras.layers.PReLU(shared_axes=[1])(conv3)
         conv3 = keras.layers.Dropout(rate=0.2)(conv3)
         # split for attention
-        attention_data = keras.layers.Lambda(lambda x: x[:,:,:256])(conv3)
-        attention_softmax = keras.layers.Lambda(lambda x: x[:,:,256:])(conv3)
+        attention_data = keras.layers.Lambda(lambda x: x[:, :, :256])(conv3)
+        attention_softmax = keras.layers.Lambda(lambda x: x[:, :, 256:])(conv3)
         # attention mechanism
         attention_softmax = keras.layers.Softmax()(attention_softmax)
-        multiply_layer = keras.layers.Multiply()([attention_softmax,attention_data])
+        multiply_layer = keras.layers.Multiply()([attention_softmax, attention_data])
         # last layer
-        dense_layer = keras.layers.Dense(units=256,activation='sigmoid')(multiply_layer)
-        dense_layer = tfa.layers.InstanceNormalization()(dense_layer)
+        dense_layer = keras.layers.Dense(units=256, activation='sigmoid')(multiply_layer)
+
+        # TODO - Nevo
+        # dense_layer = tfa.layers.InstanceNormalization()(dense_layer) - The old line
+        dense_layer = tf.keras.layers.BatchNormalization(axis=1)(dense_layer)
+
         # output layer
         flatten_layer = keras.layers.Flatten()(dense_layer)
-        output_layer = keras.layers.Dense(units=nb_classes,activation='softmax')(flatten_layer)
+        output_layer = keras.layers.Dense(units=nb_classes, activation='softmax')(flatten_layer)
 
         model = keras.models.Model(inputs=input_layer, outputs=output_layer)
 
@@ -84,10 +84,11 @@ class Classifier_ENCODER:
 
         file_path = self.output_directory + 'best_model.hdf5'
 
+        es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=30, min_delta=0)
         model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path,
-                                                           monitor='loss', save_best_only=True)
+                                                           monitor='val_loss', save_best_only=True)
 
-        self.callbacks = [model_checkpoint]
+        self.callbacks = [es, model_checkpoint]
 
         return model
 
@@ -95,6 +96,7 @@ class Classifier_ENCODER:
         if not tf.test.is_gpu_available:
             print('error')
             exit()
+
         # x_val and y_val are only used to monitor the test loss and NOT for training
         batch_size = 12
         nb_epochs = 100
@@ -125,7 +127,7 @@ class Classifier_ENCODER:
 
         keras.backend.clear_session()
 
-    def predict(self, x_test,y_true,x_train,y_train,y_test,return_df_metrics = True):
+    def predict(self, x_test, y_true, x_train, y_train, y_test, return_df_metrics=True):
         model_path = self.output_directory + 'best_model.hdf5'
         model = keras.models.load_model(model_path)
         y_pred = model.predict(x_test)
