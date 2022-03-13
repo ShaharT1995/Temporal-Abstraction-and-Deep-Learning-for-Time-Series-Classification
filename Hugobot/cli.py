@@ -49,6 +49,7 @@ def run_cli(config, prop_path, max_gap):
                      prop_path + "ta.csv"],  # 'Path to Temporal Abstraction file'
                     standalone_mode=False)
 
+
             # Method is not gradient
             else:
                 if file_type == "train":

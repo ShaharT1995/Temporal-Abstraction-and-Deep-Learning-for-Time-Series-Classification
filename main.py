@@ -43,7 +43,9 @@ def run():
     print("Done")
 
 
-def execute_running(config, prop_path, running_dict, max_gap, method, nb_bin, paa, std, gradient_window=None):
+def execute_running(config, prop_path, running_dict, max_gap, method, nb_bin, paa, std, gradient_window=None,
+                    combination=False):
+    # TODO - COMBINATION
     # todo - Add gradient to the print
     print("-------------------------------------------------------------------------------------")
     print("Method: " + method + ", Bins: " + str(nb_bin) + ", PAA: " + str(paa) + ", STD: " +
@@ -56,7 +58,6 @@ def execute_running(config, prop_path, running_dict, max_gap, method, nb_bin, pa
         print("Already Done! \n")
 
         return running_dict
-
     else:
         create_three_files(config=config,
                            path=prop_path,
@@ -70,9 +71,36 @@ def execute_running(config, prop_path, running_dict, max_gap, method, nb_bin, pa
         print("Step 3: run hugobot")
         run_cli(config, prop_path, max_gap)
 
-        # Make the second temporal abstraction -> hugobot output files to original format
-        print("Step 4: transformation 2")
-        new_ucr_files(config, prop_path) if config.archive == "UCR" else new_mts_files(config, prop_path)
+        if combination:
+            print("Step 3.1: make the gkb.csv, ta.csv and ppa.csv for Gradient method\n")
+
+            gradient_prop_path = config.path_files_for_TA + config.archive + "//" + config.classifier + "//gradient//"
+            create_directory(gradient_prop_path)
+
+            # TODO - Nevo, what is gradient_window_size
+            create_three_files(config=config,
+                               path=gradient_prop_path,
+                               method="gradient",
+                               nb_bins=nb_bin,
+                               paa_window_size=paa,
+                               std_coefficient=std,
+                               max_gap=max_gap,
+                               gradient_window_size=1)
+
+            method = config.method
+            config.set_method("gradient")
+
+            print("Step 3.2: run hugobot for Gradient method")
+            run_cli(config, gradient_prop_path, max_gap)
+
+            config.set_method(method)
+
+            combining_two_methods(config, prop_path)
+
+        else:
+            # Make the second temporal abstraction -> hugobot output files to original format
+            print("Step 4: transformation 2")
+            new_ucr_files(config, prop_path) if config.archive == "UCR" else new_mts_files(config, prop_path)
 
         print("Step 5: Run all:")
         params = "res_" + str(method) + "_" + str(nb_bin) + "_" + str(paa) + "_" + str(std) \
@@ -106,6 +134,7 @@ if __name__ == '__main__':
     from temporal_abstraction_f.set_parameters import create_three_files
     from temporal_abstraction_f.multivariate_ta_2 import new_mts_files
     from temporal_abstraction_f.univariate_ta_2 import new_ucr_files
+    from temporal_abstraction_f.ucr_to_mts import combining_two_methods
 
     sys.path.insert(0, '/sise/robertmo-group/TA-DL-TSC/Project/Hugobot')
     from Hugobot.cli import run_cli

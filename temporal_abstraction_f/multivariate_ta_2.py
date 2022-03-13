@@ -71,7 +71,6 @@ def transformation_1(path, output_path, file_type, number_of_entities, time_seri
     for class_id in classes:
         # Read the hugobot output file for class_id
         ta_output = path + file_type + "//KL-class-" + str(float(class_id)) + ".txt"
-        ta_output = path + file_type + "//KL-class-" + str(float(class_id)) + ".txt"
 
         with open(ta_output) as file:
             lines = file.readlines()
