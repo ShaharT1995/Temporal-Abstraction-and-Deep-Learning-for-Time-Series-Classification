@@ -77,11 +77,26 @@ def read_all_datasets(config):
     else:
         for dataset_name in config.UNIVARIATE_DATASET_NAMES_2018:
             if config.afterTA:
-                df_train = pd.read_csv(config.path_transformation2 + dataset_name + "//type" +
-                                       config.transformation_number + '_Train.csv', sep=',', header=None)
+                if config.combination:
+                    x_train = np.load( config.path_transformation2 + dataset_name + "//type" + config.transformation_number
+                        + '_train.npy')
+                    y_train = np.load(config.path_transformation2 + dataset_name + "//type" + config.transformation_number
+                                      + '_train_classes.npy')
+                    x_test = np.load(config.path_transformation2 + dataset_name + "//type" + config.transformation_number
+                        + '_test.npy')
+                    y_test = np.load(config.path_transformation2 + dataset_name + "//type" + config.transformation_number +
+                                     '_test_classes.npy')
 
-                df_test = pd.read_csv(config.path_transformation2 + dataset_name + "//type" +
-                                       config.transformation_number + '_Test.csv', sep=',', header=None)
+                    datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(), y_test.copy())
+
+                    return datasets_dict
+
+                else:
+                    df_train = pd.read_csv(config.path_transformation2 + dataset_name + "//type" +
+                                           config.transformation_number + '_Train.csv', sep=',', header=None)
+
+                    df_test = pd.read_csv(config.path_transformation2 + dataset_name + "//type" +
+                                           config.transformation_number + '_Test.csv', sep=',', header=None)
 
             # Raw data
             else:

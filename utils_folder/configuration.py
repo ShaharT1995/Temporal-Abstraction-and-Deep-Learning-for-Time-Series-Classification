@@ -10,9 +10,10 @@ class ConfigClass:
     classifier = ""
     archive = ""
     afterTA = False
+    combination= False
 
     # TODO - Maybe we want to get it from the user
-    transformation_number = "1"
+    transformation_number = "2"
 
     def __init__(self):
         self.path = "/sise/robertmo-group/TA-DL-TSC/"
@@ -30,10 +31,10 @@ class ConfigClass:
         self.paa_window_size = 1
         self.gradient_window_size = [1, 2, 5, 10, 20]
 
-        self.UNIVARIATE_DATASET_NAMES_2018 = ['SmoothSubspace', 'Crop', 'Adiac', 'BME', 'Coffee', 'Yoga', 'BeetleFly',
-                                              'Car', 'Computers', 'Worms', 'PLAID', 'ACSF1']
+        # self.UNIVARIATE_DATASET_NAMES_2018 = ['SmoothSubspace', 'Crop', 'Adiac', 'BME', 'Coffee', 'Yoga', 'BeetleFly',
+        #                                       'Car', 'Computers', 'Worms', 'PLAID', 'ACSF1']
 
-        #self.UNIVARIATE_DATASET_NAMES_2018 = ['SmoothSubspace']
+        self.UNIVARIATE_DATASET_NAMES_2018 = ['SmoothSubspace']
 
         self.MTS_DATASET_NAMES = ['Libras', 'JapaneseVowels', 'ECG', 'Wafer', 'CMUsubject16', 'KickvsPunch', 'NetFlow',
                                   'WalkvsRun']
@@ -61,6 +62,10 @@ class ConfigClass:
     @staticmethod
     def set_afterTA(after_TA):
         ConfigClass.afterTA = eval(after_TA)
+
+    @staticmethod
+    def set_combination(combination):
+        ConfigClass.combination = eval(combination)
 
     @staticmethod
     def set_seed():
