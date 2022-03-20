@@ -155,8 +155,16 @@ class Classifier_TLENET:
         if not tf.test.is_gpu_available:
             print('error')
             exit()
+
+        # OLD batch and and epochs
+        # mini_batch_size = 256
         nb_epochs = 1000
-        batch_size = 256
+
+        # New batch and and epochs
+        batch_size = 128
+        nb_epochs = nb_epochs // 10
+        mini_batch_size = int(min(x_train.shape[0] / 10, batch_size))
+
         nb_classes = y_train.shape[1]
 
         # limit the number of augmented time series if series too long or too many 
@@ -187,7 +195,7 @@ class Classifier_TLENET:
 
         start_time = time.time()
 
-        hist = model.fit(x_train, y_train, batch_size=batch_size, epochs=nb_epochs,
+        hist = model.fit(x_train, y_train, batch_size=mini_batch_size, epochs=nb_epochs,
                          verbose=self.verbose, validation_data=(x_test, y_test), callbacks=self.callbacks)
 
         model.save(self.output_directory + 'last_model.hdf5')
@@ -219,7 +227,12 @@ class Classifier_TLENET:
         keras.backend.clear_session()
 
     def predict(self, x_test, y_true, x_train, y_train, y_test):
-        batch_size = 256
+        # OLD line
+        # batch_size = 256
+
+        # New batch and and epochs
+        batch_size = 128
+        mini_batch_size = int(min(x_train.shape[0] / 10, batch_size))
 
         # limit the number of augmented time series if series too long or too many
         if x_train.shape[1] > 500 or x_train.shape[0] > 2000 or x_test.shape[0] > 2000:
@@ -235,7 +248,7 @@ class Classifier_TLENET:
         model_path = self.output_directory + 'best_model.hdf5'
         model = keras.models.load_model(model_path)
 
-        y_pred = model.predict(new_x_test, batch_size=batch_size)
+        y_pred = model.predict(new_x_test, batch_size=mini_batch_size)
         # convert the predicted from binary to integer
         y_pred = np.argmax(y_pred, axis=1)
 

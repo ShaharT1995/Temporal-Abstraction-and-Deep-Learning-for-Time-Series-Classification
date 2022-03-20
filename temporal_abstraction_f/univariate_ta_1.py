@@ -38,9 +38,6 @@ class UnivariateTA1:
 
         # Adding the TemporalPropertyID with fix value
         df["TemporalPropertyID"] = self.next_attribute
-
-        df['TimeStamp'] = df['TimeStamp'] - 1
-
         # Drop all columns except classifier column
         classifier_data = tsv_data.values[:, 0]
 

@@ -54,7 +54,6 @@ class Classifier_FCN:
         model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(),
                       metrics=['accuracy'])
 
-        # TODO - Nevo
         # Reduce learning rate when a metric has stopped improving
         reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=50,
                                                       min_lr=0.0001)
@@ -74,10 +73,15 @@ class Classifier_FCN:
             print('error')
             exit()
 
-        # x_val and y_val are only used to monitor the test loss and NOT for training  
-        batch_size = 16
+        # OLD batch and and epochs
+        # batch_size = 16
         nb_epochs = 2000
 
+        # New batch and and epochs
+        batch_size = 128
+        nb_epochs = nb_epochs // 10
+
+        # Was here before
         mini_batch_size = int(min(x_train.shape[0] / 10, batch_size))
 
         start_time = time.time()

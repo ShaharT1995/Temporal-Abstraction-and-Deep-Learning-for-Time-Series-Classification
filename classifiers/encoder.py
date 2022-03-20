@@ -34,7 +34,6 @@ class Classifier_ENCODER:
         # conv block -1
         conv1 = keras.layers.Conv1D(filters=128, kernel_size=5, strides=1, padding='same')(input_layer)
 
-        # TODO - Nevo
         # conv1 = tfa.layers.InstanceNormalization()(conv1) - The old line
         conv1 = tf.keras.layers.BatchNormalization(axis=1)(conv1)
 
@@ -44,7 +43,6 @@ class Classifier_ENCODER:
         # conv block -2
         conv2 = keras.layers.Conv1D(filters=256, kernel_size=11, strides=1, padding='same')(conv1)
 
-        # TODO - Nevo
         # conv2 = tfa.layers.InstanceNormalization()(conv2) - The old line
         conv2 = tf.keras.layers.BatchNormalization(axis=1)(conv2)
 
@@ -54,7 +52,6 @@ class Classifier_ENCODER:
         # conv block -3
         conv3 = keras.layers.Conv1D(filters=512, kernel_size=21, strides=1, padding='same')(conv2)
 
-        # TODO - Nevo
         # conv3 = tfa.layers.InstanceNormalization()(conv3) - The old line
         conv3 = tf.keras.layers.BatchNormalization(axis=1)(conv3)
 
@@ -69,7 +66,6 @@ class Classifier_ENCODER:
         # last layer
         dense_layer = keras.layers.Dense(units=256, activation='sigmoid')(multiply_layer)
 
-        # TODO - Nevo
         # dense_layer = tfa.layers.InstanceNormalization()(dense_layer) - The old line
         dense_layer = tf.keras.layers.BatchNormalization(axis=1)(dense_layer)
 
@@ -92,16 +88,19 @@ class Classifier_ENCODER:
 
         return model
 
-    def fit(self, x_train, y_train, x_test, y_val, y_true, iter):
+    def fit(self, x_train, y_train, x_test, y_test, y_true, iter):
         if not tf.test.is_gpu_available:
             print('error')
             exit()
 
-        # x_val and y_val are only used to monitor the test loss and NOT for training
-        batch_size = 12
+        # OLD batch and and epochs
+        # batch_size = 12
         nb_epochs = 100
 
-        mini_batch_size = batch_size
+        # New batch and and epochs
+        batch_size = 128
+        nb_epochs = nb_epochs // 10
+        mini_batch_size = int(min(x_train.shape[0] / 10, batch_size))
 
         start_time = time.time()
 
@@ -114,7 +113,7 @@ class Classifier_ENCODER:
 
         duration = time.time() - start_time
 
-        self.model.save(self.output_directory+'last_model.hdf5')
+        self.model.save(self.output_directory + 'last_model.hdf5')
 
         model = keras.models.load_model(self.output_directory + 'best_model.hdf5')
 

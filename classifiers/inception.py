@@ -100,7 +100,6 @@ class Classifier_INCEPTION:
         model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(self.lr),
                       metrics=['accuracy'])
 
-        # TODO - Nevo
         # Reduce learning rate when a metric has stopped improving
         reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=50,
                                                       min_lr=0.0001)
@@ -120,9 +119,14 @@ class Classifier_INCEPTION:
             print('error no gpu')
             exit()
 
-        # x_val and y_val are only used to monitor the test loss and NOT for training
+        # New batch and and epochs
+        self.batch_size = 128
+        self.nb_epochs = self.nb_epochs // 10
+
         if self.batch_size is None:
-            mini_batch_size = int(min(x_train.shape[0] / 10, 16))
+            # Was here before - mini_batch_size = int(min(x_train.shape[0] / 10, 16))
+            # Changed to
+            mini_batch_size = int(min(x_train.shape[0] / 10, self.batch_size))
         else:
             mini_batch_size = self.batch_size
 

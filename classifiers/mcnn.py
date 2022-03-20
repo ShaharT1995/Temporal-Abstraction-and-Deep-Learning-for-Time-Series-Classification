@@ -496,7 +496,7 @@ class Classifier_MCNN:
                 df_metrics, model, valid_loss = self.train(x_train, y_train, x_test,
                                                            y_test, y_true, iteration, pool_factor, filter_size)
 
-                if (valid_loss < best_valid_loss):
+                if valid_loss < best_valid_loss:
                     best_valid_loss = valid_loss
                     best_df_metrics = df_metrics
                     best_df_metrics.to_csv(output_directory_root + 'df_metrics.csv', index=False)

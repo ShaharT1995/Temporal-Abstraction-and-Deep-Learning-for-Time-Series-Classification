@@ -19,6 +19,7 @@ class Classifier_MCDCNN:
         self.callbacks = None
 
         if build:
+            # TODO SHAHAR
             if "NetFlow" in output_directory or "Wafer" in output_directory:
                 self.model = self.build_NetFlowAndWafer_model(input_shape, nb_classes)
             else:
@@ -86,8 +87,8 @@ class Classifier_MCDCNN:
         n_t = input_shape[0]
         n_vars = input_shape[1]
 
+        # No padding
         padding = 'valid'
-        # for ItalyPowerOndemand
         if n_t < 60:
             padding = 'same'
 
@@ -113,8 +114,6 @@ class Classifier_MCDCNN:
         else:
             concat_layer = keras.layers.Concatenate(axis=-1)(conv2_layers)
 
-        # init = tf.keras.initializers.GlorotNormal(seed=123)
-        # kernel_initializer = init
         fully_connected = keras.layers.Dense(units=732, activation='tanh')(concat_layer)
 
         output_layer = keras.layers.Dense(nb_classes, activation='softmax')(fully_connected)
@@ -149,8 +148,15 @@ class Classifier_MCDCNN:
         if not tf.test.is_gpu_available:
             print('error')
             exit()
-        mini_batch_size = 16
+
+        # OLD batch and and epochs
+        # mini_batch_size = 16
         nb_epochs = 120
+
+        # New batch and and epochs
+        batch_size = 128
+        nb_epochs = nb_epochs // 10
+        mini_batch_size = int(min(x.shape[0] / 10, batch_size))
 
         x_train, x_val, y_train, y_val = \
             train_test_split(x, y, test_size=0.3, random_state=(42 + iteration))
@@ -166,7 +172,7 @@ class Classifier_MCDCNN:
 
         duration = time.time() - start_time
 
-        self.model.save(self.output_directory+'last_model.hdf5')
+        self.model.save(self.output_directory + 'last_model.hdf5')
 
         model = keras.models.load_model(self.output_directory + 'best_model.hdf5')
 
@@ -179,6 +185,7 @@ class Classifier_MCDCNN:
 
         keras.backend.clear_session()
 
+    # TODO SHAHAR
     def predict(self, x_test, y_true, x_train, y_train, y_test, return_df_metrics=True):
         model_path = self.output_directory + 'best_model.hdf5'
         model = keras.models.load_model(model_path)

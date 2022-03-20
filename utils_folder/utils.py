@@ -10,7 +10,8 @@ from utils_folder.ranking_graph import draw_cd_diagram
 
 from builtins import print
 
-from sklearn.metrics import accuracy_score, precision_score, recall_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, balanced_accuracy_score, \
+    matthews_corrcoef, cohen_kappa_score
 
 from scipy.interpolate import interp1d
 from scipy.io import loadmat
@@ -90,9 +91,12 @@ def read_all_datasets(config):
                 df_train = pd.read_csv(root_dir_dataset + '/' + dataset_name + '_TRAIN.tsv', sep='\t', header=None)
                 df_test = pd.read_csv(root_dir_dataset + '/' + dataset_name + '_TEST.tsv', sep='\t', header=None)
 
-                # Padding with zero for missing values # TODO
-                df_train = df_train.fillna(0)
-                df_test = df_test.fillna(0)
+            # For us if needed - count how much null there is in the df
+            # df.isnull().sum().sum() != 0:
+
+            # Padding missing values
+            df_train = df_train.interpolate(method='linear', limit_direction='both', axis=1)
+            df_test = df_test.interpolate(method='linear', limit_direction='both', axis=1)
 
             y_train = df_train.values[:, 0]
             y_test = df_test.values[:, 0]
@@ -106,16 +110,15 @@ def read_all_datasets(config):
             x_train = x_train.values
             x_test = x_test.values
 
-            # TODO - Ask Nevo
             # Z-Normalization if we work on the RawData
-            if not config.afterTA:
-                std_ = x_train.std(axis=1, keepdims=True)
-                std_[std_ == 0] = 1.0
-                x_train = (x_train - x_train.mean(axis=1, keepdims=True)) / std_
-
-                std_ = x_test.std(axis=1, keepdims=True)
-                std_[std_ == 0] = 1.0
-                x_test = (x_test - x_test.mean(axis=1, keepdims=True)) / std_
+            # if not config.afterTA:
+            #     std_ = x_train.std(axis=1, keepdims=True)
+            #     std_[std_ == 0] = 1.0
+            #     x_train = (x_train - x_train.mean(axis=1, keepdims=True)) / std_
+            #
+            #     std_ = x_test.std(axis=1, keepdims=True)
+            #     std_[std_ == 0] = 1.0
+            #     x_test = (x_test - x_test.mean(axis=1, keepdims=True)) / std_
 
             datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(), y_test.copy())
 
@@ -142,10 +145,11 @@ def get_func_length(x_train, x_test, func):
 def transform_to_same_length(x, n_var, max_length):
     n = x.shape[0]
 
+    # TODO SHAHAR - change the var name (ucr_x to mts)
     # the new set in ucr form np array
     ucr_x = np.zeros((n, max_length, n_var), dtype=np.float64)
 
-    # loop through each time series
+    # loop through each entity
     for i in range(n):
         mts = x[i]
         curr_length = mts.shape[1]
@@ -218,15 +222,28 @@ def transform_mts_to_ucr_format():
 
 def calculate_metrics(y_true, y_pred, duration, y_true_val=None, y_pred_val=None):
     res = pd.DataFrame(data=np.zeros((1, 4), dtype=np.float), index=[0],
-                       columns=['precision', 'accuracy', 'recall', 'duration'])
+                       columns=['precision', 'accuracy', 'recall', 'mcc', 'cohen_kappa', 'duration', 'f1_score_macro',
+                                'f1_score_micro', 'f1_score_weighted'])
+
     res['precision'] = precision_score(y_true, y_pred, average='macro')
-    res['accuracy'] = accuracy_score(y_true, y_pred)
+    res['recall'] = recall_score(y_true, y_pred, average='macro')
+
+    res['accuracy'] = balanced_accuracy_score(y_true, y_pred)
+
+    res['f1_score_macro'] = f1_score(y_true, y_pred, average='macro')
+    res['f1_score_micro'] = f1_score(y_true, y_pred, average='micro')
+    res['f1_score_weighted'] = f1_score(y_true, y_pred, average='weighted')
+
+    # Matthews correlation coefficient
+    res['mcc'] = matthews_corrcoef(y_true, y_pred)
+
+    # Cohen’s kappa
+    res['cohen_kappa'] = cohen_kappa_score(y_true, y_pred)
 
     # This is useful when transfer learning is used with cross validation
     if y_true_val is not None:
-        res['accuracy_val'] = accuracy_score(y_true_val, y_pred_val)
+        res['accuracy_val'] = balanced_accuracy_score(y_true_val, y_pred_val)
 
-    res['recall'] = recall_score(y_true, y_pred, average='macro')
     res['duration'] = duration
     return res
 
@@ -285,7 +302,6 @@ def save_logs_t_leNet(output_directory, hist, y_pred, y_true, duration):
     hist_df.to_csv(output_directory + 'history.csv', index=False)
 
     df_metrics = calculate_metrics(y_true, y_pred, duration)
-    df_metrics.to_csv(output_directory + 'df_metrics.csv', index=False)
 
     index_best_model = hist_df['loss'].idxmin()
     row_best_model = hist_df.loc[index_best_model]
@@ -300,7 +316,10 @@ def save_logs_t_leNet(output_directory, hist, y_pred, y_true, duration):
     df_best_model['best_model_val_acc'] = row_best_model['val_accuracy']
     df_best_model['best_model_nb_epoch'] = index_best_model
 
+    df_metrics['best_model_nb_epoch'] = index_best_model
+
     df_best_model.to_csv(output_directory + 'df_best_model.csv', index=False)
+    df_metrics.to_csv(output_directory + 'df_metrics.csv', index=False)
 
     # plot losses
     plot_epochs_metric(hist, output_directory + 'epochs_loss.png')
@@ -313,8 +332,7 @@ def save_logs(output_directory, hist, y_pred, y_true, duration, lr=True, y_true_
     df_metrics = calculate_metrics(y_true, y_pred, duration, y_true_val, y_pred_val)
     df_metrics.to_csv(output_directory + 'df_metrics.csv', index=False)
 
-    # TODO - Ask Nevo
-    index_best_model = hist_df['loss'].idxmin()
+    index_best_model = hist_df['val_loss'].idxmin()
     row_best_model = hist_df.loc[index_best_model]
 
     df_best_model = pd.DataFrame(data=np.zeros((1, 6), dtype=np.float), index=[0],

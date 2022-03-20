@@ -1,12 +1,11 @@
+import math
+
 import tensorflow as tf
 import numpy as np
 import time
 import tensorflow.keras as keras
 from tensorflow.keras.layers import Input, Conv1D, BatchNormalization, ELU, Dense, Reshape, concatenate, Permute
-from tensorflow.keras.layers import  GlobalAveragePooling1D, LSTM, Dropout, Activation, multiply
-
-# TODO - Ask Nevo if he wants that
-# from utils.classifier_tools import create_class_weight
+from tensorflow.keras.layers import GlobalAveragePooling1D, LSTM, Dropout, Activation, multiply
 from tensorflow.python.keras.callbacks import EarlyStopping
 
 from utils_folder.utils import save_logs, calculate_metrics
@@ -33,6 +32,22 @@ class Classifier_MLSTM_FCN:
         if verbose:
             self.model.summary()
         self.model.save_weights(self.output_directory + 'model_init.h5')
+
+    def create_class_weight(self, labels, mu=2):
+        labels_dict = {}
+        total = 0
+        for i in range(labels.shape[1]):
+            labels_dict.update({i: sum(labels[:, i])})
+            total += sum(labels[:, i])
+
+        keys = labels_dict.keys()
+        class_weight = dict()
+
+        for key in keys:
+            score = math.log(mu * total / float(labels_dict[key]))
+            class_weight[key] = score if score > 1.0 else 1.0
+
+        return class_weight
 
     def build_model(self, input_shape, nb_classes):
 
@@ -71,54 +86,36 @@ class Classifier_MLSTM_FCN:
 
         return model
 
-    def fit(self, Ximg_train, yimg_train, Ximg_val, yimg_val, y_true,iteration):
+    def fit(self, x, y, x_test, y_test, y_true, iteration):
         if not tf.test.is_gpu_available:
             print('error')
             exit()
         batch_size = 16
         nb_epochs = 2000
-        mini_batch_size = int(min(Ximg_train.shape[0] / 10, batch_size))
+        mini_batch_size = int(min(x.shape[0] / 10, batch_size))
 
-        # TODO - Ask Nevo
         # create class weights based on the y label proportions for each image
-        # class_weight = create_class_weight(yimg_train)
+        class_weight = self.create_class_weight(y)
 
         start_time = time.time()
         # train the model
         x_train, x_val, y_train, y_val = \
-            train_test_split(Ximg_train, yimg_train, test_size=0.3, random_state=(42 + iteration))
+            train_test_split(x, y, test_size=0.3, random_state=(42 + iteration))
 
-        # self.hist = self.model.fit(Ximg_train, yimg_train,
-        #                            validation_data=[Ximg_val, yimg_val],
-        #                            class_weight=class_weight,
-        #                            verbose=self.verbose,
-        #                            epochs=nb_epochs,
-        #                            batch_size=mini_batch_size,
-        #                            callbacks=self.callbacks)
-
-        # TODO - Ask Nevo
-        self.hist = self.model.fit(Ximg_train, yimg_train,
-                                   validation_data=[Ximg_val, yimg_val],
+        self.hist = self.model.fit(x_train, y_train,
+                                   validation_data=[x_val, y_val],
+                                   class_weight=class_weight,
                                    verbose=self.verbose,
                                    epochs=nb_epochs,
                                    batch_size=mini_batch_size,
                                    callbacks=self.callbacks)
 
         self.duration = time.time() - start_time
-        '''
-        self.hist = self.model.fit(Ximg_train, yimg_train,
-                                   validation_split=0.1,
-                                   class_weight=class_weight,
-                                   verbose=self.verbose,
-                                   epochs=epochs,
-                                   batch_size=mini_batch_size,
-                                   callbacks=self.callbacks)
-        self.duration = time.time() - start_time
-        '''
+
         keras.models.save_model(self.model, self.output_directory + 'model.h5')
         model = keras.models.load_model(self.output_directory + 'best_model.hdf5')
 
-        y_pred = model.predict(Ximg_val) # check with Nevo
+        y_pred = model.predict(x_test)
 
         # convert the predicted from binary to integer
         y_pred = np.argmax(y_pred, axis=1)
@@ -136,19 +133,7 @@ class Classifier_MLSTM_FCN:
             return df_metrics
         else:
             return y_pred
-    """"
-    talk with Nevo
-    def predict(self, X_img, y_img, best):
-        if best:
-            model = keras.models.load_model(self.output_directory + 'best_model.h5')
-        else:
-            model = keras.models.load_model(self.output_directory + 'model.h5')
 
-        model_metrics, conf_mat, y_true, y_pred = predict_model(model, X_img, y_img, self.output_directory)
-        save_logs(self.output_directory, self.hist, y_pred, y_true, self.duration)
-        keras.backend.clear_session()
-        return model_metrics, conf_mat
-        """
 
 def squeeze_excite_block(input):
     ''' Create a squeeze-excite block

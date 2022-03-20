@@ -10,9 +10,10 @@ class ConfigClass:
     classifier = ""
     archive = ""
     afterTA = False
+    combination = False
 
     # TODO - Maybe we want to get it from the user
-    transformation_number = "1"
+    transformation_number = "3"
 
     def __init__(self):
         self.path = "/sise/robertmo-group/TA-DL-TSC/"
@@ -24,21 +25,27 @@ class ConfigClass:
         self.path_transformation1 = ""
         self.path_transformation2 = ""
 
-        self.nb_bin = [2, 5, 10, 20]
+        # self.nb_bin = [2, 5, 10, 20]
+        # self.std_coefficient = [-1]
+        # self.max_gap = [1, 2]
+        # self.paa_window_size = 1
+        # self.gradient_window_size = [1, 2, 5, 10, 20]
+
+        self.nb_bin = [3, 10]
         self.std_coefficient = [-1]
-        self.max_gap = [1, 2]
+        self.max_gap = [1]
         self.paa_window_size = 1
-        self.gradient_window_size = [1, 2, 5, 10, 20]
+        self.gradient_window_size = [10]
 
         self.UNIVARIATE_DATASET_NAMES_2018 = ['SmoothSubspace', 'Crop', 'Adiac', 'BME', 'Coffee', 'Yoga', 'BeetleFly',
                                               'Car', 'Computers', 'Worms', 'PLAID', 'ACSF1']
 
         #self.UNIVARIATE_DATASET_NAMES_2018 = ['SmoothSubspace']
 
-        self.MTS_DATASET_NAMES = ['Libras', 'JapaneseVowels', 'ECG', 'Wafer', 'CMUsubject16', 'KickvsPunch', 'NetFlow',
-                                  'WalkvsRun']
+        # self.MTS_DATASET_NAMES = ['Libras', 'JapaneseVowels', 'ECG', 'Wafer', 'CMUsubject16', 'KickvsPunch', 'NetFlow',
+        #                           'WalkvsRun']
 
-        # self.MTS_DATASET_NAMES = ['Libras']
+        self.MTS_DATASET_NAMES = ['Libras']
 
     def set_path_transformations(self):
         self.path_transformation1 = self.path_files_for_TA + "Transformation1//" + self.archive + "//"
@@ -61,6 +68,10 @@ class ConfigClass:
     @staticmethod
     def set_afterTA(after_TA):
         ConfigClass.afterTA = eval(after_TA)
+
+    @staticmethod
+    def set_combination(combination):
+        ConfigClass.combination = eval(combination)
 
     @staticmethod
     def set_seed():

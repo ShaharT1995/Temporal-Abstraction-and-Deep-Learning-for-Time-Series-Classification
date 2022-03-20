@@ -129,10 +129,16 @@ class Classifier_RESNET:
         if not tf.test.is_gpu_available:
             print('error')
             exit()
-        # x_val and y_val are only used to monitor the test loss and NOT for training
-        batch_size = 64
+
+        # OLD batch and and epochs
+        # batch_size = 64
         nb_epochs = 1500
 
+        # New batch and and epochs
+        batch_size = 128
+        nb_epochs = nb_epochs // 10
+
+        # Was here before
         mini_batch_size = int(min(x_train.shape[0] / 10, batch_size))
 
         start_time = time.time()

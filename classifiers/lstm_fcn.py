@@ -2,6 +2,7 @@
 # when tuning start with learning rate->mini_batch_size ->
 # momentum-> #hidden_units -> # learning_rate_decay -> #layers
 import tensorflow.keras as keras
+from sklearn.model_selection import train_test_split
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Dense, LSTM, multiply, concatenate, Activation, Masking, Reshape
 from tensorflow.keras.layers import Conv1D, BatchNormalization, GlobalAveragePooling1D, Permute, Dropout
@@ -52,50 +53,6 @@ class Classifier_LSTMFCN:
             self.model.save_weights(self.output_directory + 'model_init.hdf5')
         return
 
-    # def build_model(self, input_shape, nb_classes):
-    #     input_layer = keras.layers.Input(input_shape)
-    #
-    #     lstm_layer = Masking()(input_layer)
-    #     lstm_layer = LSTM(64)(lstm_layer)
-    #     lstm_layer = Dropout(0.8)(lstm_layer)
-    #
-    #     conv1 = keras.layers.Conv1D(filters=128, kernel_size=8, padding='same')(input_layer)
-    #     conv1 = keras.layers.BatchNormalization()(conv1)
-    #     conv1 = keras.layers.Activation(activation='relu')(conv1)
-    #
-    #     conv2 = keras.layers.Conv1D(filters=256, kernel_size=5, padding='same')(conv1)
-    #     conv2 = keras.layers.BatchNormalization()(conv2)
-    #     conv2 = keras.layers.Activation('relu')(conv2)
-    #
-    #     conv3 = keras.layers.Conv1D(128, kernel_size=3, padding='same')(conv2)
-    #     conv3 = keras.layers.BatchNormalization()(conv3)
-    #     conv3 = keras.layers.Activation('relu')(conv3)
-    #
-    #     gap_layer = keras.layers.GlobalAveragePooling1D()(conv3)
-    #
-    #     x = concatenate([lstm_layer, gap_layer])
-    #
-    #     output_layer = keras.layers.Dense(nb_classes, activation='softmax')(x)
-    #
-    #     model = keras.models.Model(inputs=input_layer, outputs=output_layer)
-    #
-    #     model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(),
-    #                   metrics=['accuracy'])
-    #
-    #     # TODO - Ask Nevo
-    #     reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=50,
-    #                                                   min_lr=0.0001)
-    #
-    #     file_path = self.output_directory + 'best_model.hdf5'
-    #
-    #     es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=30, min_delta=0)
-    #     model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='val_loss',
-    #                                                        save_best_only=True)
-    #
-    #     self.callbacks = [es, reduce_lr, model_checkpoint]
-    #
-    #     return model
-
     def build_model(self, input_shape, nb_classes):
         ip = Input(input_shape)
 
@@ -130,21 +87,20 @@ class Classifier_LSTMFCN:
         model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(),
                       metrics=['accuracy'])
 
-        # TODO - Ask Nevo
-        reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='loss', factor=0.5, patience=50,
+        reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=50,
                                                       min_lr=0.0001)
 
         file_path = self.output_directory + 'best_model.hdf5'
 
         es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=30, min_delta=0)
-        model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='loss',
+        model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='val_loss',
                                                            save_best_only=True)
 
         self.callbacks = [es, reduce_lr, model_checkpoint]
 
         return model
 
-    def fit(self, x_train, y_train, x_val, y_val, y_true):
+    def fit(self, x, y, x_test, y_test, y_true, iteration):
         if not tf.test.is_gpu_available:
             print('error')
             exit()
@@ -152,9 +108,12 @@ class Classifier_LSTMFCN:
         batch_size = 8
         nb_epochs = 100
 
-        mini_batch_size = int(min(x_train.shape[0] / 10, batch_size))
+        mini_batch_size = int(min(x.shape[0] / 10, batch_size))
 
         start_time = time.time()
+
+        x_train, x_val, y_train, y_val = \
+            train_test_split(x, y, test_size=0.3, random_state=(42 + iteration))
 
         hist = self.model.fit(x_train, y_train, batch_size=mini_batch_size, epochs=nb_epochs,
                               verbose=self.verbose, validation_data=(x_val, y_val), callbacks=self.callbacks)
@@ -165,7 +124,7 @@ class Classifier_LSTMFCN:
 
         model = keras.models.load_model(self.output_directory + 'best_model.hdf5')
 
-        y_pred = model.predict(x_val)
+        y_pred = model.predict(x_test)
 
         # convert the predicted from binary to integer
         y_pred = np.argmax(y_pred, axis=1)

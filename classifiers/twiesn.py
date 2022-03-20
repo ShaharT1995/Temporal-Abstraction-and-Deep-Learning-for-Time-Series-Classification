@@ -13,8 +13,6 @@ from utils_folder.utils import calculate_metrics, create_directory
 from utils_folder.configuration import ConfigClass
 
 
-# TODO - Nevo: There is no ModelCheckpoint!
-
 class Classifier_TWIESN:
 
     def __init__(self, output_directory, verbose):
@@ -121,12 +119,12 @@ class Classifier_TWIESN:
         ridge_classifier.fit(new_x_train, new_labels)
 
         ################
-        ## Validation ##
+        # Validation
         ################
         # compute state matrix for validation set
         state_matrix = self.compute_state_matrix(self.x_val)
         # add the input to form the new feature space and transform to
-        # the new feature space to be feeded to the classifier
+        # the new feature space to be fed to the classifier
         new_x_val = np.concatenate((self.x_val, state_matrix), axis=2).reshape(
             self.x_val.shape[0] * self.T, self.num_dim + self.N_x)
         # get the prediction on the train set
@@ -139,13 +137,14 @@ class Classifier_TWIESN:
         train_acc = df_val_metrics['accuracy'][0]
 
         ###############
-        ### Testing ###
+        # Testing
         ###############
 
-        # get the predicition on the test set
+        # get the prediction on the test set
         # transform the test set to the new features
         state_matrix = self.compute_state_matrix(self.x_test)
-        # add the input to form the new feature space and transform to the new feature space to be feeded to the classifier
+        # add the input to form the new feature space and transform to the new feature space to be feeded to the
+        # classifier
         new_x_test = np.concatenate((self.x_test, state_matrix), axis=2).reshape(self.x_test.shape[0] * self.T,
                                                                                  self.num_dim + self.N_x)
         # memory free

@@ -19,6 +19,7 @@ def fit_classifier(iter, datasets_dict, dataset_name, classifier_name, output_di
     y_test = enc.transform(y_test.reshape(-1, 1)).toarray()
 
     # Save the original y, because later we will use binary
+    # TODO SHAHAR - change to y_test_true
     y_true = np.argmax(y_test, axis=1)
 
     # If univariate add a dimension to make it multivariate with one dimension

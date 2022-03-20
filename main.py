@@ -43,8 +43,7 @@ def run():
     print("Done")
 
 
-def execute_running(config, prop_path, running_dict, max_gap, method, nb_bin, paa, std, gradient_window=None,
-                    combination=False):
+def execute_running(config, prop_path, running_dict, max_gap, method, nb_bin, paa, std, gradient_window=None):
     # TODO - COMBINATION
     # todo - Add gradient to the print
     print("-------------------------------------------------------------------------------------")
@@ -71,7 +70,7 @@ def execute_running(config, prop_path, running_dict, max_gap, method, nb_bin, pa
         print("Step 3: run hugobot")
         run_cli(config, prop_path, max_gap)
 
-        if combination:
+        if config.combination:
             print("Step 3.1: make the gkb.csv, ta.csv and ppa.csv for Gradient method\n")
 
             gradient_prop_path = config.path_files_for_TA + config.archive + "//" + config.classifier + "//gradient//"
@@ -105,6 +104,7 @@ def execute_running(config, prop_path, running_dict, max_gap, method, nb_bin, pa
         print("Step 5: Run all:")
         params = "res_" + str(method) + "_" + str(nb_bin) + "_" + str(paa) + "_" + str(std) \
                         + "_" + str(max_gap) + "_" + str(gradient_window)
+
         run_models.run_all(config, params)
         print("")
 
@@ -144,9 +144,11 @@ if __name__ == '__main__':
         create_files()
 
     if sys.argv[1] == 'run_all':
+        # run_all UCR mcdcnn True sax
         config.set_classifier(sys.argv[3])
         config.set_afterTA(sys.argv[4])
         config.set_method(sys.argv[5])
+        config.set_combination(sys.argv[6])
         config.set_path_transformations()
 
         run() if config.afterTA else run_models.run_all(config, "RawData")
