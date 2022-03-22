@@ -76,7 +76,7 @@ def execute_running(config, prop_path, running_dict, max_gap, method, nb_bin, pa
             gradient_prop_path = config.path_files_for_TA + config.archive + "//" + config.classifier + "//gradient//"
             create_directory(gradient_prop_path)
 
-            # TODO - Nevo, what is gradient_window_size
+            # TODO Change the gradient window size
             create_three_files(config=config,
                                path=gradient_prop_path,
                                method="gradient",
@@ -84,7 +84,7 @@ def execute_running(config, prop_path, running_dict, max_gap, method, nb_bin, pa
                                paa_window_size=paa,
                                std_coefficient=std,
                                max_gap=max_gap,
-                               gradient_window_size=1)
+                               gradient_window_size=config.gradient_window_size[0])
 
             method = config.method
             config.set_method("gradient")

@@ -29,9 +29,9 @@ def new_ucr_files(config, prop_path):
             number_of_columns = univariate_dict[(dataset_name, file_type.lower())]["columns"]
 
             # Run the three transformation on the Train and Test files
-            for key in transformation_dict.keys():
-                transformation_dict[key](path, output_path, file_type, number_of_rows, number_of_columns, classes)
-                print("\t\ttransformation_" + key + ", " + file_type.lower())
+            transformation_dict[config.transformation_number](path, output_path, file_type, number_of_rows,
+                                                              number_of_columns, classes)
+            print("\t\ttransformation_" + config.transformation_number + ", " + file_type.lower())
 
         print("")
 

@@ -59,7 +59,6 @@ class Classifier_CNN:
         self.callbacks = [es, model_checkpoint]
         return model
 
-    # TODO - Ask Nevo - about y true
     def fit(self, x_train, y_train, x_test, y_test, y_true,  iteration):
         if not tf.test.is_gpu_available:
             print('error')
@@ -97,14 +96,3 @@ class Classifier_CNN:
         save_logs(self.output_directory, hist, y_pred, y_true, duration, lr=False)
 
         keras.backend.clear_session()
-
-    def predict(self, x_test, y_true, x_train, y_train, y_test, return_df_metrics=True):
-        model_path = self.output_directory + 'best_model.hdf5'
-        model = keras.models.load_model(model_path)
-        y_pred = model.predict(x_test)
-        if return_df_metrics:
-            y_pred = np.argmax(y_pred, axis=1)
-            df_metrics = calculate_metrics(y_true, y_pred, 0.0)
-            return df_metrics
-        else:
-            return y_pred

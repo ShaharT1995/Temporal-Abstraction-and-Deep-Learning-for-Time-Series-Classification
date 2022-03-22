@@ -23,19 +23,17 @@ class Gradient(TemporalAbstraction):
         """
         self.__window_size = window_size
 
-        # original #
-        # self.__states = states
-
-        # new #
         if states is not None:
-            if 'Method' in states.columns:
+            if not TemporalAbstraction.is_valid_states(states, ncr):
+                raise Exception('ERROR: States input is invalid')
+            if StatesColumns.Method in states.columns:
                 curr_states = states[states[StatesColumns.Method] == MethodsNames.Gradient]
                 l_titles = list(curr_states.columns)
-                l_titles.insert(len(l_titles) - 1, l_titles.pop(l_titles.index('Method')))
+                l_titles.insert(len(l_titles) - 1, l_titles.pop(l_titles.index(StatesColumns.Method)))
                 curr_states = curr_states.loc[:, l_titles]
                 self.__states = curr_states
             else:
-                states['Method'] = MethodsNames.Gradient
+                states[StatesColumns.Method] = MethodsNames.Gradient
                 self.__states = states
 
     @staticmethod
@@ -67,7 +65,7 @@ class Gradient(TemporalAbstraction):
                 b_1 = ss_xy / ss_xx
                 return np.degrees(np.arctan(b_1))
             else:
-                return 0
+                return
 
         df[DatasetColumns.TemporalPropertyValue] = df.apply(calc_derivative_of_sample, axis=1)
         return df
@@ -80,24 +78,14 @@ class Gradient(TemporalAbstraction):
         :param states: Dataframe, contains the states the gradient uses
         :return: Dataframe, a symbolic time series
         """
-
-        # original #
-        # time_point_series = df.groupby(by=[DatasetColumns.EntityID, DatasetColumns.TemporalPropertyID]). \
-        #     apply(lambda x: Gradient.derivative(x, window_size)).dropna()
-
-        # new #
         time_point_series = df.groupby(by=[DatasetColumns.EntityID, DatasetColumns.TemporalPropertyID]). \
             apply(lambda x: Gradient.derivative(x, window_size)).dropna(subset=[DatasetColumns.TemporalPropertyValue])
         time_point_series.reset_index(drop=True, inplace=True)
 
-        # old #
-        # symbolic_time_series = TemporalAbstraction.create_symbolic_time_series(states, time_point_series)
-
-        # new #
-        if 'Method' in states.columns:
+        if StatesColumns.Method in states.columns:
             states = states[states[StatesColumns.Method] == MethodsNames.Gradient]
             symbolic_time_series = TemporalAbstraction.create_symbolic_time_series(states, time_point_series)
-            symbolic_time_series['Method'] = MethodsNames.Gradient
+            symbolic_time_series[StatesColumns.Method] = MethodsNames.Gradient
         else:
             symbolic_time_series = TemporalAbstraction.create_symbolic_time_series(states, time_point_series)
 
@@ -105,7 +93,7 @@ class Gradient(TemporalAbstraction):
 
     def discretize_property(self, prop_df):
         if prop_df.empty:
-            return self.__states,\
+            return self.__states, \
                    DataframesGenerator.generate_empty_symbolic_time_series()
 
         prop_id = prop_df[DatasetColumns.TemporalPropertyID].values[0]

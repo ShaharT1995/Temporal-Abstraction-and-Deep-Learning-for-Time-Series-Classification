@@ -1,6 +1,8 @@
 import time
 import numpy as np
 import pandas as pd
+from sklearn.model_selection import train_test_split
+
 from utils_folder.utils import calculate_metrics
 
 import time
@@ -228,6 +230,11 @@ class Classifier_Rocket:
         # Train ROCKET Classifier
         start_time = time.time()
         rocket = Base_Classifier_ROCKET(self.n_kernels, self.kss, self.verbose)
+
+        # We don't use the validation set
+        x_train, x_val, y_train, y_val = \
+            train_test_split(x_train, y_train, test_size=0.3, random_state=(42 + iteration))
+
         rocket.fit(x_train, y_train)
         duration = time.time() - start_time
         train_timings = rocket.train_timings_

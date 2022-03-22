@@ -8,8 +8,6 @@ import time
 from utils_folder.utils import create_directory, calculate_metrics
 from utils_folder.configuration import ConfigClass
 
-# TODO - Nevo: There is no ModelCheckpoint!
-
 
 class Classifier_MCNN:
 
@@ -505,8 +503,3 @@ class Classifier_MCNN:
                 model = None
                 # clear memeory 
                 keras.backend.clear_session()
-
-    def predict(self, x_test, y_true, x_train, y_train, y_test, iteration):
-        df_metrics, _, _ = self.train(x_train, y_train, x_test, y_test, y_true, iteration, do_train=False)
-
-        return df_metrics

@@ -111,7 +111,6 @@ class Classifier_RESNET:
         model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(),
                       metrics=['accuracy'])
 
-        # TODO - Nevo
         # Reduce learning rate when a metric has stopped improving
         reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=50, min_lr=0.0001)
 
@@ -168,17 +167,3 @@ class Classifier_RESNET:
         keras.backend.clear_session()
 
         return df_metrics
-
-    def predict(self, x_test, y_true, x_train, y_train, y_test, return_df_metrics=True):
-        start_time = time.time()
-        model_path = self.output_directory + 'best_model.hdf5'
-        model = keras.models.load_model(model_path)
-        y_pred = model.predict(x_test)
-        if return_df_metrics:
-            y_pred = np.argmax(y_pred, axis=1)
-            df_metrics = calculate_metrics(y_true, y_pred, 0.0)
-            return df_metrics
-        else:
-            test_duration = time.time() - start_time
-            save_test_duration(self.output_directory + 'test_duration.csv', test_duration)
-            return y_pred

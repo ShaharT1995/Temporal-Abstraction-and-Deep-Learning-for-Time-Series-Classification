@@ -123,17 +123,6 @@ class Classifier_MLSTM_FCN:
         save_logs(self.output_directory, self.hist, y_pred, y_true, self.duration)
         keras.backend.clear_session()
 
-    def predict(self, x_test, y_true, x_train, y_train, y_test, return_df_metrics=True):
-        model_path = self.output_directory + 'best_model.h5'
-        model = keras.models.load_model(model_path)
-        y_pred = model.predict(x_test)
-        if return_df_metrics:
-            y_pred = np.argmax(y_pred, axis=1)
-            df_metrics = calculate_metrics(y_true, y_pred, 0.0)
-            return df_metrics
-        else:
-            return y_pred
-
 
 def squeeze_excite_block(input):
     ''' Create a squeeze-excite block

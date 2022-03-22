@@ -19,8 +19,7 @@ def fit_classifier(iter, datasets_dict, dataset_name, classifier_name, output_di
     y_test = enc.transform(y_test.reshape(-1, 1)).toarray()
 
     # Save the original y, because later we will use binary
-    # TODO SHAHAR - change to y_test_true
-    y_true = np.argmax(y_test, axis=1)
+    y_test_true = np.argmax(y_test, axis=1)
 
     # If univariate add a dimension to make it multivariate with one dimension
     if len(x_train.shape) == 2:
@@ -30,7 +29,7 @@ def fit_classifier(iter, datasets_dict, dataset_name, classifier_name, output_di
     input_shape = x_train.shape[1:]
     classifier = create_classifier(classifier_name, input_shape, nb_classes, output_directory)
 
-    classifier.fit(x_train, y_train, x_test, y_test, y_true, iter)
+    classifier.fit(x_train, y_train, x_test, y_test_true, iter)
 
 
 def create_classifier(classifier_name, input_shape, nb_classes, output_directory, verbose=False):

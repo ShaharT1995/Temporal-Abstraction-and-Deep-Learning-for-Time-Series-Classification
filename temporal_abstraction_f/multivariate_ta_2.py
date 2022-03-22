@@ -35,17 +35,16 @@ def new_mts_files(config, prop_path):
 
         for file_type in files_type:
             # Run the three transformation on the Train and Test files
-            for key in transformation_dict.keys():
-
-                if file_type == "train":
-                    transformation_dict[key](path, output_path, file_type, number_of_entities_train, time_serious_length,
-                                             number_of_attributes, classes)
-                    print("\t\ttransformation_" + key + ", train")
-                else:
-                    transformation_dict[key](path, output_path, file_type, number_of_entities_test, time_serious_length,
-                                             number_of_attributes, classes)
-                    print("\t\ttransformation_" + key + ", test")
-
+            if file_type == "train":
+                transformation_dict[config.transformation_number](path, output_path, file_type,
+                                                                  number_of_entities_train, time_serious_length,
+                                                                  number_of_attributes, classes)
+                print("\t\ttransformation_" + config.transformation_number + ", train")
+            else:
+                transformation_dict[config.transformation_number](path, output_path, file_type,
+                                                                  number_of_entities_test, time_serious_length,
+                                                                  number_of_attributes, classes)
+                print("\t\ttransformation_" + config.transformation_number + ", test")
         print("")
 
 

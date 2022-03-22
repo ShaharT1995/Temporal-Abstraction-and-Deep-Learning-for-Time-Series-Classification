@@ -29,12 +29,12 @@ def combining_two_methods(config, prop_path):
             # Get from the read me file the number of rows, number of columns and number of
             classes = univariate_dict[(dataset_name, file_type.lower())]["classes"]
             number_of_rows = univariate_dict[(dataset_name, file_type.lower())]["rows"]
-            number_of_columns = univariate_dict[(dataset_name, file_type.lower())]["columns"] -1
+            number_of_columns = univariate_dict[(dataset_name, file_type.lower())]["columns"] - 1
 
             # Run the three transformation on the Train and Test files
-            for key in transformation_dict.keys():
-                transformation_dict[key](path, gradient_path, output_path, file_type, number_of_rows, number_of_columns, classes)
-                print("\t\ttransformation_" + key + ", " + file_type.lower())
+            transformation_dict[config.transformation_number](path, gradient_path, output_path, file_type,
+                                                              number_of_rows, number_of_columns, classes)
+            print("\t\ttransformation_" + config.transformation_number + ", " + file_type.lower())
 
         print("")
 
@@ -57,8 +57,6 @@ def fill_transformation1(arr, path, file_type, classes, time_series_number, max_
                 # Extract the line of data
                 data = lines[index + 1].split(";")
 
-                # TODO
-                # Add the classifier column
                 if arr_class is not None:
                     arr_class[int(entity_id)] = int(class_id)
 
@@ -70,13 +68,15 @@ def fill_transformation1(arr, path, file_type, classes, time_series_number, max_
                         int(parse_data[2]) + max_state
 
     if arr_class is not None:
-        np.save(output_path + 'type1_' + file_type.lower() + 'classes.npy', arr_class)
+        np.save(output_path + 'type1_' + file_type.lower() + '_classes.npy', arr_class)
 
     return arr
 
 
 def transformation_1(path, gradient_path, output_path, file_type, number_of_rows, number_of_columns, classes):
     """
+    :param output_path:
+    :param gradient_path:
     :param path: the location of the hugobot output
     :param file_type: train/test
     :param number_of_rows: the number of entities
@@ -124,8 +124,8 @@ def fill_transformation2(arr, path, file_type, classes, max_state, output_path, 
                     parse_data = data[info].split(',')
                     # For each entity, put the state id in the range of start_time to end_time columns
 
-                    arr[int(entity_id)][int(parse_data[0]) - 1: int(parse_data[1]) - 1,
-                    int(parse_data[2])+ max_state - 1] = True
+                    arr[int(entity_id)][int(parse_data[0]) - 1: int(parse_data[1]) - 1, int(parse_data[2]) + max_state
+                                                                                        - 1] = True
 
     if arr_class is not None:
         np.save(output_path + 'type2_' + file_type.lower() + '_classes.npy', arr_class)

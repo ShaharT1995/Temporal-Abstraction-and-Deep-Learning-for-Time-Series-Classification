@@ -49,6 +49,8 @@ class Classifier_TWIESN:
         self.y_test = None
         self.x_val = None
         self.y_val = None
+        self.x_train = None
+        self.y_train = None
         self.N = None
 
     def init_matrices(self, iter):
@@ -198,7 +200,8 @@ class Classifier_TWIESN:
         self.y_true = y_true
         self.y_test = y_test
 
-        # split train to validation set to choose best hyper parameters
+        # Split train to validation set to choose best hyper parameters
+        # We don't use the validation set
         self.x_train, self.x_val, self.y_train, self.y_val = \
             train_test_split(x_train, y_train, test_size=0.3, random_state=(42 + iter))
         self.N = self.x_train.shape[0]

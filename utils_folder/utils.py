@@ -79,14 +79,14 @@ def read_all_datasets(config):
         for dataset_name in config.UNIVARIATE_DATASET_NAMES_2018:
             if config.afterTA:
                 if config.combination:
-                    x_train = np.load( config.path_transformation2 + dataset_name + "//type" + config.transformation_number
-                        + '_train.npy')
-                    y_train = np.load(config.path_transformation2 + dataset_name + "//type" + config.transformation_number
-                                      + '_train_classes.npy')
-                    x_test = np.load(config.path_transformation2 + dataset_name + "//type" + config.transformation_number
-                        + '_test.npy')
-                    y_test = np.load(config.path_transformation2 + dataset_name + "//type" + config.transformation_number +
-                                     '_test_classes.npy')
+                    x_train = np.load(config.path_transformation2 + dataset_name + "//type" +
+                                       config.transformation_number + '_train.npy')
+                    y_train = np.load(config.path_transformation2 + dataset_name + "//type" +
+                                      config.transformation_number + '_train_classes.npy')
+                    x_test = np.load(config.path_transformation2 + dataset_name + "//type" +
+                                     config.transformation_number + '_test.npy')
+                    y_test = np.load(config.path_transformation2 + dataset_name + "//type" +
+                                     config.transformation_number + '_test_classes.npy')
 
                     datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(), y_test.copy())
 
@@ -112,7 +112,7 @@ def read_all_datasets(config):
 
             if df_test.isnull().sum().sum() != 0:
                 df_test = df_test.interpolate(method='linear', limit_direction='both', axis=1)
-            
+
             y_train = df_train.values[:, 0]
             y_test = df_test.values[:, 0]
 
@@ -160,9 +160,8 @@ def get_func_length(x_train, x_test, func):
 def transform_to_same_length(x, n_var, max_length):
     n = x.shape[0]
 
-    # TODO SHAHAR - change the var name (ucr_x to mts)
     # the new set in ucr form np array
-    ucr_x = np.zeros((n, max_length, n_var), dtype=np.float64)
+    mts_x = np.zeros((n, max_length, n_var), dtype=np.float64)
 
     # loop through each entity
     for i in range(n):
@@ -178,9 +177,9 @@ def transform_to_same_length(x, n_var, max_length):
             # linear interpolation
             f = interp1d(idx, ts, kind='cubic')
             new_ts = f(idx_new)
-            ucr_x[i, :, j] = new_ts
+            mts_x[i, :, j] = new_ts
 
-    return ucr_x
+    return mts_x
 
 
 def transform_mts_to_ucr_format():
@@ -299,7 +298,6 @@ def generate_results_csv(config, params):
     res.to_csv(path + params + ".csv", index=False)
 
 
-# TODO - Ask Nevo
 def plot_epochs_metric(hist, file_name, metric='loss'):
     plt.figure()
     plt.plot(hist.history[metric])
