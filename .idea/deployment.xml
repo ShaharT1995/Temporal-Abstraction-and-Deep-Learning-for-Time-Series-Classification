@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="shaharap@132.72.45.83:22" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="shaharap@132.72.40.31:22" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
       <paths name="hadas5@132.72.46.106:22">
         <serverdata>
           <mappings>
             <mapping deploy="/sise/robertmo-group/TA-DL-TSC/SyncProject" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="shaharap@132.72.40.31:22">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/sise/robertmo-group/TA-DL-TSC/Project" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>

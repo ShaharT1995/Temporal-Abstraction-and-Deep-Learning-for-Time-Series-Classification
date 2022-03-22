@@ -106,13 +106,13 @@ def read_all_datasets(config):
                 df_train = pd.read_csv(root_dir_dataset + '/' + dataset_name + '_TRAIN.tsv', sep='\t', header=None)
                 df_test = pd.read_csv(root_dir_dataset + '/' + dataset_name + '_TEST.tsv', sep='\t', header=None)
 
-            # For us if needed - count how much null there is in the df
-            # df.isnull().sum().sum() != 0:
-
             # Padding missing values
-            df_train = df_train.interpolate(method='linear', limit_direction='both', axis=1)
-            df_test = df_test.interpolate(method='linear', limit_direction='both', axis=1)
+            if df_train.isnull().sum().sum() != 0:
+                df_train = df_train.interpolate(method='linear', limit_direction='both', axis=1)
 
+            if df_test.isnull().sum().sum() != 0:
+                df_test = df_test.interpolate(method='linear', limit_direction='both', axis=1)
+            
             y_train = df_train.values[:, 0]
             y_test = df_test.values[:, 0]
 
@@ -236,7 +236,7 @@ def transform_mts_to_ucr_format():
 
 
 def calculate_metrics(y_true, y_pred, duration, y_true_val=None, y_pred_val=None):
-    res = pd.DataFrame(data=np.zeros((1, 4), dtype=np.float), index=[0],
+    res = pd.DataFrame(data=np.zeros((1, 9), dtype=np.float), index=[0],
                        columns=['precision', 'accuracy', 'recall', 'mcc', 'cohen_kappa', 'duration', 'f1_score_macro',
                                 'f1_score_micro', 'f1_score_weighted'])
 

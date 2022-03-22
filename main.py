@@ -71,7 +71,7 @@ def execute_running(config, prop_path, running_dict, max_gap, method, nb_bin, pa
         run_cli(config, prop_path, max_gap)
 
         if config.combination:
-            print("Step 3.1: make the gkb.csv, ta.csv and ppa.csv for Gradient method\n")
+            print("Step 3.1: make the gkb.csv, ta.csv and ppa.csv for " + method + " method\n")
 
             gradient_prop_path = config.path_files_for_TA + config.archive + "//" + config.classifier + "//gradient//"
             create_directory(gradient_prop_path)

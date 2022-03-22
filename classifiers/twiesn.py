@@ -34,6 +34,23 @@ class Classifier_TWIESN:
         self.rho_s = [0.55, 0.9, 2.0, 5.0]
         self.alpha = 0.1  # leaky rate
 
+        self.W_in = None
+        self.rho = None
+        self.N_x = None
+        self.connect = None
+        self.scaleW_in = None
+        self.lamda = None
+        self.W_out = None
+
+        self.num_dim = None
+        self.T = None
+        self.x_test = None
+        self.y_true = None
+        self.y_test = None
+        self.x_val = None
+        self.y_val = None
+        self.N = None
+
     def init_matrices(self, iter):
         self.W_in = (2.0 * np.random.rand(self.N_x, self.num_dim) - 1.0) / (2.0 * self.scaleW_in)
 
@@ -42,7 +59,7 @@ class Classifier_TWIESN:
         i = 0
 
         # repeat because could not converge to find eigenvalues
-        while (not converged):
+        while not converged:
             i += 1
 
             # generate sparse, uniformly distributed weights
@@ -65,24 +82,27 @@ class Classifier_TWIESN:
     def compute_state_matrix(self, x_in):
         # number of instances
         n = x_in.shape[0]
+
         # the state matrix to be computed
-        X_t = np.zeros((n, self.T, self.N_x), dtype=np.float64)
+        x_t = np.zeros((n, self.T, self.N_x), dtype=np.float64)
+
         # previous state matrix
-        X_t_1 = np.zeros((n, self.N_x), dtype=np.float64)
+        x_t_1 = np.zeros((n, self.N_x), dtype=np.float64)
+
         # loop through each time step
         for t in range(self.T):
             # get all the time series data points for the time step t
             curr_in = x_in[:, t, :]
             # calculate the linear activation
-            curr_state = np.tanh(self.W_in.dot(curr_in.T) + self.W.dot(X_t_1.T)).T
+            curr_state = np.tanh(self.W_in.dot(curr_in.T) + self.W.dot(x_t_1.T)).T
             # apply leakage
-            curr_state = (1 - self.alpha) * X_t_1 + self.alpha * curr_state
+            curr_state = (1 - self.alpha) * x_t_1 + self.alpha * curr_state
             # save in previous state
-            X_t_1 = curr_state
+            x_t_1 = curr_state
             # save in state matrix
-            X_t[:, t, :] = curr_state
+            x_t[:, t, :] = curr_state
 
-        return X_t
+        return x_t
 
     def reshape_prediction(self, y_pred, num_instances, length_series):
         # reshape so the first axis has the number of instances
@@ -96,9 +116,7 @@ class Classifier_TWIESN:
     def train(self, iter):
         start_time = time.time()
 
-        ################
-        ### Training ###
-        ################
+        # Training
 
         # init the matrices
         self.init_matrices(iter)
@@ -118,9 +136,8 @@ class Classifier_TWIESN:
         # fit the new feature space
         ridge_classifier.fit(new_x_train, new_labels)
 
-        ################
         # Validation
-        ################
+
         # compute state matrix for validation set
         state_matrix = self.compute_state_matrix(self.x_val)
         # add the input to form the new feature space and transform to
@@ -136,9 +153,7 @@ class Classifier_TWIESN:
         # get the train accuracy
         train_acc = df_val_metrics['accuracy'][0]
 
-        ###############
         # Testing
-        ###############
 
         # get the prediction on the test set
         # transform the test set to the new features

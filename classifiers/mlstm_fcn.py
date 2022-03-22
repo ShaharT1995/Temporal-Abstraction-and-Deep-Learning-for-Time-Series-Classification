@@ -15,23 +15,24 @@ from sklearn.model_selection import train_test_split
 # TODO
 # https://github.com/Navidfoumani/Disjoint-CNN
 
+
 class Classifier_MLSTM_FCN:
-    def __init__(self, output_directory, input_shape, nb_classes, verbose=False):
+    def __init__(self, output_directory, input_shape, nb_classes, verbose=False, build=True):
         config = ConfigClass()
         config.set_seed()
 
         self.callbacks = None
-
-        if verbose:
-            print('Creating MLSTM_FCN Classifier')
-        self.verbose = verbose
         self.output_directory = output_directory
-        # Build Model -----------------------------------------------------------
-        self.model = self.build_model(input_shape, nb_classes)
-        # -----------------------------------------------------------------------
-        if verbose:
-            self.model.summary()
-        self.model.save_weights(self.output_directory + 'model_init.h5')
+
+        if build:
+            self.model = self.build_model(input_shape, nb_classes)
+
+            # if verbose:
+            #     self.model.summary()
+
+            self.verbose = verbose
+            self.model.save_weights(self.output_directory + 'model_init.h5')
+        return 
 
     def create_class_weight(self, labels, mu=2):
         labels_dict = {}
@@ -50,9 +51,8 @@ class Classifier_MLSTM_FCN:
         return class_weight
 
     def build_model(self, input_shape, nb_classes):
-
-        Y_input = Input(shape=input_shape)
-        y = Conv1D(128, 8, padding='same', kernel_initializer='he_uniform')(Y_input)
+        y_input = Input(shape=input_shape)
+        y = Conv1D(128, 8, padding='same', kernel_initializer='he_uniform')(y_input)
         y = BatchNormalization()(y)
         y = Activation('relu')(y)
         y = squeeze_excite_block(y)
@@ -67,16 +67,16 @@ class Classifier_MLSTM_FCN:
         y = Activation('relu')(y)
         y = GlobalAveragePooling1D()(y)
 
-        x = Permute((2, 1))(Y_input)
+        x = Permute((2, 1))(y_input)
         x = LSTM(8)(x)
         x = Dropout(0.8)(x)
 
         x = concatenate([x, y])
 
         out = Dense(nb_classes, activation='softmax')(x)
-        model = keras.models.Model(inputs=Y_input, outputs=out)
+        model = keras.models.Model(inputs=y_input, outputs=out)
 
-        self.model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(), metrics=['accuracy'])
+        model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(), metrics=['accuracy'])
         reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=50, min_lr=0.0001)
         file_path = self.output_directory + 'best_model.h5'
 
@@ -113,7 +113,7 @@ class Classifier_MLSTM_FCN:
         self.duration = time.time() - start_time
 
         keras.models.save_model(self.model, self.output_directory + 'model.h5')
-        model = keras.models.load_model(self.output_directory + 'best_model.hdf5')
+        model = keras.models.load_model(self.output_directory + 'best_model.h5')
 
         y_pred = model.predict(x_test)
 
@@ -124,7 +124,7 @@ class Classifier_MLSTM_FCN:
         keras.backend.clear_session()
 
     def predict(self, x_test, y_true, x_train, y_train, y_test, return_df_metrics=True):
-        model_path = self.output_directory + 'best_model.hdf5'
+        model_path = self.output_directory + 'best_model.h5'
         model = keras.models.load_model(model_path)
         y_pred = model.predict(x_test)
         if return_df_metrics:
@@ -143,7 +143,7 @@ def squeeze_excite_block(input):
         k: width factor
     Returns: a keras tensor
     '''
-    filters = input._keras_shape[-1]  # channel_axis = -1 for TF
+    filters = input.shape[-1]  # channel_axis = -1 for TF
 
     se = GlobalAveragePooling1D()(input)
     se = Reshape((1, filters))(se)

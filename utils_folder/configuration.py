@@ -13,7 +13,7 @@ class ConfigClass:
     combination = False
 
     # TODO - Maybe we want to get it from the user
-    transformation_number = "3"
+    transformation_number = "1"
 
     def __init__(self):
         self.path = "/sise/robertmo-group/TA-DL-TSC/"
@@ -37,10 +37,10 @@ class ConfigClass:
         self.paa_window_size = 1
         self.gradient_window_size = [10]
 
-        self.UNIVARIATE_DATASET_NAMES_2018 = ['SmoothSubspace', 'Crop', 'Adiac', 'BME', 'Coffee', 'Yoga', 'BeetleFly',
-                                              'Car', 'Computers', 'Worms', 'PLAID', 'ACSF1']
+        # self.UNIVARIATE_DATASET_NAMES_2018 = ['SmoothSubspace', 'Crop', 'Adiac', 'BME', 'Coffee', 'Yoga', 'BeetleFly',
+        #                                       'Car', 'Computers', 'Worms', 'PLAID', 'ACSF1']
 
-        #self.UNIVARIATE_DATASET_NAMES_2018 = ['SmoothSubspace']
+        self.UNIVARIATE_DATASET_NAMES_2018 = ['SmoothSubspace']
 
         # self.MTS_DATASET_NAMES = ['Libras', 'JapaneseVowels', 'ECG', 'Wafer', 'CMUsubject16', 'KickvsPunch', 'NetFlow',
         #                           'WalkvsRun']

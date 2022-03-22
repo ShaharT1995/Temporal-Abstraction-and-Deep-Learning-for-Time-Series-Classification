@@ -74,6 +74,18 @@ def create_classifier(classifier_name, input_shape, nb_classes, output_directory
         from classifiers import inception
         return inception.Classifier_INCEPTION(output_directory, input_shape, nb_classes, verbose)
 
+    if classifier_name == 'rocket':
+        from classifiers import rocket2
+        return rocket2.Classifier_Rocket(output_directory, verbose)
+
+    if classifier_name == 'lstm_fcn':
+        from classifiers import lstm_fcn
+        return lstm_fcn.Classifier_LSTMFCN(output_directory, input_shape, nb_classes, verbose)
+
+    if classifier_name == 'mlstm_fcn':
+        from classifiers import mlstm_fcn
+        return mlstm_fcn.Classifier_MLSTM_FCN(output_directory, input_shape, nb_classes, verbose)
+
 
 def run_all(config, params):
     config.set_seed()

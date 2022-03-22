@@ -8,7 +8,7 @@
       <sourceFolder url="file://$MODULE_DIR$/Hugobot/temporal_abstraction/discretization" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/cd-diagram-master" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="Remote Python 3.8.2 (sftp://shaharap@132.72.45.83:22/home/shaharap/.conda/envs/new_env/bin/python)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Remote Python 3.8.2 (sftp://shaharap@132.72.40.31:22/home/shaharap/.conda/envs/new_env/bin/python)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
