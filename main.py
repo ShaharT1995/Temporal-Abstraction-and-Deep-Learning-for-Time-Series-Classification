@@ -149,6 +149,7 @@ if __name__ == '__main__':
         config.set_afterTA(sys.argv[4])
         config.set_method(sys.argv[5])
         config.set_combination(sys.argv[6])
+        config.set_transformation(sys.argv[7])
         config.set_path_transformations()
 
         run() if config.afterTA else run_models.run_all(config, "RawData")

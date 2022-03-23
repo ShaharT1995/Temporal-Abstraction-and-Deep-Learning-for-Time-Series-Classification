@@ -12,8 +12,7 @@ class ConfigClass:
     afterTA = False
     combination = False
 
-    # TODO - Maybe we want to get it from the user
-    transformation_number = "1"
+    transformation_number = ""
 
     def __init__(self):
         self.path = "/sise/robertmo-group/TA-DL-TSC/"
@@ -55,6 +54,10 @@ class ConfigClass:
     @staticmethod
     def set_method(method):
         ConfigClass.method = method
+
+    @staticmethod
+    def set_transformation(transformation_number):
+        ConfigClass.transformation_number = transformation_number
 
     @staticmethod
     def set_classifier(cf):
