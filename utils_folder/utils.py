@@ -270,9 +270,9 @@ def save_test_duration(file_name, test_duration):
 
 def generate_results_csv(config, params):
     res = pd.DataFrame(data=np.zeros((0, 7), dtype=np.float), index=[],
-                       columns=['classifier_name', 'archive_name', 'dataset_name', 'precision', 'accuracy',
-                                'recall', 'duration'])
-
+                       columns=['classifier_name', 'archive_name', 'dataset_name', 'precision', 'accuracy'
+                                ,'mcc',"cohen_kappa",'duration',"f1_score_macro", "f1_score_micro","f1_score_weighted"])
+    #todo - hadas
     dataset_list = config.UNIVARIATE_DATASET_NAMES_2018 if config.archive == "UCR" else config.MTS_DATASET_NAMES
 
     for it in range(config.ITERATIONS):
