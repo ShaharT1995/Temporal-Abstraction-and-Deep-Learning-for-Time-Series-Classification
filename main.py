@@ -154,6 +154,11 @@ if __name__ == '__main__':
 
         run() if config.afterTA else run_models.run_all(config, "RawData")
 
+        # todo - hadas
+        if not config.afterTA:
+            print("Step 6: Generate Results to CSV")
+            generate_results_csv(config, "RawData")
+
     elif sys.argv[1] == 'transform_mts_to_ucr_format':
         transform_mts_to_ucr_format()
 
