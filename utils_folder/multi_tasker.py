@@ -5,9 +5,6 @@ import random
 import subprocess
 import time
 import timeit
-from datetime import datetime
-
-import pause as pause
 
 
 def get_number_of_jobs(user_name):

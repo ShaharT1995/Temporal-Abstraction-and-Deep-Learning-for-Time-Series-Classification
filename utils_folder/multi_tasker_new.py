@@ -5,9 +5,6 @@ import random
 import subprocess
 import time
 import timeit
-from datetime import datetime
-
-import pause as pause
 
 
 def get_number_of_jobs(user_name):
@@ -98,7 +95,8 @@ if __name__ == '__main__':
     file = open(project_path + "/Run//combination_list.pkl", "rb")
     data = pickle.load(file)
 
-    number_to_run = number_of_total_jobs - get_number_of_jobs(current_user)
+    # number_to_run = number_of_total_jobs - get_number_of_jobs(current_user)
+    number_to_run = max(number_of_total_jobs - get_number_of_jobs(current_user), 0)
 
     combination_for_running = data[: number_to_run]
     save_combination_pickle(data[number_to_run:])
@@ -110,6 +108,7 @@ if __name__ == '__main__':
         print("Start running: " + str(["run_all"] + combination))
         run_job_using_sbatch(sbatch_path, ["run_all"] + combination)
         time.sleep(60)
+
     run_job_using_sbatch(current_file_path, [])
     exit(0)
 

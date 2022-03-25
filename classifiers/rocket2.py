@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
+from utils_folder.configuration import ConfigClass
 from utils_folder.utils import calculate_metrics
 
 import time
@@ -108,8 +109,7 @@ def apply_kernels(X, kernels):
             b1 = a1 + lengths[j]
             b2 = a2 + 2
 
-            _X[i, a2:b2] = \
-            apply_kernel(X[i], weights[a1:b1], lengths[j], biases[j], dilations[j], paddings[j])
+            _X[i, a2:b2] = apply_kernel(X[i], weights[a1:b1], lengths[j], biases[j], dilations[j], paddings[j])
 
             a1 = b1
             a2 = b2
@@ -159,6 +159,21 @@ class Base_Classifier_ROCKET(BaseEstimator, ClassifierMixin):
 
         return self
 
+    @staticmethod
+    def reshape_prediction(y_pred, num_instances, length_series):
+        # reshape so the first axis has the number of instances
+
+        print(num_instances)
+        print(length_series)
+        print(y_pred.shape[-1])
+
+        new_y_pred = y_pred.reshape(num_instances, length_series, y_pred.shape[-1])
+        # average the predictions of instances
+        new_y_pred = np.average(new_y_pred, axis=1)
+        # get the label with maximum prediction over the last label axis
+        new_y_pred = np.argmax(new_y_pred, axis=1)
+        return new_y_pred
+
     def predict(self, x):
         check_is_fitted(self)
 
@@ -177,7 +192,21 @@ class Base_Classifier_ROCKET(BaseEstimator, ClassifierMixin):
         if self.verbose:
             print('predict')
         time_a = time.perf_counter()
+
         y_pred = self.ridge_cv_.predict(self.x_test_)
+        y_pred = self.reshape_prediction(y_pred, self.x_test_.shape[0], self.x_test_.shape[1])
+
+
+        # y_pred_des_func = self.ridge_cv_.decision_function(self.x_test_)
+        # y_pred = []
+        # for v in y_pred_des_func:
+        #     y_pred.append(np.exp(v) / (1 + np.exp(v)))
+
+        # y_pred = np.array([np.array(xi) for xi in x])
+        # print(len(y_pred[0]))
+        # print(type(y_pred))
+        # print(type(y_pred[0]))
+
         time_b = time.perf_counter()
         self.test_timings_.append(time_b - time_a)
 
@@ -212,6 +241,9 @@ class Base_Classifier_ROCKET(BaseEstimator, ClassifierMixin):
 
 class Classifier_Rocket:
     def __init__(self, output_dir, verbose):
+        config = ConfigClass()
+        config.set_seed()
+
         self.output_dir = output_dir
         self.verbose = verbose
 
@@ -245,6 +277,7 @@ class Classifier_Rocket:
 
         # Predict ROCKET Classifier
         y_pred = rocket.predict(x_test)
+        print(y_pred)
 
         # Save Metrics
         df_metrics = calculate_metrics(y_true, y_pred, duration)
