@@ -157,3 +157,17 @@ class Classifier_INCEPTION:
         keras.backend.clear_session()
 
         return df_metrics
+
+    def predict(self, x_test, y_true, x_train, y_train, y_test, return_df_metrics=True):
+        start_time = time.time()
+        model_path = self.output_directory + 'best_model.hdf5'
+        model = keras.models.load_model(model_path)
+        y_pred = model.predict(x_test)
+        if return_df_metrics:
+            y_pred = np.argmax(y_pred, axis=1)
+            df_metrics = calculate_metrics(y_true, y_pred, 0.0)
+            return df_metrics
+        else:
+            test_duration = time.time() - start_time
+            save_test_duration(self.output_directory + 'test_duration.csv', test_duration)
+            return y_pred

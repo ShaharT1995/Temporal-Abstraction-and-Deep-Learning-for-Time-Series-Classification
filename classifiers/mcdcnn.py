@@ -175,9 +175,6 @@ class Classifier_MCDCNN:
         model = keras.models.load_model(self.output_directory + 'best_model.hdf5')
 
         y_pred = model.predict(x_test)
-        print(len(y_pred[0]))
-        print(y_pred)
-        print(type(y_pred[0]))
 
         # convert the predicted from binary to integer
         y_pred = np.argmax(y_pred, axis=1)

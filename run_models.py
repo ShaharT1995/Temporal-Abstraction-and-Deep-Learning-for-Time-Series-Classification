@@ -29,7 +29,7 @@ def fit_classifier(iter, datasets_dict, dataset_name, classifier_name, output_di
     input_shape = x_train.shape[1:]
     classifier = create_classifier(classifier_name, input_shape, nb_classes, output_directory)
 
-    classifier.fit(x_train, y_train, x_test, y_test,y_test, y_test_true, iter)
+    classifier.fit(x_train, y_train, x_test, y_test, y_test_true, iter)
 
 
 def create_classifier(classifier_name, input_shape, nb_classes, output_directory, verbose=False):
@@ -90,6 +90,8 @@ def run_all(config, params):
     config.set_seed()
 
     datasets_dict = read_all_datasets(config)
+
+    print(config.classifier + "\n")
 
     for iter in range(config.ITERATIONS):
         print('\t\t\titer', iter)

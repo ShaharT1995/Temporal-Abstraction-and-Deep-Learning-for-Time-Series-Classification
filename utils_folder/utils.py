@@ -1,9 +1,11 @@
 import pickle
+import random
+
 import numpy as np
 import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
-import os
+import os, time
 
 from utils_folder.configuration import ConfigClass
 from utils_folder.ranking_graph import draw_cd_diagram
@@ -40,6 +42,38 @@ def check_pickle_exists(name):
     return os.path.exists(config.path + "/Project/temporal_abstraction_f/pickle_files//" + name + ".pkl")
 
 
+def is_locked(filepath, cli):
+    locked = None
+    file_object = None
+    if os.path.exists(filepath):
+        try:
+            if cli:
+                file_object = pd.read_csv(filepath)
+
+            else:
+                if config.archive == "UCR" and not config.combination:
+                    file_object = pd.read_csv(filepath, sep='\t', header=None)
+                # MTS
+                else:
+                    file_object = np.load(filepath)
+
+            if file_object is not None:
+                locked = False
+        except IOError as message:
+            locked = True
+
+    return locked, file_object
+
+
+def wait_for_files(filepath, cli=False):
+    flag, data = is_locked(filepath, cli)
+    while flag:
+        flag, data = is_locked(filepath, cli)
+        time.sleep(random.randint(0, 20))
+
+    return data
+
+
 def create_directory(directory_path):
     if os.path.exists(directory_path):
         return None
@@ -59,19 +93,18 @@ def read_all_datasets(config):
             root_dir_dataset = config.mts_path + '/' + dataset_name + '/'
 
             if config.afterTA:
-                x_train = np.load(config.path_transformation2 + dataset_name + "//type" + config.transformation_number
-                                  + '_train.npy')
-                y_train = np.load(root_dir_dataset + 'y_train.npy')
-                x_test = np.load(config.path_transformation2 + dataset_name + "//type" + config.transformation_number
-                                  + '_test.npy')
-                y_test = np.load(root_dir_dataset + 'y_test.npy')
-
+                x_train = wait_for_files(config.path_transformation2 + dataset_name + "//type" +
+                                         config.transformation_number + '_train.npy')
+                y_train = wait_for_files(root_dir_dataset + 'y_train.npy')
+                x_test = wait_for_files(config.path_transformation2 + dataset_name + "//type" +
+                                        config.transformation_number + '_test.npy')
+                y_test = wait_for_files(root_dir_dataset + 'y_test.npy')
             # Raw data
             else:
-                x_train = np.load(root_dir_dataset + 'x_train.npy')
-                y_train = np.load(root_dir_dataset + 'y_train.npy')
-                x_test = np.load(root_dir_dataset + 'x_test.npy')
-                y_test = np.load(root_dir_dataset + 'y_test.npy')
+                x_train = wait_for_files(root_dir_dataset + 'x_train.npy')
+                y_train = wait_for_files(root_dir_dataset + 'y_train.npy')
+                x_test = wait_for_files(root_dir_dataset + 'x_test.npy')
+                y_test = wait_for_files(root_dir_dataset + 'y_test.npy')
 
             datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(), y_test.copy())
     # UCR
@@ -79,32 +112,32 @@ def read_all_datasets(config):
         for dataset_name in config.UNIVARIATE_DATASET_NAMES_2018:
             if config.afterTA:
                 if config.combination:
-                    x_train = np.load(config.path_transformation2 + dataset_name + "//type" +
-                                       config.transformation_number + '_train.npy')
-                    y_train = np.load(config.path_transformation2 + dataset_name + "//type" +
-                                      config.transformation_number + '_train_classes.npy')
-                    x_test = np.load(config.path_transformation2 + dataset_name + "//type" +
-                                     config.transformation_number + '_test.npy')
-                    y_test = np.load(config.path_transformation2 + dataset_name + "//type" +
-                                     config.transformation_number + '_test_classes.npy')
+                    x_train = wait_for_files(config.path_transformation2 + dataset_name + "//type" +
+                                             config.transformation_number + '_train.npy')
+                    y_train = wait_for_files(config.path_transformation2 + dataset_name + "//type" +
+                                             config.transformation_number + '_train_classes.npy')
+                    x_test = wait_for_files(config.path_transformation2 + dataset_name + "//type" +
+                                            config.transformation_number + '_test.npy')
+                    y_test = wait_for_files(config.path_transformation2 + dataset_name + "//type" +
+                                            config.transformation_number + '_test_classes.npy')
 
                     datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(), y_test.copy())
 
                     return datasets_dict
 
                 else:
-                    df_train = pd.read_csv(config.path_transformation2 + dataset_name + "//type" +
-                                           config.transformation_number + '_Train.csv', sep=',', header=None)
+                    df_train = wait_for_files(config.path_transformation2 + dataset_name + "//type" +
+                                              config.transformation_number + '_Train.csv')
 
-                    df_test = pd.read_csv(config.path_transformation2 + dataset_name + "//type" +
-                                           config.transformation_number + '_Test.csv', sep=',', header=None)
+                    df_test = wait_for_files(config.path_transformation2 + dataset_name + "//type" +
+                                             config.transformation_number + '_Test.csv')
 
             # Raw data
             else:
                 root_dir_dataset = config.ucr_path + '/' + dataset_name + '/'
 
-                df_train = pd.read_csv(root_dir_dataset + '/' + dataset_name + '_TRAIN.tsv', sep='\t', header=None)
-                df_test = pd.read_csv(root_dir_dataset + '/' + dataset_name + '_TEST.tsv', sep='\t', header=None)
+                df_train = wait_for_files(root_dir_dataset + '/' + dataset_name + '_TRAIN.tsv')
+                df_test = wait_for_files(root_dir_dataset + '/' + dataset_name + '_TEST.tsv')
 
             # Padding missing values
             if df_train.isnull().sum().sum() != 0:
@@ -269,10 +302,11 @@ def save_test_duration(file_name, test_duration):
 
 
 def generate_results_csv(config, params):
-    res = pd.DataFrame(data=np.zeros((0, 7), dtype=np.float), index=[],
-                       columns=['classifier_name', 'archive_name', 'dataset_name', 'precision', 'accuracy'
-                                ,'mcc',"cohen_kappa",'duration',"f1_score_macro", "f1_score_micro","f1_score_weighted"])
-    #todo - hadas
+    res = pd.DataFrame(data=np.zeros((0, 11), dtype=np.float), index=[],
+                       columns=['classifier_name', 'archive_name', 'dataset_name', 'precision', 'accuracy',
+                                'mcc', "cohen_kappa", 'duration', "f1_score_macro", "f1_score_micro",
+                                "f1_score_weighted"])
+
     dataset_list = config.UNIVARIATE_DATASET_NAMES_2018 if config.archive == "UCR" else config.MTS_DATASET_NAMES
 
     for it in range(config.ITERATIONS):

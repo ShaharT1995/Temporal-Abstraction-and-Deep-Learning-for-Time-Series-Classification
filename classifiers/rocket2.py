@@ -159,21 +159,6 @@ class Base_Classifier_ROCKET(BaseEstimator, ClassifierMixin):
 
         return self
 
-    @staticmethod
-    def reshape_prediction(y_pred, num_instances, length_series):
-        # reshape so the first axis has the number of instances
-
-        print(num_instances)
-        print(length_series)
-        print(y_pred.shape[-1])
-
-        new_y_pred = y_pred.reshape(num_instances, length_series, y_pred.shape[-1])
-        # average the predictions of instances
-        new_y_pred = np.average(new_y_pred, axis=1)
-        # get the label with maximum prediction over the last label axis
-        new_y_pred = np.argmax(new_y_pred, axis=1)
-        return new_y_pred
-
     def predict(self, x):
         check_is_fitted(self)
 
@@ -194,18 +179,14 @@ class Base_Classifier_ROCKET(BaseEstimator, ClassifierMixin):
         time_a = time.perf_counter()
 
         y_pred = self.ridge_cv_.predict(self.x_test_)
-        y_pred = self.reshape_prediction(y_pred, self.x_test_.shape[0], self.x_test_.shape[1])
 
-
+        # Get the probability to be in a class
         # y_pred_des_func = self.ridge_cv_.decision_function(self.x_test_)
         # y_pred = []
         # for v in y_pred_des_func:
         #     y_pred.append(np.exp(v) / (1 + np.exp(v)))
-
-        # y_pred = np.array([np.array(xi) for xi in x])
-        # print(len(y_pred[0]))
-        # print(type(y_pred))
-        # print(type(y_pred[0]))
+        #
+        # y_pred = np.array(y_pred)
 
         time_b = time.perf_counter()
         self.test_timings_.append(time_b - time_a)
@@ -277,7 +258,6 @@ class Classifier_Rocket:
 
         # Predict ROCKET Classifier
         y_pred = rocket.predict(x_test)
-        print(y_pred)
 
         # Save Metrics
         df_metrics = calculate_metrics(y_true, y_pred, duration)

@@ -4,6 +4,7 @@ import pickle
 import random
 import subprocess
 import time
+from utils_folder.utils import write_pickle
 import timeit
 
 
@@ -21,9 +22,9 @@ def run_job_using_sbatch(sbatch_path, arguments):
 
 # We run this function one time. The function create all the possible combination
 def create_combination_lst():
-    dict_name = {"classifier": ['fcn', 'mlp', 'resnet', 'tlenet', 'twiesn', 'encoder', 'mcdcnn', 'cnn', 'inception',
+    dict_name = {"archive": ['MTS', 'UCR'],
+                 "classifier": ['fcn', 'mlp', 'resnet', 'tlenet', 'twiesn', 'encoder', 'mcdcnn', 'cnn', 'inception',
                                 'lstm_fcn', 'mlstm_fcn', 'rocket'],
-                 "archive": ['MTS', 'UCR'],
                  "afterTA": ['True', 'False'],
                  "method": ['RawData', 'sax', 'td4c-cosine', 'gradient'],
                  "combination": ['False'],
@@ -34,8 +35,29 @@ def create_combination_lst():
     combination_lst = []
     for combination in keys_list:
         # If the method is raw data, afterTa must be false, so we remove those combination
-        if not (combination[3] == "RawData" and combination[2] == "True"):
+        if not (combination[3] == "RawData" and combination[2] == "True" and (combination[5] == "2" or
+                                                                              combination[5] == "3")):
             combination_lst.append(list(combination))
+
+    # Save the pickle file
+    save_combination_pickle(combination_lst)
+
+
+# We run this function one time. The function create all the possible combination
+def create_combination_lst_2():
+    dict_name = {"archive": ['MTS', 'UCR'],
+                 "classifier": ['fcn', 'mlp', 'resnet', 'tlenet', 'twiesn', 'encoder', 'mcdcnn', 'cnn', 'inception',
+                                'lstm_fcn', 'mlstm_fcn', 'rocket'],
+                 "afterTA": ['True', 'False'],
+                 "method": ['sax', 'td4c-cosine', 'gradient'],
+                 "combination": ['False'],
+                 "transformation": ["1", "2", "3"]}
+
+    keys_list = list(itertools.product(*dict_name.values()))
+
+    combination_lst = []
+    for combination in keys_list:
+        combination_lst.append(list(combination))
 
     # Save the pickle file
     save_combination_pickle(combination_lst)
@@ -75,42 +97,43 @@ def check_lock():
 
 
 if __name__ == '__main__':
-    estimated_end_time = timeit.default_timer() + 7 * 24 * 60 * 60
-    time_before_sleeping = estimated_end_time - timeit.default_timer()
-
     current_user = "shaharap"
     user1 = "hadas5"
     user2 = "roze"
     user3 = "oshermac"
 
-    number_of_total_jobs = 2
+    number_of_total_jobs = 15
     project_path = "/sise/robertmo-group/TA-DL-TSC/"
     sbatch_path = "/sise/home/" + current_user + "/run_python_code"
     current_file_path = "/sise/home/" + current_user + "/run_multi_tasker"
     temp_file = open("/sise/home/" + current_user + "/tmp.txt", 'w')
 
-    while time_before_sleeping > 60 * 60:
-        while not check_lock():
-            print("The file is lock by another user")
+    # write_pickle("running_dictUCR", {})
+    # write_pickle("running_dictMTS", {})
+    # create_combination_lst_2()
 
-        file = open(project_path + "/Run//combination_list.pkl", "rb")
-        data = pickle.load(file)
+    while not check_lock():
+        print("The file is lock by another user")
 
-        number_to_run = number_of_total_jobs - get_number_of_jobs(current_user)
+    file = open(project_path + "/Run//combination_list.pkl", "rb")
+    data = pickle.load(file)
 
-        combination_for_running = data[: number_to_run]
-        save_combination_pickle(data[number_to_run:])
+    number_to_run = max(number_of_total_jobs - get_number_of_jobs(current_user), 0)
 
-        os.remove(project_path + "/Run//" + current_user + ".txt")
-        print("The file unlock by " + current_user)
+    combination_for_running = data[: number_to_run]
+    save_combination_pickle(data[number_to_run:])
 
-        for combination in combination_for_running:
-            print("Start running: " + str(["run_all"] + combination))
-            run_job_using_sbatch(sbatch_path, ["run_all"] + combination)
-            time.sleep(60)
+    os.remove(project_path + "/Run//" + current_user + ".txt")
+    print("The file unlock by " + current_user)
 
-        print("Job went to sleep for 24 hours")
-        time.sleep(60 * 60 * 24)
+    for combination in combination_for_running:
+        print("Start running: " + str(["run_all"] + combination))
+        run_job_using_sbatch(sbatch_path, ["run_all"] + combination)
+        time.sleep(60)
 
-    run_job_using_sbatch(current_file_path, [])
+    if number_to_run != 0:
+        print("Starting the script again")
+        run_job_using_sbatch(current_file_path, [])
+    else:
+        raise Exception("The script finish running")
     exit(0)

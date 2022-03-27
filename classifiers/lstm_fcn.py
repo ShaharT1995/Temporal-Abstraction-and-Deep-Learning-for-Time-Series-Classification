@@ -85,7 +85,7 @@ class Classifier_LSTMFCN:
         out = Dense(nb_classes, activation='softmax')(x)
 
         model = Model(ip, out)
-        model.summary()
+        # model.summary()
 
         model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(),
                       metrics=['accuracy'])

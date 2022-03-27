@@ -114,7 +114,9 @@ class FilesManager(ABC):
         prop_data_path = self.__get_prop_data_path()
         entity_class_relations_path = self.__get_entity_class_relations_file_path()
 
-        dataset = pd.read_csv(self.input_path)
+        from utils_folder.utils import wait_for_files
+        dataset = wait_for_files(self.input_path, cli=True)
+        # dataset = pd.read_csv(self.input_path)
 
         entity_class_relations = dataset[
             dataset[DatasetColumns.TemporalPropertyID] == FilesManager.CLASS_IDENTIFIER].copy()
