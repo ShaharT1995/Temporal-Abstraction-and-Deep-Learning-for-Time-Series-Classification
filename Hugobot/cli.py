@@ -78,4 +78,6 @@ def run_cli(config, prop_path, max_gap):
                          str(max_gap),
                          'knowledge-based',
                          test_gkb_path], standalone_mode=False)
+            # else:
+            #     print("\tHugobot step already done!")
         print("")

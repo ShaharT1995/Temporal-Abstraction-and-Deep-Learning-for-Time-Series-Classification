@@ -16,13 +16,13 @@ def get_number_of_jobs(user_name):
 
 # Run batch file with args
 def run_job_using_sbatch(sbatch_path, arguments):
-    run_list = ["sbatch", sbatch_path] + arguments
+    run_list = ["sbatch", "multi_tasker_cpu"] + arguments
     subprocess.Popen(run_list, stdout=temp_file, stderr=temp_file)
 
 
 # We run this function one time. The function create all the possible combination
 def create_combination_lst():
-    dict_name = {"archive": ['MTS', 'UCR'],
+    dict_name = {"archive": ['UCR', 'MTS'],
                  "classifier": ['fcn', 'mlp', 'resnet', 'tlenet', 'twiesn', 'encoder', 'mcdcnn', 'cnn', 'inception',
                                 'lstm_fcn', 'mlstm_fcn', 'rocket'],
                  "afterTA": ['True', 'False'],
@@ -45,10 +45,10 @@ def create_combination_lst():
 
 # We run this function one time. The function create all the possible combination
 def create_combination_lst_2():
-    dict_name = {"archive": ['MTS', 'UCR'],
+    dict_name = {"archive": ['UCR', 'MTS'],
                  "classifier": ['fcn', 'mlp', 'resnet', 'tlenet', 'twiesn', 'encoder', 'mcdcnn', 'cnn', 'inception',
                                 'lstm_fcn', 'mlstm_fcn', 'rocket'],
-                 "afterTA": ['True', 'False'],
+                 "afterTA": ['True'],
                  "method": ['sax', 'td4c-cosine', 'gradient'],
                  "combination": ['False'],
                  "transformation": ["1", "2", "3"]}
@@ -104,36 +104,37 @@ if __name__ == '__main__':
 
     number_of_total_jobs = 15
     project_path = "/sise/robertmo-group/TA-DL-TSC/"
-    sbatch_path = "/sise/home/" + current_user + "/run_python_code"
-    current_file_path = "/sise/home/" + current_user + "/run_multi_tasker"
+    sbatch_path = "/sise/home/" + current_user + "/run_python_code_cpu"
+    current_file_path = "/sise/home/" + current_user + "/run_multi_tasker_cpu"
     temp_file = open("/sise/home/" + current_user + "/tmp.txt", 'w')
 
-    # write_pickle("running_dictUCR", {})
-    # write_pickle("running_dictMTS", {})
-    # create_combination_lst_2()
+    write_pickle("running_dictUCR", {})
+    write_pickle("running_dictMTS", {})
+    create_combination_lst_2()
 
-    while not check_lock():
-        print("The file is lock by another user")
-
-    file = open(project_path + "/Run//combination_list.pkl", "rb")
-    data = pickle.load(file)
-
-    number_to_run = max(number_of_total_jobs - get_number_of_jobs(current_user), 0)
-
-    combination_for_running = data[: number_to_run]
-    save_combination_pickle(data[number_to_run:])
-
-    os.remove(project_path + "/Run//" + current_user + ".txt")
-    print("The file unlock by " + current_user)
-
-    for combination in combination_for_running:
-        print("Start running: " + str(["run_all"] + combination))
-        run_job_using_sbatch(sbatch_path, ["run_all"] + combination)
-        time.sleep(60)
-
-    if number_to_run != 0:
-        print("Starting the script again")
-        run_job_using_sbatch(current_file_path, [])
-    else:
-        raise Exception("The script finish running")
-    exit(0)
+    # while not check_lock():
+    #     print("The file is lock by another user")
+    #
+    # file = open(project_path + "/Run//combination_list.pkl", "rb")
+    # data = pickle.load(file)
+    #
+    # number_to_run = max(number_of_total_jobs - get_number_of_jobs(current_user), 0)
+    #
+    # combination_for_running = data[: number_to_run]
+    # save_combination_pickle(data[number_to_run:])
+    #
+    # os.remove(project_path + "/Run//" + current_user + ".txt")
+    # print("The file unlock by " + current_user)
+    #
+    # for combination in combination_for_running:
+    #     print("Start running: " + str(["run_all"] + combination))
+    #     run_job_using_sbatch(sbatch_path, ["run_all"] + combination)
+    #     time.sleep(60)
+    #
+    # if len(data[number_to_run:]) != 0:
+    #     print("Starting the script again")
+    #     run_job_using_sbatch(current_file_path, [])
+    #     time.sleep(30)
+    # else:
+    #     raise Exception("The script finish running")
+    # exit(0)

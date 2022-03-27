@@ -74,8 +74,8 @@ def create_classifier(classifier_name, input_shape, nb_classes, output_directory
         return inception.Classifier_INCEPTION(output_directory, input_shape, nb_classes, verbose)
 
     if classifier_name == 'rocket':
-        from classifiers import rocket2
-        return rocket2.Classifier_Rocket(output_directory, verbose)
+        from classifiers import rocket3
+        return rocket3.RocketClassifier(output_directory)
 
     if classifier_name == 'lstm_fcn':
         from classifiers import lstm_fcn
@@ -91,27 +91,27 @@ def run_all(config, params):
 
     datasets_dict = read_all_datasets(config)
 
-    print(config.classifier + "\n")
+    print(config.classifier)
 
     for iter in range(config.ITERATIONS):
-        print('\t\t\titer', iter)
+        print('\titer', iter)
 
         dataset_list = config.UNIVARIATE_DATASET_NAMES_2018 if config.archive == "UCR" else config.MTS_DATASET_NAMES
         for dataset_name in dataset_list:
-            print('\t\t\t\tdataset_name: ', dataset_name)
+            print('\t\tdataset_name: ', dataset_name)
 
             output_directory = config.path + "/ResultsProject//DNN//" + config.archive + "//" + config.classifier + '/' + \
                                config.method + "/" + params + "//itr" + str(iter) + '//' + dataset_name + '/'
 
-            if os.path.exists(output_directory + "/DONE"):
-                print("Already Done")
-                continue
+            # if os.path.exists(output_directory + "/DONE"):
+            #     print("Already Done")
+            #     continue
 
             create_directory(output_directory)
 
             fit_classifier(iter, datasets_dict, dataset_name, config.classifier, output_directory)
 
-            print('\t\t\t\t\tDONE')
+            print('\t\tDONE')
 
             # the creation of this directory means
             create_directory(output_directory + '/DONE')

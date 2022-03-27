@@ -27,11 +27,13 @@ class TemporalAbstraction(ABC):
         # added -inf and +inf at each edge to ignore calculation errors and to keep only the relevant ranges for the user
         bins = [-inf] + sorted(cutpoints) + [inf]  # added sorted() method to fix monotonically increase of bins
 
-        # TODO
-        # For CMUsubject16, KickvsPunch and WalkvsRun
-        # discrete_values = pd.cut(values, bins=bins, labels=False, duplicates='drop')
-
-        discrete_values = pd.cut(values, bins=bins, labels=False)
+        try:
+            discrete_values = pd.cut(values, bins=bins, labels=False)
+        except:
+            # For CMUsubject16, KickvsPunch and WalkvsRun
+            discrete_values = pd.cut(values, bins=bins, labels=False, duplicates='drop')
+            #TODO
+            print("")
 
         return discrete_values
 

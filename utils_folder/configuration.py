@@ -46,10 +46,10 @@ class ConfigClass:
                                               'SemgHandSubjectCh2', 'ShapesAll', 'SmoothSubspace', 'Strawberry',
                                               'SyntheticControl', 'Worms', 'WormsTwoClass']
 
-        self.MTS_DATASET_NAMES = ['ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
-                                  'JapaneseVowels', 'KickvsPunch', 'Libras', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
+        # self.MTS_DATASET_NAMES = ['ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
+        #                           'JapaneseVowels', 'KickvsPunch', 'Libras', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
 
-        # self.MTS_DATASET_NAMES = ['Libras']
+        self.MTS_DATASET_NAMES = ['Libras']
 
     def set_path_transformations(self):
         self.path_transformation1 = self.path_files_for_TA + "Transformation1//" + self.archive + "//"

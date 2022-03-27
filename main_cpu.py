@@ -25,7 +25,7 @@ def run_cpu():
     # Make the 3 files - gkb.csv, ta.csv and ppa.csv
     print("Step 2: make the gkb.csv, ta.csv and ppa.csv \n")
 
-    if not check_pickle_exists("running_dict" + config.archive):
+    if not check_pickle_exists("create_files_dict_" + config.archive):
         write_pickle("create_files_dict_" + config.archive, {})
 
     running_dict = open_pickle("create_files_dict_" + config.archive)
@@ -51,7 +51,8 @@ def run_hugobot(config, prop_path, running_dict, max_gap, method, nb_bin, paa, s
           str(std) + ", Max_Gap: " + str(max_gap))
     print("------------------------------------------------------------------------------------- \n")
 
-    key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window)
+    key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window,
+           config.transformation_number)
 
     if key in running_dict:
         print("Already Done! \n")
@@ -113,7 +114,7 @@ if __name__ == '__main__':
 
     from utils_folder.configuration import ConfigClass
     from utils_folder.utils import write_pickle, open_pickle, create_directory, check_pickle_exists, \
-    transform_mts_to_ucr_format
+        transform_mts_to_ucr_format
 
     config = ConfigClass()
     config.set_archive(sys.argv[2])
@@ -136,7 +137,7 @@ if __name__ == '__main__':
         create_files()
 
     elif sys.argv[1] == 'create_files':
-        # run_all UCR mcdcnn True sax
+        # create_files MTS mcdcnn True td4c-cosine False 1
         config.set_classifier(sys.argv[3])
         config.set_afterTA(sys.argv[4])
         config.set_method(sys.argv[5])

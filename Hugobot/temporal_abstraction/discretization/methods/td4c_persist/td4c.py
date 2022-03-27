@@ -18,6 +18,10 @@ from temporal_abstraction.discretization.methods.td4c_persist.shared_functions i
 class TD4C(Supervised):
 
     def _generate_cutpoints(self, prop_df):
+        import pandas
+        if pandas.Series(prop_df[prop_df["TemporalPropertyID"] == 71]["TemporalPropertyID"]).any():
+            print("")
+
         prop_df = prop_df.merge(self._entity_class_relations, on=DatasetColumns.EntityID)
         bool_ig = False
         if type(self) is TD4CEntropyIG:
