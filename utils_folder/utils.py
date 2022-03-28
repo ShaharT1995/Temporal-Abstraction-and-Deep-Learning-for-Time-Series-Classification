@@ -356,10 +356,10 @@ def transform_mts_to_ucr_format():
     write_pickle("length_dict", length_dict)
 
 
-def calculate_metrics(y_true, y_pred, duration, y_true_val=None, y_pred_val=None):
-    res = pd.DataFrame(data=np.zeros((1, 9), dtype=np.float), index=[0],
-                       columns=['precision', 'accuracy', 'recall', 'mcc', 'cohen_kappa', 'duration', 'f1_score_macro',
-                                'f1_score_micro', 'f1_score_weighted'])
+def calculate_metrics(y_true, y_pred, learning_time, predicting_time, y_true_val=None, y_pred_val=None):
+    res = pd.DataFrame(data=np.zeros((1, 10), dtype=np.float), index=[0],
+                       columns=['precision', 'accuracy', 'recall', 'mcc', 'cohen_kappa', 'learning_time',
+                                'predicting_time' 'f1_score_macro', 'f1_score_micro', 'f1_score_weighted'])
 
     res['precision'] = precision_score(y_true, y_pred, average='macro')
     res['recall'] = recall_score(y_true, y_pred, average='macro')
@@ -380,7 +380,9 @@ def calculate_metrics(y_true, y_pred, duration, y_true_val=None, y_pred_val=None
     if y_true_val is not None:
         res['accuracy_val'] = balanced_accuracy_score(y_true_val, y_pred_val)
 
-    res['duration'] = duration
+    res['learning_time'] = learning_time
+    res['predicting_time'] = predicting_time
+
     return res
 
 
@@ -461,11 +463,12 @@ def save_logs_t_leNet(output_directory, hist, y_pred, y_true, duration):
     plot_epochs_metric(hist, output_directory + 'epochs_loss.png')
 
 
-def save_logs(output_directory, hist, y_pred, y_true, duration, lr=True, y_true_val=None, y_pred_val=None):
+def save_logs(output_directory, hist, y_pred, y_true, learning_time, predicting_time,  lr=True, y_true_val=None,
+              y_pred_val=None):
     hist_df = pd.DataFrame(hist.history)
     hist_df.to_csv(output_directory + 'history.csv', index=False)
 
-    df_metrics = calculate_metrics(y_true, y_pred, duration, y_true_val, y_pred_val)
+    df_metrics = calculate_metrics(y_true, y_pred, learning_time, predicting_time, y_true_val, y_pred_val)
     df_metrics.to_csv(output_directory + 'df_metrics.csv', index=False)
 
     index_best_model = hist_df['val_loss'].idxmin()

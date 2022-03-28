@@ -116,8 +116,6 @@ class Classifier_TWIESN:
         return new_y_pred
 
     def train(self, iter):
-        start_time = time.time()
-
         # Training
 
         # init the matrices
@@ -135,8 +133,11 @@ class Classifier_TWIESN:
         new_labels = np.repeat(self.y_train, self.T, axis=0)
         # new model
         ridge_classifier = Ridge(alpha=self.lamda)
+
         # fit the new feature space
+        start_time = time.time()
         ridge_classifier.fit(new_x_train, new_labels)
+        learning_time = time.time() - start_time
 
         # Validation
 
@@ -168,13 +169,16 @@ class Classifier_TWIESN:
         state_matrix = None
         gc.collect()
         # get the prediction on the test set
+
+        start_time = time.time()
         y_pred = ridge_classifier.predict(new_x_test)
+        predicting_time = time.time() - start_time
+
         # reconstruct the test predictions
         y_pred = self.reshape_prediction(y_pred, self.x_test.shape[0], self.T)
 
-        duration = time.time() - start_time
         # get the metrics for the test predictions
-        df_metrics = calculate_metrics(self.y_true, y_pred, duration)
+        df_metrics = calculate_metrics(self.y_true, y_pred, learning_time, predicting_time)
 
         # get the output layer weights
         self.W_out = ridge_classifier.coef_

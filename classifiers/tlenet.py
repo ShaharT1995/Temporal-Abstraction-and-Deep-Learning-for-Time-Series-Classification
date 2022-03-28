@@ -194,9 +194,9 @@ class Classifier_TLENET:
             model.summary()
 
         start_time = time.time()
-
         hist = model.fit(x_train, y_train, batch_size=mini_batch_size, epochs=nb_epochs,
                          verbose=self.verbose, validation_data=(x_test, y_test), callbacks=self.callbacks)
+        learning_time = time.time() - start_time
 
         model.save(self.output_directory + 'last_model.hdf5')
 
@@ -207,6 +207,7 @@ class Classifier_TLENET:
         y_pred = np.argmax(y_pred, axis=1)
 
         # get the true predictions of the test set
+        start_time = time.time()
         y_predicted = []
         test_num_batch = int(x_test.shape[0] / tot_increase_num)
         for i in range(test_num_batch):
@@ -219,10 +220,9 @@ class Classifier_TLENET:
             y_predicted.append(predicted_label)
 
         y_pred = np.array(y_predicted)
+        predicting_time = time.time() - start_time
 
-        duration = time.time() - start_time
-
-        save_logs(self.output_directory, hist, y_pred, y_true, duration)
+        save_logs(self.output_directory, hist, y_pred, y_true, learning_time, predicting_time)
 
         keras.backend.clear_session()
 

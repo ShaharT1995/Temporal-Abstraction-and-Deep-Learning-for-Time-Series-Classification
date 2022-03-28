@@ -85,7 +85,6 @@ class Classifier_LSTMFCN:
         out = Dense(nb_classes, activation='softmax')(x)
 
         model = Model(ip, out)
-        # model.summary()
 
         model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(),
                       metrics=['accuracy'])
@@ -119,25 +118,25 @@ class Classifier_LSTMFCN:
         # Was here before
         mini_batch_size = int(min(x.shape[0] / 10, batch_size))
 
-        start_time = time.time()
-
         x_train, x_val, y_train, y_val = \
             train_test_split(x, y, test_size=0.3, random_state=(42 + iteration))
 
+        start_time = time.time()
         hist = self.model.fit(x_train, y_train, batch_size=mini_batch_size, epochs=nb_epochs,
                               verbose=self.verbose, validation_data=(x_val, y_val), callbacks=self.callbacks)
-
-        duration = time.time() - start_time
+        learning_time = time.time() - start_time
 
         self.model.save(self.output_directory + 'last_model.hdf5')
 
         model = keras.models.load_model(self.output_directory + 'best_model.hdf5')
 
+        start_time = time.time()
         y_pred = model.predict(x_test)
+        predicting_time = time.time() - start_time
 
         # convert the predicted from binary to integer
         y_pred = np.argmax(y_pred, axis=1)
 
-        save_logs(self.output_directory, hist, y_pred, y_true, duration)
+        save_logs(self.output_directory, hist, y_pred, y_true, learning_time, predicting_time)
 
         keras.backend.clear_session()

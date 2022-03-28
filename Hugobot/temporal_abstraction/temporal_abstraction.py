@@ -32,8 +32,7 @@ class TemporalAbstraction(ABC):
         except:
             # For CMUsubject16, KickvsPunch and WalkvsRun
             discrete_values = pd.cut(values, bins=bins, labels=False, duplicates='drop')
-            #TODO
-            print("")
+            print("Make the list unique in hugobot")
 
         return discrete_values
 

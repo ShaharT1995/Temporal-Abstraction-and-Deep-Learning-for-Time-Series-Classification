@@ -97,11 +97,11 @@ class Classifier_MLSTM_FCN:
         # create class weights based on the y label proportions for each image
         class_weight = self.create_class_weight(y)
 
-        start_time = time.time()
         # train the model
         x_train, x_val, y_train, y_val = \
             train_test_split(x, y, test_size=0.3, random_state=(42 + iteration))
 
+        start_time = time.time()
         self.hist = self.model.fit(x_train, y_train,
                                    validation_data=[x_val, y_val],
                                    class_weight=class_weight,
@@ -109,18 +109,19 @@ class Classifier_MLSTM_FCN:
                                    epochs=nb_epochs,
                                    batch_size=mini_batch_size,
                                    callbacks=self.callbacks)
-
-        self.duration = time.time() - start_time
+        learning_time = time.time() - start_time
 
         keras.models.save_model(self.model, self.output_directory + 'model.h5')
         model = keras.models.load_model(self.output_directory + 'best_model.h5')
 
+        start_time = time.time()
         y_pred = model.predict(x_test)
+        predicting_time = time.time() - start_time
 
         # convert the predicted from binary to integer
         y_pred = np.argmax(y_pred, axis=1)
 
-        save_logs(self.output_directory, self.hist, y_pred, y_true, self.duration)
+        save_logs(self.output_directory, self.hist, y_pred, y_true, learning_time, predicting_time)
         keras.backend.clear_session()
 
 

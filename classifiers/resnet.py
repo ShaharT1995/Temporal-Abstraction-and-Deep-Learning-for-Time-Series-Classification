@@ -140,21 +140,20 @@ class Classifier_RESNET:
         # Was here before
         mini_batch_size = int(min(x_train.shape[0] / 10, batch_size))
 
-        start_time = time.time()
-
         # Added lines because model's fit on the testing set - bug in the original code
         x_train, x_val, y_train, y_val = \
             train_test_split(x_train, y_train, test_size=0.3, random_state=(42 + iteration))
 
+        start_time = time.time()
         hist = self.model.fit(x_train, y_train, batch_size=mini_batch_size, epochs=nb_epochs,
                               verbose=self.verbose, validation_data=(x_val, y_val), callbacks=self.callbacks)
-
-        duration = time.time() - start_time
+        learning_time = time.time() - start_time
 
         self.model.save(self.output_directory + 'last_model.hdf5')
 
-        y_pred = self.predict(x_test, y_true, x_train, y_train, y_val,
-                              return_df_metrics=False)
+        start_time = time.time()
+        y_pred = self.predict(x_test, y_true, x_train, y_train, y_val, return_df_metrics=False)
+        predicting_time = time.time() - start_time
 
         # save predictions
         np.save(self.output_directory + 'y_pred.npy', y_pred)
@@ -162,7 +161,7 @@ class Classifier_RESNET:
         # convert the predicted from binary to integer
         y_pred = np.argmax(y_pred, axis=1)
 
-        df_metrics = save_logs(self.output_directory, hist, y_pred, y_true, duration)
+        df_metrics = save_logs(self.output_directory, hist, y_pred, y_true, learning_time, predicting_time)
 
         keras.backend.clear_session()
 

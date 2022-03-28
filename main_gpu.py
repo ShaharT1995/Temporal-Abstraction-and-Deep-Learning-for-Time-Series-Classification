@@ -25,7 +25,8 @@ def execute_running(config, running_dict, max_gap, method, nb_bin, paa, std, gra
           str(std) + ", Max_Gap: " + str(max_gap))
     print("------------------------------------------------------------------------------------- \n")
 
-    key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window)
+    key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window,
+           config.transformation_number)
 
     if key in running_dict:
         print("Already Done! \n")
