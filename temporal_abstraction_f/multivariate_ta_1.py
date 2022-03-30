@@ -1,4 +1,3 @@
-import os
 import numpy as np
 import pandas as pd
 
@@ -78,6 +77,6 @@ class MultivariateTA1:
             self.attributes_dict[dataset_name] = [i for i in range(self.next_attribute, self.next_attribute + r)]
             self.next_attribute += r
 
-        write_pickle("attributes_dict", self.attributes_dict)
+        write_pickle("attributes_dict_mts", self.attributes_dict)
 
         return self.next_attribute

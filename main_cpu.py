@@ -8,13 +8,13 @@ def create_files():
     if config.archive == "UCR":
         uni_ta_1 = UnivariateTA1(config, 0)
         next_attribute = uni_ta_1.convert_all_UTS()
-
     # config.archive == "MTS"
     else:
         multi_ta_1 = MultivariateTA1(config, 0)
         next_attribute = multi_ta_1.convert_all_MTS()
 
     write_pickle("next_property_index" + config.archive, {"ID": next_attribute})
+
     print()
 
 

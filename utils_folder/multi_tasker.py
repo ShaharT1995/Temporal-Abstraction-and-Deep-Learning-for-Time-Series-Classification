@@ -43,7 +43,8 @@ def create_combination_lst():
     save_combination_pickle(combination_lst)
 
 
-def create_combination_gpu_2():
+# We run this function one time. The function create all the possible combination
+def create_combination_lst_2():
     dict_name = {"archive": ['UCR', 'MTS'],
                  "classifier": ['fcn', 'mlp', 'resnet', 'tlenet', 'twiesn', 'encoder', 'mcdcnn', 'cnn', 'inception',
                                 'lstm_fcn', 'mlstm_fcn', 'rocket'],
@@ -62,51 +63,8 @@ def create_combination_gpu_2():
     save_combination_pickle(combination_lst)
 
 
-# We run this function one time. The function create all the possible combination
-def create_combination_gpu():
-    dict_name = {"archive": ['UCR', 'MTS'],
-                 "classifier": ['fcn', 'mlp', 'resnet', 'tlenet', 'encoder', 'mcdcnn', 'cnn', 'inception', 'lstm_fcn',
-                                'mlstm_fcn'],
-                 "afterTA": ['True'],
-                 "method": ['sax', 'td4c-cosine', 'gradient'],
-                 "combination": ['False'],
-                 "transformation": ["1", "2", "3"]}
-
-    keys_list = list(itertools.product(*dict_name.values()))
-
-    combination_lst = []
-    for combination in keys_list:
-        combination_lst.append(list(combination))
-
-    # Save the pickle file
-    save_combination_pickle(combination_lst, gpu=True)
-
-
-# We run this function one time. The function create all the possible combination
-def create_combination_cpu():
-    dict_name = {"archive": ['UCR', 'MTS'],
-                 "classifier": ['rocket', 'twiesn'],
-                 "afterTA": ['True'],
-                 "method": ['sax', 'td4c-cosine', 'gradient'],
-                 "combination": ['False'],
-                 "transformation": ["1", "2", "3"]}
-
-    keys_list = list(itertools.product(*dict_name.values()))
-
-    combination_lst = []
-    for combination in keys_list:
-        combination_lst.append(list(combination))
-
-    # Save the pickle file
-    save_combination_pickle(combination_lst, gpu=False)
-
-
-def save_combination_pickle(data, gpu=None):
-    if gpu is not None:
-        type = "gpu" if gpu else "cpu"
-        file = open(project_path + "/Run//combination_list_" + type + ".pkl", "wb")
-    else:
-        file = open(project_path + "/Run//combination_list.pkl", "wb")
+def save_combination_pickle(data):
+    file = open(project_path + "/Run//combination_list.pkl", "wb")
     pickle.dump(data, file)
     file.close()
 
@@ -152,11 +110,7 @@ if __name__ == '__main__':
 
     write_pickle("running_dictUCR", {})
     write_pickle("running_dictMTS", {})
-    write_pickle("create_files_dict_UTS", {})
-    write_pickle("create_files_dict_MTS", {})
-    create_combination_gpu_2()
-    create_combination_gpu()
-    create_combination_cpu()
+    create_combination_lst_2()
 
     # while not check_lock():
     #     print("The file is lock by another user")
@@ -168,7 +122,7 @@ if __name__ == '__main__':
     #
     # combination_for_running = data[: number_to_run]
     # save_combination_pickle(data[number_to_run:])
-
+    #
     # os.remove(project_path + "/Run//" + current_user + ".txt")
     # print("The file unlock by " + current_user)
     #

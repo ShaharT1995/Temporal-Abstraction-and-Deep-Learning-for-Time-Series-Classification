@@ -35,21 +35,21 @@ class ConfigClass:
         self.max_gap = [1]
         self.paa_window_size = 1
         self.gradient_window_size = [10]
+        self.UNIVARIATE_DATASET_NAMES_2018 = ['SmoothSubspace', 'Crop']
+        # self.UNIVARIATE_DATASET_NAMES_2018 = ['SmoothSubspace', 'Adiac', 'BME', 'Coffee', 'Yoga', 'BeetleFly',
+        #                                       'Car', 'Computers', 'Worms', 'PLAID', 'ACSF1']
+        # self.UNIVARIATE_DATASET_NAMES_2018 = ['ACSF1', 'Adiac', 'Beef', 'Computers', 'CricketX', 'CricketY', 'CricketZ',
+        #                                       'Crop', 'Earthquakes', 'ECG200', 'ElectricDevices', 'EthanolLevel',
+        #                                       'FordA', 'FordB', 'HandOutlines', 'Herring', 'LargeKitchenAppliances',
+        #                                       'MiddlePhalanxOutlineCorrect', 'MiddlePhalanxTW',
+        #                                       'PhalangesOutlinesCorrect', 'PLAID', 'PowerCons', 'SemgHandMovementCh2',
+        #                                       'SemgHandSubjectCh2', 'ShapesAll', 'SmoothSubspace', 'Strawberry',
+        #                                       'SyntheticControl', 'Worms', 'WormsTwoClass']
 
-        # self.UNIVARIATE_DATASET_NAMES_2018 = ['SmoothSubspace']
+        # self.MTS_DATASET_NAMES = ['ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
+        #                           'JapaneseVowels', 'KickvsPunch', 'Libras', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
 
-        self.UNIVARIATE_DATASET_NAMES_2018 = ['ACSF1', 'Adiac', 'Beef', 'Computers', 'CricketX', 'CricketY', 'CricketZ',
-                                              'Crop', 'Earthquakes', 'ECG200', 'ElectricDevices', 'EthanolLevel',
-                                              'FordA', 'FordB', 'HandOutlines', 'Herring', 'LargeKitchenAppliances',
-                                              'MiddlePhalanxOutlineCorrect', 'MiddlePhalanxTW',
-                                              'PhalangesOutlinesCorrect', 'PLAID', 'PowerCons', 'SemgHandMovementCh2',
-                                              'SemgHandSubjectCh2', 'ShapesAll', 'SmoothSubspace', 'Strawberry',
-                                              'SyntheticControl', 'Worms', 'WormsTwoClass']
-
-        self.MTS_DATASET_NAMES = ['ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
-                                  'JapaneseVowels', 'KickvsPunch', 'Libras', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
-
-        # self.MTS_DATASET_NAMES = ['Libras']
+        self.MTS_DATASET_NAMES = ['ArabicDigits', 'AUSLAN']
 
     def set_path_transformations(self):
         self.path_transformation1 = self.path_files_for_TA + "Transformation1//" + self.archive + "//"
@@ -95,6 +95,7 @@ class ConfigClass:
 
         # Setting the graph-level random seed.
         tf.random.set_seed(89)
+
 
         session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
         sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)

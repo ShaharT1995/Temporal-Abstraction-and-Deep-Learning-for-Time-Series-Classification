@@ -44,9 +44,9 @@ def run_cli(config, prop_path, max_gap):
                      output_folder,  # 'Path to output dir'
                      'per-property',  # per-property
                      '-s',  # -s (when using Gradient or KnowledgeBased)
-                     prop_path + "gkb.csv",  # 'Path to states file' (when using Gradient or KnowledgeBased)
-                     prop_path + "pp.csv",  # 'Path to pre-processing file'
-                     prop_path + "ta.csv"],  # 'Path to Temporal Abstraction file'
+                     prop_path + dataset_name+ "//gkb.csv",  # 'Path to states file' (when using Gradient or KnowledgeBased)
+                     prop_path + dataset_name+  "//pp.csv",  # 'Path to pre-processing file'
+                     prop_path + dataset_name+  "//ta.csv"],  # 'Path to Temporal Abstraction file'
                     standalone_mode=False)
 
             # Method is not gradient
@@ -56,8 +56,8 @@ def run_cli(config, prop_path, max_gap):
                          f'{raw_data_path}',  # 'Path to data set file'
                          output_folder,  # 'Path to output dir'
                          'per-property',  # per-property
-                         prop_path + "pp.csv",  # 'Path to pre-processing file'
-                         prop_path + "ta.csv"],  # 'Path to Temporal Abstraction file'
+                         prop_path + dataset_name+ "//pp.csv",  # 'Path to pre-processing file'
+                         prop_path + dataset_name+ "//ta.csv"],  # 'Path to Temporal Abstraction file'
                         standalone_mode=False)
 
                 # Test
