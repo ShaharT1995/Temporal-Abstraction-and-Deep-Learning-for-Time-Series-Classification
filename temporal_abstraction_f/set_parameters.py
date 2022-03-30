@@ -1,5 +1,5 @@
 import pandas as pd
-from utils_folder.utils import open_pickle
+from utils_folder.utils import open_pickle, create_directory
 
 
 def create_three_files(config, path, method, nb_bins, paa_window_size, std_coefficient, max_gap,
@@ -57,9 +57,9 @@ def create_three_files(config, path, method, nb_bins, paa_window_size, std_coeff
 
                     df_gkb = df_gkb.append(new_row, ignore_index=True)
 
-
+        create_directory(path + ds)
         if method == "gradient":
-            df_gkb.to_csv(path +"//"+ ds +'//gkb.csv', index=False)
+            df_gkb.to_csv(path + ds +'//gkb.csv', index=False)
         # Save all data frames to csv
-        df_ta.to_csv(path +"//"+ ds + '//ta.csv', index=False)
-        df_pp.to_csv(path +"//"+ ds + '//pp.csv', index=False)
+        df_ta.to_csv(path + ds + '//ta.csv', index=False)
+        df_pp.to_csv(path + ds + '//pp.csv', index=False)
