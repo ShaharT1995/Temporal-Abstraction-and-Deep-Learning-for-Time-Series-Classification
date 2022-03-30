@@ -4,7 +4,7 @@ from functools import reduce
 
 import pandas as pd
 from pandas._libs.parsers import is_float_dtype
-
+from utils_folder.utils import wait_for_files
 from constants import DatasetColumns, EntityClassRelationsColumns, FileNames, TimeIntervalsColumns
 from time_intervals_adapter.time_intervals_adapter import TimeIntervalsAdapter
 
@@ -29,7 +29,8 @@ class FilesManager(ABC):
 
     @staticmethod
     def read_csv(file_path):
-        return pd.read_csv(file_path)
+        #return pd.read_csv(file_path)
+        return wait_for_files(file_path, cli=True)
 
     def read_dataset(self):
         entity_class_relations_path = self.__get_entity_class_relations_file_path()
@@ -40,7 +41,9 @@ class FilesManager(ABC):
         return self.dataset
 
     def read_states(self):
-        return pd.read_csv(self.__get_states_path())
+        #return pd.read_csv(self.__get_states_path())
+        return wait_for_files(self.__get_states_path(), cli=True)
+
 
     def write_states(self, states):
         states.to_csv(self.__get_states_path(), index=False)
@@ -73,7 +76,8 @@ class FilesManager(ABC):
 
     def read_entity_class_relations(self):
         entity_class_relations_path = self.__get_entity_class_relations_file_path()
-        return pd.read_csv(entity_class_relations_path)
+        #return pd.read_csv(entity_class_relations_path)
+        return wait_for_files(entity_class_relations_path, cli= True)
 
     def write_entity_class_relations(self, entity_class_relations):
         entity_class_relations_path = self.__get_entity_class_relations_file_path()
@@ -114,7 +118,6 @@ class FilesManager(ABC):
         prop_data_path = self.__get_prop_data_path()
         entity_class_relations_path = self.__get_entity_class_relations_file_path()
 
-        from utils_folder.utils import wait_for_files
         dataset = wait_for_files(self.input_path, cli=True)
         # dataset = pd.read_csv(self.input_path)
 
