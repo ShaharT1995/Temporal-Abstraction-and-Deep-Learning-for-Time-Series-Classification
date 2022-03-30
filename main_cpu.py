@@ -20,6 +20,9 @@ def create_files():
 
 def run_cpu():
     prop_path = config.path_files_for_TA + config.archive + "//" + config.classifier + "//" + config.method + "//"
+
+    if config.combination:
+        prop_path += "combination//"
     create_directory(prop_path)
 
     # Make the 3 files - gkb.csv, ta.csv and ppa.csv
@@ -52,7 +55,7 @@ def run_hugobot(config, prop_path, running_dict, max_gap, method, nb_bin, paa, s
     print("------------------------------------------------------------------------------------- \n")
 
     key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window,
-           config.transformation_number)
+           config.transformation_number, config.combination)
 
     if key in running_dict:
         print("Already Done! \n")
@@ -71,7 +74,7 @@ def run_hugobot(config, prop_path, running_dict, max_gap, method, nb_bin, paa, s
         print("Step 3: run hugobot")
         run_cli(config, prop_path, max_gap)
 
-        if config.combination:
+        if config.combination and config.method != "gradient":
             print("Step 3.1: make the gkb.csv, ta.csv and ppa.csv for " + method + " method\n")
 
             gradient_prop_path = config.path_files_for_TA + config.archive + "//" + config.classifier + "//gradient//"

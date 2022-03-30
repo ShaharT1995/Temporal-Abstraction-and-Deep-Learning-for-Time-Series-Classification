@@ -19,32 +19,8 @@ def run_job_using_sbatch(sbatch_path, arguments):
     run_list = ["sbatch", "multi_tasker_cpu"] + arguments
     subprocess.Popen(run_list, stdout=temp_file, stderr=temp_file)
 
-
-# We run this function one time. The function create all the possible combination
-def create_combination_lst():
-    dict_name = {"archive": ['UCR', 'MTS'],
-                 "classifier": ['fcn', 'mlp', 'resnet', 'tlenet', 'twiesn', 'encoder', 'mcdcnn', 'cnn', 'inception',
-                                'lstm_fcn', 'mlstm_fcn', 'rocket'],
-                 "afterTA": ['True', 'False'],
-                 "method": ['RawData', 'sax', 'td4c-cosine', 'gradient'],
-                 "combination": ['False'],
-                 "transformation": ["1", "2", "3"]}
-
-    keys_list = list(itertools.product(*dict_name.values()))
-
-    combination_lst = []
-    for combination in keys_list:
-        # If the method is raw data, afterTa must be false, so we remove those combination
-        if not (combination[3] == "RawData" and combination[2] == "True" and (combination[5] == "2" or
-                                                                              combination[5] == "3")):
-            combination_lst.append(list(combination))
-
-    # Save the pickle file
-    save_combination_pickle(combination_lst)
-
-
-# We run this function one time. The function create all the possible combination
-def create_combination_lst_2():
+# for step one running hugobot
+def create_combination_list():
     dict_name = {"archive": ['UCR', 'MTS'],
                  "classifier": ['fcn', 'mlp', 'resnet', 'tlenet', 'twiesn', 'encoder', 'mcdcnn', 'cnn', 'inception',
                                 'lstm_fcn', 'mlstm_fcn', 'rocket'],
@@ -63,8 +39,54 @@ def create_combination_lst_2():
     save_combination_pickle(combination_lst)
 
 
-def save_combination_pickle(data):
-    file = open(project_path + "/Run//combination_list.pkl", "wb")
+# We run this function one time. The function create all the possible combination
+def create_combination_gpu():
+    dict_name = {"archive": ['UCR', 'MTS'],
+                 "classifier": ['fcn', 'mlp', 'resnet', 'tlenet', 'encoder', 'mcdcnn', 'cnn', 'inception', 'lstm_fcn',
+                                'mlstm_fcn'],
+                 "afterTA": ['False', "True"],
+                 "method": ['sax', 'td4c-cosine', 'gradient', "RawData"],
+                 "combination": ['False'],
+                 "transformation": ["1", "2", "3"]}
+
+    keys_list = list(itertools.product(*dict_name.values()))
+
+    combination_lst = []
+    for combination in keys_list:
+        if not (combination[3] == "RawData" and combination[2] == "True" and (combination[5] == "2" or
+                                                                              combination[5] == "3")):
+            combination_lst.append(list(combination))
+    # Save the pickle file
+    save_combination_pickle(combination_lst, gpu=True)
+
+
+# We run this function one time. The function create all the possible combination
+def create_combination_cpu():
+    dict_name = {"archive": ['UCR', 'MTS'],
+                 "classifier": ['rocket', 'twiesn'],
+                 "afterTA": ['False', "True"],
+                 "method": ['sax', 'td4c-cosine', 'gradient', "RawData"],
+                 "combination": ['False'],
+                 "transformation": ["1", "2", "3"]}
+
+    keys_list = list(itertools.product(*dict_name.values()))
+
+    combination_lst = []
+    for combination in keys_list:
+        if not (combination[3] == "RawData" and combination[2] == "True" and (combination[5] == "2" or
+                                                                              combination[5] == "3")):
+            combination_lst.append(list(combination))
+
+    # Save the pickle file
+    save_combination_pickle(combination_lst, gpu=False)
+
+
+def save_combination_pickle(data, gpu=None):
+    if gpu is not None:
+        type = "gpu" if gpu else "cpu"
+        file = open(project_path + "/Run//combination_list_" + type + ".pkl", "wb")
+    else:
+        file = open(project_path + "/Run//combination_list.pkl", "wb")
     pickle.dump(data, file)
     file.close()
 
@@ -97,20 +119,20 @@ def check_lock():
 
 
 if __name__ == '__main__':
-    current_user = "shaharap"
-    user1 = "hadas5"
+    current_user = "hadas5"
+    user1 = "shaharap"
     user2 = "roze"
     user3 = "oshermac"
 
     number_of_total_jobs = 15
     project_path = "/sise/robertmo-group/TA-DL-TSC/"
-    sbatch_path = "/sise/home/" + current_user + "/run_python_code_cpu"
-    current_file_path = "/sise/home/" + current_user + "/run_multi_tasker_cpu"
-    temp_file = open("/sise/home/" + current_user + "/tmp.txt", 'w')
+    sbatch_path = "/home/" + current_user + "/run_python_code_cpu"
+    current_file_path = "/home/" + current_user + "/run_multi_tasker_cpu"
+    temp_file = open("/home/" + current_user + "/tmp.txt", 'w')
 
     write_pickle("running_dictUCR", {})
     write_pickle("running_dictMTS", {})
-    create_combination_lst_2()
+    create_combination_list()
 
     # while not check_lock():
     #     print("The file is lock by another user")

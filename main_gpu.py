@@ -26,7 +26,7 @@ def execute_running(config, running_dict, max_gap, method, nb_bin, paa, std, gra
     print("------------------------------------------------------------------------------------- \n")
 
     key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window,
-           config.transformation_number)
+           config.transformation_number, config.combination)
 
     if key in running_dict:
         print("Already Done! \n")
@@ -35,7 +35,8 @@ def execute_running(config, running_dict, max_gap, method, nb_bin, paa, std, gra
     else:
         print("Step 5: Run all:")
         params = "res_" + str(method) + "_" + str(nb_bin) + "_" + str(paa) + "_" + str(std) \
-                        + "_" + str(max_gap) + "_" + str(gradient_window) + "_" + str(config.transformation_number)
+                        + "_" + str(max_gap) + "_" + str(gradient_window) + "_" + str(config.transformation_number)\
+                        + "_" + str(config.combination)
 
         run_models.run_all(config, params)
         print("")
@@ -55,8 +56,7 @@ if __name__ == '__main__':
     sys.path.insert(0, '/sise/robertmo-group/TA-DL-TSC/Project/')
 
     from utils_folder.configuration import ConfigClass
-    from utils_folder.utils import generate_results_csv, write_pickle, open_pickle, transform_mts_to_ucr_format, \
-        create_directory, check_pickle_exists
+    from utils_folder.utils import generate_results_csv, write_pickle, open_pickle, check_pickle_exists
 
     config = ConfigClass()
     config.set_archive(sys.argv[2])

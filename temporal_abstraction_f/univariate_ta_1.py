@@ -81,5 +81,7 @@ class UnivariateTA1:
 
             print("")
 
-        write_pickle("univariate_dict_ucr", self.univariate_dict)
+        write_pickle("univariate_dict", self.univariate_dict)
+        write_pickle("attributes_dict_ucr", attributes_dict)
+
         return self.next_attribute
