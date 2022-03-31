@@ -62,6 +62,7 @@ def run_hugobot(config, prop_path, running_dict, max_gap, method, nb_bin, paa, s
 
         return running_dict
     else:
+        prop_path += "number_bin_" + str(nb_bin) + "//"
         create_three_files(config=config,
                            path=prop_path,
                            method=method,
@@ -103,6 +104,7 @@ def run_hugobot(config, prop_path, running_dict, max_gap, method, nb_bin, paa, s
         else:
             # Make the second temporal abstraction -> hugobot output files to original format
             print("Step 4: transformation 2")
+            config.set_path_transformations_2(nb_bin)
             new_ucr_files(config, prop_path) if config.archive == "UCR" else new_mts_files(config, prop_path)
 
         running_dict[key] = True

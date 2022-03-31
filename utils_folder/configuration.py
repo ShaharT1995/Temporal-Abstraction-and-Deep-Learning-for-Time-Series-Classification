@@ -35,7 +35,7 @@ class ConfigClass:
         self.max_gap = [1]
         self.paa_window_size = 1
         self.gradient_window_size = [10]
-        #self.UNIVARIATE_DATASET_NAMES_2018 = ['SmoothSubspace', 'Crop']
+        #self.UNIVARIATE_DATASET_NAMES_2018 = ['Worms', 'WormsTwoClass']
         # self.UNIVARIATE_DATASET_NAMES_2018 = ['SmoothSubspace', 'Adiac', 'BME', 'Coffee', 'Yoga', 'BeetleFly',
         #                                       'Car', 'Computers', 'Worms', 'PLAID', 'ACSF1']
         self.UNIVARIATE_DATASET_NAMES_2018 = ['ACSF1', 'Adiac', 'Beef', 'Computers', 'CricketX', 'CricketY', 'CricketZ',
@@ -56,6 +56,9 @@ class ConfigClass:
         self.path_transformation2 = self.path_after_TA + self.archive + "//" + self.classifier + "//" + self.method \
                                     + "//"
 
+    def set_path_transformations_2(self, nb_bin ):
+        self.path_transformation2 = self.path_after_TA + self.archive + "//" + self.classifier + "//" + self.method \
+                                    + "//" + "number_bin_" + str(nb_bin) + "//"
     @staticmethod
     def set_method(method):
         ConfigClass.method = method

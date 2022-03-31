@@ -17,8 +17,6 @@ def create_three_files(config, path, method, nb_bins, paa_window_size, std_coeff
     #next_attribute = open_pickle("next_property_index" + config.archive)["ID"]
     attribute_dict= open_pickle("attributes_dict_ucr") if config.archive == "UCR" else open_pickle("attributes_dict_mts")
     dataset_list = config.UNIVARIATE_DATASET_NAMES_2018 if config.archive == "UCR" else config.MTS_DATASET_NAMES
-
-
     for ds in dataset_list:
         # GKB
         index = 0
