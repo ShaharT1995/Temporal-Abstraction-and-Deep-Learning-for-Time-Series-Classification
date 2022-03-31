@@ -57,14 +57,18 @@ def run_hugobot(config, prop_path, running_dict, max_gap, method, nb_bin, paa, s
     key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window,
            config.transformation_number, config.combination)
 
+    transformation_dict = open_pickle("transformation_number")
+    key_2 = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window, config.combination)
+
     if key in running_dict:
         print("Already Done! \n")
-
         return running_dict
+
     else:
         prop_path += "number_bin_" + str(nb_bin) + "//"
+        create_directory(prop_path)
         #todo - remove this if
-        if config.transformation_number == "1" :
+        if key_2 not in transformation_dict:
             create_three_files(config=config,
                                path=prop_path,
                                method=method,
@@ -102,6 +106,11 @@ def run_hugobot(config, prop_path, running_dict, max_gap, method, nb_bin, paa, s
                 config.set_method(method)
 
                 combining_two_methods(config, prop_path)
+
+            else:
+                transformation_dict[key_2]=True
+                write_pickle("transformation_number" , transformation_dict)
+
 
         else:
             # Make the second temporal abstraction -> hugobot output files to original format
