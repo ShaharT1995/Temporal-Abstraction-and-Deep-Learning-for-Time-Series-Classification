@@ -24,7 +24,8 @@ class TemporalAbstraction(ABC):
         :return: List, a list of discrete values
         """
 
-        # added -inf and +inf at each edge to ignore calculation errors and to keep only the relevant ranges for the user
+        # added -inf and +inf at each edge to ignore calculation errors and to keep only the relevant ranges for the
+        # user
         bins = [-inf] + sorted(cutpoints) + [inf]  # added sorted() method to fix monotonically increase of bins
 
         try:

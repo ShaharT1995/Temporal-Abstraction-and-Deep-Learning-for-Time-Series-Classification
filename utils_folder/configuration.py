@@ -35,7 +35,7 @@ class ConfigClass:
         self.max_gap = [1]
         self.paa_window_size = 1
         self.gradient_window_size = [10]
-        #self.UNIVARIATE_DATASET_NAMES_2018 = ['Worms', 'WormsTwoClass']
+        # self.UNIVARIATE_DATASET_NAMES_2018 = ['Worms', 'WormsTwoClass']
         # self.UNIVARIATE_DATASET_NAMES_2018 = ['SmoothSubspace', 'Adiac', 'BME', 'Coffee', 'Yoga', 'BeetleFly',
         #                                       'Car', 'Computers', 'Worms', 'PLAID', 'ACSF1']
         self.UNIVARIATE_DATASET_NAMES_2018 = ['ACSF1', 'Adiac', 'Beef', 'Computers', 'CricketX', 'CricketY', 'CricketZ',
@@ -49,16 +49,16 @@ class ConfigClass:
         self.MTS_DATASET_NAMES = ['ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
                                   'JapaneseVowels', 'KickvsPunch', 'Libras', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
 
-        #self.MTS_DATASET_NAMES = ['ArabicDigits', 'AUSLAN']
+        # self.MTS_DATASET_NAMES = ['ArabicDigits', 'AUSLAN']
 
     def set_path_transformations(self):
         self.path_transformation1 = self.path_files_for_TA + "Transformation1//" + self.archive + "//"
         self.path_transformation2 = self.path_after_TA + self.archive + "//" + self.classifier + "//" + self.method \
                                     + "//"
 
-    def set_path_transformations_2(self, nb_bin ):
-        self.path_transformation2 = self.path_after_TA + self.archive + "//" + self.classifier + "//" + self.method \
-                                    + "//" + "number_bin_" + str(nb_bin) + "//"
+    def set_path_transformations_2(self, nb_bin):
+        self.path_transformation2 += "number_bin_" + str(nb_bin) + "//"
+
     @staticmethod
     def set_method(method):
         ConfigClass.method = method
@@ -99,8 +99,6 @@ class ConfigClass:
         # Setting the graph-level random seed.
         tf.random.set_seed(89)
 
-
         session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
         sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
         K.set_session(sess)
-

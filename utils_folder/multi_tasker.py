@@ -4,8 +4,8 @@ import pickle
 import random
 import subprocess
 import time
-from utils_folder.utils import write_pickle
-import timeit
+
+from utils_folder.utils import write_pickle, open_pickle
 
 
 def get_number_of_jobs(user_name):
@@ -19,6 +19,7 @@ def run_job_using_sbatch(sbatch_path, arguments):
     run_list = ["sbatch", "multi_tasker_cpu"] + arguments
     subprocess.Popen(run_list, stdout=temp_file, stderr=temp_file)
 
+
 # for step one running hugobot
 def create_combination_list():
     dict_name = {"archive": ['UCR', 'MTS'],
@@ -27,7 +28,7 @@ def create_combination_list():
                  "afterTA": ['True'],
                  "method": ['sax', 'td4c-cosine', 'gradient'],
                  "combination": ['False'],
-                 "transformation": ["1", "2", "3"]}
+                 "transformation": ["1"]}
 
     keys_list = list(itertools.product(*dict_name.values()))
 
@@ -119,16 +120,16 @@ def check_lock():
 
 
 if __name__ == '__main__':
-    current_user = "hadas5"
-    user1 = "shaharap"
+    current_user = "shaharap"
+    user1 = "hadas5"
     user2 = "roze"
     user3 = "oshermac"
 
     number_of_total_jobs = 15
     project_path = "/sise/robertmo-group/TA-DL-TSC/"
-    sbatch_path = "/home/" + current_user + "/run_python_code_cpu"
-    current_file_path = "/home/" + current_user + "/run_multi_tasker_cpu"
-    temp_file = open("/home/" + current_user + "/tmp.txt", 'w')
+    sbatch_path = "/sise/home/" + current_user + "/run_python_code_cpu"
+    current_file_path = "/sise/home/" + current_user + "/run_multi_tasker_cpu"
+    temp_file = open("/sise/home/" + current_user + "/tmp.txt", 'w')
 
     write_pickle("running_dictUCR", {})
     write_pickle("running_dictMTS", {})
