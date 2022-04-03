@@ -46,75 +46,64 @@ def run_cpu():
     print("Done")
 
 
-def run_hugobot(config, prop_path, running_dict, max_gap, method, nb_bin, paa, std, gradient_window=None):
-    # TODO - COMBINATION
-    # todo - Add gradient to the print
+def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, gradient_window=None):
     print("-------------------------------------------------------------------------------------")
-    print("Method: " + method + ", Bins: " + str(nb_bin) + ", PAA: " + str(paa) + ", STD: " +
-          str(std) + ", Max_Gap: " + str(max_gap))
+    print("Classifier: " + config.classifier + ", Method: " + method + ", Bins: " + str(nb_bin) + " Combination:" +
+          str(config.combination))
     print("------------------------------------------------------------------------------------- \n")
 
-    key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window,
-           config.transformation_number, config.combination)
-
-    transformation_dict = open_pickle("transformation_number")
-    key_2 = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window, config.combination)
+    key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window, config.combination)
 
     if key in running_dict:
         print("Already Done! \n")
         return running_dict
 
     else:
-        prop_path += "number_bin_" + str(nb_bin) + "//"
+        prop_path = path + "number_bin_" + str(nb_bin) + "//"
         create_directory(prop_path)
-        #todo - remove this if
-        if key_2 not in transformation_dict:
+
+        # create_three_files(config=config,
+        #                    path=prop_path,
+        #                    method=method,
+        #                    nb_bins=nb_bin,
+        #                    paa_window_size=paa,
+        #                    std_coefficient=std,
+        #                    max_gap=max_gap,
+        #                    gradient_window_size=gradient_window)
+        #
+        # print("Step 3: run hugobot")
+        # run_cli(config, prop_path, max_gap)
+
+        if config.combination and config.method != "gradient":
+            print("Step 3.1: make the gkb.csv, ta.csv and ppa.csv for " + method + " method\n")
+
+            gradient_prop_path = config.path_files_for_TA + config.archive + "//" + config.classifier + "//gradient//"
+            create_directory(gradient_prop_path)
+
+            # TODO Change the gradient window size
             create_three_files(config=config,
-                               path=prop_path,
-                               method=method,
+                               path=gradient_prop_path,
+                               method="gradient",
                                nb_bins=nb_bin,
                                paa_window_size=paa,
                                std_coefficient=std,
                                max_gap=max_gap,
-                               gradient_window_size=gradient_window)
+                               gradient_window_size=config.gradient_window_size[0])
 
-            print("Step 3: run hugobot")
-            run_cli(config, prop_path, max_gap)
+            method = config.method
+            config.set_method("gradient")
 
-            if config.combination and config.method != "gradient":
-                print("Step 3.1: make the gkb.csv, ta.csv and ppa.csv for " + method + " method\n")
+            print("Step 3.2: run hugobot for Gradient method")
+            run_cli(config, gradient_prop_path, max_gap)
 
-                gradient_prop_path = config.path_files_for_TA + config.archive + "//" + config.classifier + "//gradient//"
-                create_directory(gradient_prop_path)
+            config.set_method(method)
 
-                # TODO Change the gradient window size
-                create_three_files(config=config,
-                                   path=gradient_prop_path,
-                                   method="gradient",
-                                   nb_bins=nb_bin,
-                                   paa_window_size=paa,
-                                   std_coefficient=std,
-                                   max_gap=max_gap,
-                                   gradient_window_size=config.gradient_window_size[0])
-
-                method = config.method
-                config.set_method("gradient")
-
-                print("Step 3.2: run hugobot for Gradient method")
-                run_cli(config, gradient_prop_path, max_gap)
-
-                config.set_method(method)
-
-                combining_two_methods(config, prop_path)
-
-            else:
-                transformation_dict[key_2]=True
-                write_pickle("transformation_number" , transformation_dict)
-
+            combining_two_methods(config, prop_path)
 
         else:
             # Make the second temporal abstraction -> hugobot output files to original format
             print("Step 4: transformation 2")
+
             config.set_path_transformations_2(nb_bin)
             new_ucr_files(config, prop_path) if config.archive == "UCR" else new_mts_files(config, prop_path)
 

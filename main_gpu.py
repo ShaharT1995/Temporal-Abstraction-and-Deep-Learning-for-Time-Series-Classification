@@ -21,12 +21,14 @@ def execute_running(config, running_dict, max_gap, method, nb_bin, paa, std, gra
     # TODO - COMBINATION
     # todo - Add gradient to the print
     print("-------------------------------------------------------------------------------------")
-    print("Method: " + method + ", Bins: " + str(nb_bin) + ", PAA: " + str(paa) + ", STD: " +
-          str(std) + ", Max_Gap: " + str(max_gap))
+    print("Classifier: " + config.classifier + ", Method: " + method + ", Bins: " + str(nb_bin) + " Combination:" +
+          str(config.combination))
     print("------------------------------------------------------------------------------------- \n")
 
     key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window,
            config.transformation_number, config.combination)
+    # set number of bins in the path
+    config.set_path_transformations_2(nb_bin)
 
     if key in running_dict:
         print("Already Done! \n")

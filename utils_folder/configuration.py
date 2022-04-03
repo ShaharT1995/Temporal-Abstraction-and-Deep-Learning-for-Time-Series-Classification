@@ -35,7 +35,7 @@ class ConfigClass:
         self.max_gap = [1]
         self.paa_window_size = 1
         self.gradient_window_size = [10]
-        #self.UNIVARIATE_DATASET_NAMES_2018 = ['Worms', 'WormsTwoClass']
+        #self.UNIVARIATE_DATASET_NAMES_2018 = ['Coffee']
         # self.UNIVARIATE_DATASET_NAMES_2018 = ['SmoothSubspace', 'Adiac', 'BME', 'Coffee', 'Yoga', 'BeetleFly',
         #                                       'Car', 'Computers', 'Worms', 'PLAID', 'ACSF1']
         self.UNIVARIATE_DATASET_NAMES_2018 = ['ACSF1', 'Adiac', 'Beef', 'Computers', 'CricketX', 'CricketY', 'CricketZ',
