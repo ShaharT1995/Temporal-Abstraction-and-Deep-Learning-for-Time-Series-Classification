@@ -44,9 +44,10 @@ def run_cli(config, prop_path, max_gap):
                      output_folder,  # 'Path to output dir'
                      'per-property',  # per-property
                      '-s',  # -s (when using Gradient or KnowledgeBased)
-                     prop_path + dataset_name+ "//gkb.csv",  # 'Path to states file' (when using Gradient or KnowledgeBased)
-                     prop_path + dataset_name+  "//pp.csv",  # 'Path to pre-processing file'
-                     prop_path + dataset_name+  "//ta.csv"],  # 'Path to Temporal Abstraction file'
+                     prop_path + dataset_name + "//gkb.csv",  # 'Path to states file' (when using Gradient or
+                                                              # KnowledgeBased)
+                     prop_path + dataset_name + "//pp.csv",  # 'Path to pre-processing file'
+                     prop_path + dataset_name + "//ta.csv"],  # 'Path to Temporal Abstraction file'
                     standalone_mode=False)
 
             # Method is not gradient
@@ -78,6 +79,4 @@ def run_cli(config, prop_path, max_gap):
                          str(max_gap),
                          'knowledge-based',
                          test_gkb_path], standalone_mode=False)
-            # else:
-            #     print("\tHugobot step already done!")
         print("")
