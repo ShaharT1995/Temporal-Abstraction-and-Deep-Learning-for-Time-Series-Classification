@@ -42,7 +42,7 @@ def check_pickle_exists(name):
     return os.path.exists(config.path + "/Project/temporal_abstraction_f/pickle_files//" + name + ".pkl")
 
 
-def is_locked(filepath, cli):
+def is_locked(filepath, cli, sep):
     locked = None
     file_object = None
     if os.path.exists(filepath):
@@ -52,7 +52,8 @@ def is_locked(filepath, cli):
 
             else:
                 if config.archive == "UCR" and not config.combination:
-                    file_object = pd.read_csv(filepath, sep='\t', header=None)
+                    #todo - sep=','
+                    file_object = pd.read_csv(filepath, sep=sep, header=None)
                 # MTS
                 else:
                     file_object = np.load(filepath)
@@ -65,10 +66,10 @@ def is_locked(filepath, cli):
     return locked, file_object
 
 
-def wait_for_files(filepath, cli=False):
-    flag, data = is_locked(filepath, cli)
+def wait_for_files(filepath, cli=False, sep = ','):
+    flag, data = is_locked(filepath, cli, sep)
     while flag:
-        flag, data = is_locked(filepath, cli)
+        flag, data = is_locked(filepath, cli, sep)
         time.sleep(random.randint(0, 20))
 
     return data
@@ -190,10 +191,11 @@ def read_all_datasets(config):
                 y_test = wait_for_files(root_dir_dataset + 'y_test.npy')
             # Raw data
             else:
-                x_train = wait_for_files(root_dir_dataset + 'x_train.npy')
-                y_train = wait_for_files(root_dir_dataset + 'y_train.npy')
-                x_test = wait_for_files(root_dir_dataset + 'x_test.npy')
-                y_test = wait_for_files(root_dir_dataset + 'y_test.npy')
+                #todo - sending the sep
+                x_train = wait_for_files(root_dir_dataset + 'x_train.npy',sep='\t')
+                y_train = wait_for_files(root_dir_dataset + 'y_train.npy',sep='\t')
+                x_test = wait_for_files(root_dir_dataset + 'x_test.npy',sep='\t')
+                y_test = wait_for_files(root_dir_dataset + 'y_test.npy',sep='\t')
 
             datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(), y_test.copy())
     # UCR
@@ -357,7 +359,8 @@ def transform_mts_to_ucr_format():
 
 
 def calculate_metrics(y_true, y_pred, learning_time, predicting_time, y_true_val=None, y_pred_val=None):
-    res = pd.DataFrame(data=np.zeros((1, 10), dtype=np.float), index=[0],
+    #todo - np.zeros((1, 9)) -was np.zeros((1, 10)
+    res = pd.DataFrame(data=np.zeros((1, 9), dtype=np.float), index=[0],
                        columns=['precision', 'accuracy', 'recall', 'mcc', 'cohen_kappa', 'learning_time',
                                 'predicting_time' 'f1_score_macro', 'f1_score_micro', 'f1_score_weighted'])
 
