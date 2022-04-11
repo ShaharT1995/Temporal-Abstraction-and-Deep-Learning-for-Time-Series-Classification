@@ -149,6 +149,8 @@ class RocketClassifier:
             y_val: validation target
         """
         self.kernels = generate_kernels(x_train.shape[1], self.n_kernels, x_train.shape[2])
+
+        x_train = x_train.astype(np.float64)
         x_training_transform = apply_kernels(x_train, self.kernels)
 
         y_train_new = np.argmax(y_train, axis=1)
@@ -177,6 +179,8 @@ class RocketClassifier:
             y_pred: prediction
         """
         start_time = time.perf_counter()
+
+        x_test = x_test.astype(np.float64)
         x_test_transform = apply_kernels(x_test, self.kernels)
 
         y_pred_des_func = self.classifier.decision_function(x_test_transform)
