@@ -4,7 +4,7 @@ import sklearn
 from utils_folder.utils import read_all_datasets, create_directory
 
 
-def fit_classifier(iter, datasets_dict, dataset_name, classifier_name, output_directory):
+def fit_classifier(config, iter, datasets_dict, dataset_name, classifier_name, output_directory):
     x_train = datasets_dict[dataset_name][0]
     y_train = datasets_dict[dataset_name][1]
     x_test = datasets_dict[dataset_name][2]
@@ -27,12 +27,12 @@ def fit_classifier(iter, datasets_dict, dataset_name, classifier_name, output_di
         x_test = x_test.reshape((x_test.shape[0], x_test.shape[1], 1))
 
     input_shape = x_train.shape[1:]
-    classifier = create_classifier(classifier_name, input_shape, nb_classes, output_directory)
+    classifier = create_classifier(config, classifier_name, input_shape, nb_classes, output_directory)
 
     classifier.fit(x_train, y_train, x_test, y_test, y_test_true, iter)
 
 
-def create_classifier(classifier_name, input_shape, nb_classes, output_directory, verbose=False):
+def create_classifier(config, classifier_name, input_shape, nb_classes, output_directory, verbose=False):
     if classifier_name == 'fcn':
         from classifiers import fcn
         return fcn.Classifier_FCN(output_directory, input_shape, nb_classes, verbose)
@@ -74,12 +74,12 @@ def create_classifier(classifier_name, input_shape, nb_classes, output_directory
         return inception.Classifier_INCEPTION(output_directory, input_shape, nb_classes, verbose)
 
     if classifier_name == 'rocket':
-        from classifiers import rocket2
-        return rocket2.Classifier_Rocket(output_directory, verbose)
-        # from classifiers import rocket3
-        # return rocket3.RocketClassifier(output_directory)
-        # from classifiers import rocket4
-        # return rocket4.RocketClassifier(output_directory)
+        if config.archive == "UCR":
+            from classifiers import rocket_ucr
+            return rocket_ucr.Classifier_Rocket(output_directory, verbose)
+        else:
+            from classifiers import rocket_mts
+            return rocket_mts.RocketClassifier(output_directory)
 
     if classifier_name == 'lstm_fcn':
         from classifiers import lstm_fcn
@@ -113,7 +113,7 @@ def run_all(config, params):
 
             create_directory(output_directory)
 
-            fit_classifier(iter, datasets_dict, dataset_name, config.classifier, output_directory)
+            fit_classifier(config, iter, datasets_dict, dataset_name, config.classifier, output_directory)
 
             print('\t\tDONE')
 

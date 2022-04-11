@@ -67,7 +67,7 @@ def create_combination_gpu():
 # We run this function one time. The function create all the possible combination
 def create_combination_cpu():
     dict_name = {"archive": ['UCR', 'MTS'],
-                 "classifier": ['rocket', 'twiesn'],
+                 "classifier": ['rocket'],
                  "afterTA": ['False', "True"],
                  "method": ['sax', 'td4c-cosine', 'gradient'],
                  "combination": ['False'],
@@ -125,10 +125,10 @@ def check_lock():
 
 
 if __name__ == '__main__':
-    current_user = "oshermac"
+    current_user = "shaharap"
     user1 = "hadas5"
     user2 = "roze"
-    user3 = "shaharap"
+    user3 = "oshermac"
 
     number_of_total_jobs = 15
     project_path = "/sise/robertmo-group/TA-DL-TSC/"

@@ -145,6 +145,7 @@ class Base_Classifier_ROCKET(BaseEstimator, ClassifierMixin):
             print('apply kernels')
         time_a = time.perf_counter()
 
+        x = x.astype(np.float64)
         self.x_train_ = apply_kernels(x, self.kernels_)
         time_b = time.perf_counter()
         self.train_timings_ = [time_b - time_a]
@@ -204,6 +205,7 @@ class Base_Classifier_ROCKET(BaseEstimator, ClassifierMixin):
             if self.verbose:
                 print('apply kernels_again')
             time_a = time.perf_counter()
+            x = x.astype(np.float64)
             self.x_test_ = apply_kernels(x, self.kernels_)
             time_b = time.perf_counter()
             self.test_timings_ = [time_b - time_a]
