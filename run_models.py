@@ -74,10 +74,12 @@ def create_classifier(classifier_name, input_shape, nb_classes, output_directory
         return inception.Classifier_INCEPTION(output_directory, input_shape, nb_classes, verbose)
 
     if classifier_name == 'rocket':
-        # from classifiers import rocket2
-        # return rocket2.Classifier_Rocket(output_directory, verbose)
-        from classifiers import rocket3
-        return rocket3.RocketClassifier(output_directory)
+        from classifiers import rocket2
+        return rocket2.Classifier_Rocket(output_directory, verbose)
+        # from classifiers import rocket3
+        # return rocket3.RocketClassifier(output_directory)
+        # from classifiers import rocket4
+        # return rocket4.RocketClassifier(output_directory)
 
     if classifier_name == 'lstm_fcn':
         from classifiers import lstm_fcn
