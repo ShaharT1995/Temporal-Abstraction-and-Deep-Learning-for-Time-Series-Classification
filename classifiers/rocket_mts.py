@@ -184,6 +184,10 @@ class RocketClassifier:
         x_test_transform = apply_kernels(x_test, self.kernels)
 
         y_pred_des_func = self.classifier.decision_function(x_test_transform)
+
+        if len(y_pred_des_func.shape) == 1:
+            y_pred_des_func = y_pred_des_func.reshape(y_pred_des_func.shape[0], 1)
+
         y_pred = []
         for v in y_pred_des_func:
             y_pred.append(np.exp(v) / (1 + np.exp(v)))
