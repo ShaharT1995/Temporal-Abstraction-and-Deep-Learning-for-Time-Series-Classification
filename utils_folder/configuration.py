@@ -24,12 +24,6 @@ class ConfigClass:
         self.path_transformation1 = ""
         self.path_transformation2 = ""
 
-        # self.nb_bin = [2, 5, 10, 20]
-        # self.std_coefficient = [-1]
-        # self.max_gap = [1, 2]
-        # self.paa_window_size = 1
-        # self.gradient_window_size = [1, 2, 5, 10, 20]
-
         self.nb_bin = [3, 10]
         self.std_coefficient = [-1]
         self.max_gap = [1]
@@ -37,10 +31,8 @@ class ConfigClass:
         self.gradient_window_size = [10]
         #self.UNIVARIATE_DATASET_NAMES_2018 = ['Beef']
         #todo -'Coffee'
-        # self.UNIVARIATE_DATASET_NAMES_2018 = ['SmoothSubspace', 'Adiac', 'BME', 'Coffee', 'Yoga', 'BeetleFly',
-        #                                       'Car', 'Computers', 'Worms', 'PLAID', 'ACSF1']
 
-        self.UNIVARIATE_DATASET_NAMES_2018 = ['ACSF1', 'Adiac', 'Beef', 'Computers', 'CricketX', 'CricketY', 'CricketZ',
+        self.UNIVARIATE_DATASET_NAMES_2018 = ['Beef', 'ACSF1', 'Adiac', 'Beef', 'Computers', 'CricketX', 'CricketY', 'CricketZ',
                                               'Crop', 'Earthquakes', 'ECG200', 'ElectricDevices', 'EthanolLevel',
                                               'FordA', 'FordB', 'HandOutlines', 'Herring', 'LargeKitchenAppliances',
                                               'MiddlePhalanxOutlineCorrect', 'MiddlePhalanxTW',
@@ -48,8 +40,8 @@ class ConfigClass:
                                               'SemgHandSubjectCh2', 'ShapesAll', 'SmoothSubspace', 'Strawberry',
                                               'SyntheticControl', 'Worms', 'WormsTwoClass']
 
-        self.MTS_DATASET_NAMES = ['ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
-                                  'JapaneseVowels', 'KickvsPunch', 'Libras', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
+        self.MTS_DATASET_NAMES = ['Libras', 'ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
+                                  'JapaneseVowels', 'KickvsPunch', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
 
         #self.MTS_DATASET_NAMES = ['ArabicDigits', 'AUSLAN']
 

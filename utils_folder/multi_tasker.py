@@ -16,7 +16,7 @@ def get_number_of_jobs(user_name):
 
 # Run batch file with args
 def run_job_using_sbatch(sbatch_path, arguments):
-    run_list = ["sbatch", "multi_tasker_cpu"] + arguments
+    run_list = ["sbatch", "multi_tasker_gpu"] + arguments
     subprocess.Popen(run_list, stdout=temp_file, stderr=temp_file)
 
 
@@ -46,7 +46,7 @@ def create_combination_gpu():
                  "classifier": ['fcn', 'mlp', 'resnet', 'tlenet', 'encoder', 'mcdcnn', 'cnn', 'inception', 'lstm_fcn',
                                 'mlstm_fcn'],
                  "afterTA": ['False', "True"],
-                 "method": ['sax', 'td4c-cosine', 'gradient', "RawData"],
+                 "method": ['sax', 'td4c-cosine', 'gradient', 'RawData'],
                  "combination": ['False'],
                  "transformation": ["1", "2", "3"]}
 
@@ -54,9 +54,12 @@ def create_combination_gpu():
 
     combination_lst = []
     for combination in keys_list:
-        if not (combination[3] == "RawData" and combination[2] == "True" and (combination[5] == "2" or
-                                                                              combination[5] == "3")):
-            combination_lst.append(list(combination))
+        if not (combination[3] == "RawData" and combination[2] == "True"):
+            if not (combination[3] != "RawData" and combination[2] == "False"):
+                if not (combination[3] == "RawData" and combination[2] == "False" and (combination[5] == "2" or
+                                                                                       combination[5] == "3")):
+                    combination_lst.append(list(combination))
+
     # Save the pickle file
     save_combination_pickle(combination_lst, gpu=True)
 
@@ -66,7 +69,7 @@ def create_combination_cpu():
     dict_name = {"archive": ['UCR', 'MTS'],
                  "classifier": ['rocket', 'twiesn'],
                  "afterTA": ['False', "True"],
-                 "method": ['sax', 'td4c-cosine', 'gradient', "RawData"],
+                 "method": ['sax', 'td4c-cosine', 'gradient'],
                  "combination": ['False'],
                  "transformation": ["1", "2", "3"]}
 
@@ -74,9 +77,11 @@ def create_combination_cpu():
 
     combination_lst = []
     for combination in keys_list:
-        if not (combination[3] == "RawData" and combination[2] == "True" and (combination[5] == "2" or
-                                                                              combination[5] == "3")):
-            combination_lst.append(list(combination))
+        if not (combination[3] == "RawData" and combination[2] == "True"):
+            if not (combination[3] != "RawData" and combination[2] == "False"):
+                if not (combination[3] == "RawData" and combination[2] == "False" and (combination[5] == "2" or
+                                                                                       combination[5] == "3")):
+                    combination_lst.append(list(combination))
 
     # Save the pickle file
     save_combination_pickle(combination_lst, gpu=False)
@@ -120,31 +125,30 @@ def check_lock():
 
 
 if __name__ == '__main__':
-    current_user = "shaharap"
+    current_user = "oshermac"
     user1 = "hadas5"
     user2 = "roze"
-    user3 = "oshermac"
+    user3 = "shaharap"
 
     number_of_total_jobs = 15
     project_path = "/sise/robertmo-group/TA-DL-TSC/"
-    sbatch_path = "/sise/home/" + current_user + "/run_python_code_cpu"
-    current_file_path = "/sise/home/" + current_user + "/run_multi_tasker_cpu"
+    sbatch_path = "/sise/home/" + current_user + "/run_python_code_gpu"
+    current_file_path = "/sise/home/" + current_user + "/run_multi_tasker_gpu"
     temp_file = open("/sise/home/" + current_user + "/tmp.txt", 'w')
 
-    write_pickle("running_dictUCR", {})
-    write_pickle("running_dictMTS", {})
-    create_combination_list()
+    # create_combination_gpu()
+    create_combination_cpu()
 
     # while not check_lock():
     #     print("The file is lock by another user")
     #
-    # file = open(project_path + "/Run//combination_list.pkl", "rb")
+    # file = open(project_path + "/Run//combination_list_gpu.pkl", "rb")
     # data = pickle.load(file)
     #
     # number_to_run = max(number_of_total_jobs - get_number_of_jobs(current_user), 0)
     #
     # combination_for_running = data[: number_to_run]
-    # save_combination_pickle(data[number_to_run:])
+    # save_combination_pickle(data[number_to_run:], gpu=True)
     #
     # os.remove(project_path + "/Run//" + current_user + ".txt")
     # print("The file unlock by " + current_user)
@@ -157,7 +161,7 @@ if __name__ == '__main__':
     # if len(data[number_to_run:]) != 0:
     #     print("Starting the script again")
     #     run_job_using_sbatch(current_file_path, [])
-    #     time.sleep(30)
+    #     time.sleep(60 * 60 * 2)
     # else:
     #     raise Exception("The script finish running")
     # exit(0)

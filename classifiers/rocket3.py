@@ -2,13 +2,15 @@ import time
 import numpy as np
 import pickle
 import os
-from numba import njit, prange
 
+from numba import njit
 from sklearn.linear_model import RidgeClassifierCV
+
+from utils_folder.configuration import ConfigClass
 from utils_folder.utils import calculate_metrics
 
 
-@njit("Tuple((float64[:],int32[:],float64[:],int32[:],int32[:]))(int64,int64,Tuple((int32,int32,int32)))")
+@njit(fastmath=True)
 def generate_kernels(input_length, num_kernels, num_channels=1):
     candidate_lengths = np.array((7, 9, 11), dtype=np.int32)
     candidate_lengths = candidate_lengths[candidate_lengths < input_length]
@@ -81,8 +83,7 @@ def apply_kernel(X, weights, length, bias, dilation, padding, num_channel_indice
     return _ppv / output_length, _max
 
 
-@njit("float64[:,:](float64[:,:],Tuple((float64[::1],int32[:],float64[:],int32[:],int32[:])))", parallel=True,
-      fastmath=True)
+@njit(parallel=True, fastmath=True)
 def apply_kernels(X, kernels, stride=1):
     weights, lengths, biases, dilations, paddings, num_channel_indices, channel_indices = kernels
 
@@ -91,7 +92,7 @@ def apply_kernels(X, kernels, stride=1):
 
     _X = np.zeros((num_examples, num_kernels * 2), dtype=np.float32)  # 2 features per kernel
 
-    for i in prange(num_examples):
+    for i in range(num_examples):
         a = 0
         a1 = 0
         for j in range(num_kernels):
@@ -118,6 +119,9 @@ class RocketClassifier:
                  output_folder: str,
                  build: bool = True,
                  n_kernels: int = 1000):
+        config = ConfigClass()
+        config.set_seed()
+
         self.name = "Rocket"
         self.output_folder = output_folder
         self.n_kernels = n_kernels
@@ -138,7 +142,6 @@ class RocketClassifier:
     def fit(self, x_train, y_train, x_test, y_val, y_true, iteration):
         """
         Fit Rocket
-
         Inputs:
             x_train: training data (num_examples, num_timestep, num_channels)
             y_train: training target
@@ -163,12 +166,11 @@ class RocketClassifier:
 
         # Save Metrics
         df_metrics = calculate_metrics(y_true, y_pred, learning_time, predicting_time)
-        df_metrics.to_csv(self.output_dir + 'df_metrics.csv', index=False)
+        df_metrics.to_csv(self.output_folder + 'df_metrics.csv', index=False)
 
     def predict(self, x_test: np.array):
         """
         Do prediction with Rocket
-
         Inputs:
             x_test: data for prediction (num_examples, num_timestep, num_channels)
         Outputs:

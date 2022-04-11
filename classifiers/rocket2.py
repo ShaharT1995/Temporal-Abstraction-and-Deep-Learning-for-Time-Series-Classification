@@ -260,7 +260,7 @@ class Classifier_Rocket:
         y_pred = rocket.predict(x_test)
 
         # Save Metrics
-        df_metrics = calculate_metrics(y_true, y_pred, duration)
+        df_metrics = calculate_metrics(y_true, y_pred, duration, 0)
         df_metrics.to_csv(self.output_dir + 'df_metrics.csv', index=False)
 
         # Save train and test timings

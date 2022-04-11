@@ -74,6 +74,8 @@ def create_classifier(classifier_name, input_shape, nb_classes, output_directory
         return inception.Classifier_INCEPTION(output_directory, input_shape, nb_classes, verbose)
 
     if classifier_name == 'rocket':
+        # from classifiers import rocket2
+        # return rocket2.Classifier_Rocket(output_directory, verbose)
         from classifiers import rocket3
         return rocket3.RocketClassifier(output_directory)
 
@@ -103,9 +105,9 @@ def run_all(config, params):
             output_directory = config.path + "/ResultsProject//DNN//" + config.archive + "//" + config.classifier + '/' + \
                                config.method + "/" + params + "//itr" + str(iter) + '//' + dataset_name + '/'
 
-            # if os.path.exists(output_directory + "/DONE"):
-            #     print("Already Done")
-            #     continue
+            if os.path.exists(output_directory + "/DONE"):
+                print("Already Done")
+                continue
 
             create_directory(output_directory)
 

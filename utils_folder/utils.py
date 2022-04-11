@@ -50,9 +50,9 @@ def is_locked(filepath, cli, sep):
             if cli:
                 file_object = pd.read_csv(filepath)
 
+            # Read all datasets
             else:
                 if config.archive == "UCR" and not config.combination:
-                    #todo - sep=','
                     file_object = pd.read_csv(filepath, sep=sep, header=None)
                 # MTS
                 else:
@@ -66,7 +66,7 @@ def is_locked(filepath, cli, sep):
     return locked, file_object
 
 
-def wait_for_files(filepath, cli=False, sep = ','):
+def wait_for_files(filepath, cli=False, sep=','):
     flag, data = is_locked(filepath, cli, sep)
     while flag:
         flag, data = is_locked(filepath, cli, sep)
@@ -191,11 +191,10 @@ def read_all_datasets(config):
                 y_test = wait_for_files(root_dir_dataset + 'y_test.npy')
             # Raw data
             else:
-                #todo - sending the sep
-                x_train = wait_for_files(root_dir_dataset + 'x_train.npy',sep='\t')
-                y_train = wait_for_files(root_dir_dataset + 'y_train.npy',sep='\t')
-                x_test = wait_for_files(root_dir_dataset + 'x_test.npy',sep='\t')
-                y_test = wait_for_files(root_dir_dataset + 'y_test.npy',sep='\t')
+                x_train = wait_for_files(root_dir_dataset + 'x_train.npy')
+                y_train = wait_for_files(root_dir_dataset + 'y_train.npy')
+                x_test = wait_for_files(root_dir_dataset + 'x_test.npy')
+                y_test = wait_for_files(root_dir_dataset + 'y_test.npy')
 
             datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(), y_test.copy())
     # UCR
@@ -216,6 +215,7 @@ def read_all_datasets(config):
 
                     return datasets_dict
 
+                # Combination
                 else:
                     df_train = wait_for_files(config.path_transformation2 + dataset_name + "//type" +
                                               config.transformation_number + '_Train.csv')
@@ -227,8 +227,8 @@ def read_all_datasets(config):
             else:
                 root_dir_dataset = config.ucr_path + '/' + dataset_name + '/'
 
-                df_train = wait_for_files(root_dir_dataset + '/' + dataset_name + '_TRAIN.tsv')
-                df_test = wait_for_files(root_dir_dataset + '/' + dataset_name + '_TEST.tsv')
+                df_train = wait_for_files(root_dir_dataset + '/' + dataset_name + '_TRAIN.tsv', sep='\t')
+                df_test = wait_for_files(root_dir_dataset + '/' + dataset_name + '_TEST.tsv', sep='\t')
 
             # Padding missing values
             if df_train.isnull().sum().sum() != 0:
@@ -359,10 +359,9 @@ def transform_mts_to_ucr_format():
 
 
 def calculate_metrics(y_true, y_pred, learning_time, predicting_time, y_true_val=None, y_pred_val=None):
-    #todo - np.zeros((1, 9)) -was np.zeros((1, 10)
-    res = pd.DataFrame(data=np.zeros((1, 9), dtype=np.float), index=[0],
+    res = pd.DataFrame(data=np.zeros((1, 10), dtype=np.float), index=[0],
                        columns=['precision', 'accuracy', 'recall', 'mcc', 'cohen_kappa', 'learning_time',
-                                'predicting_time' 'f1_score_macro', 'f1_score_micro', 'f1_score_weighted'])
+                                'predicting_time', 'f1_score_macro', 'f1_score_micro', 'f1_score_weighted'])
 
     res['precision'] = precision_score(y_true, y_pred, average='macro')
     res['recall'] = recall_score(y_true, y_pred, average='macro')
@@ -396,10 +395,10 @@ def save_test_duration(file_name, test_duration):
 
 
 def generate_results_csv(config, params):
-    res = pd.DataFrame(data=np.zeros((0, 11), dtype=np.float), index=[],
-                       columns=['classifier_name', 'archive_name', 'dataset_name', 'precision', 'accuracy',
-                                'mcc', "cohen_kappa", 'duration', "f1_score_macro", "f1_score_micro",
-                                "f1_score_weighted"])
+    res = pd.DataFrame(data=np.zeros((0, 13), dtype=np.float), index=[],
+                       columns=['classifier_name', 'archive_name', 'dataset_name', 'precision', 'recall', 'accuracy',
+                                'mcc', "cohen_kappa", "f1_score_macro", "f1_score_micro",
+                                "f1_score_weighted", 'learning_time', 'predicting_time'])
 
     dataset_list = config.UNIVARIATE_DATASET_NAMES_2018 if config.archive == "UCR" else config.MTS_DATASET_NAMES
 
@@ -438,13 +437,13 @@ def plot_epochs_metric(hist, file_name, metric='loss'):
     plt.close()
 
 
-def save_logs_t_leNet(output_directory, hist, y_pred, y_true, duration):
+def save_logs_t_leNet(output_directory, hist, y_pred, y_true, learning_time, predicting_time):
     hist_df = pd.DataFrame(hist.history)
     hist_df.to_csv(output_directory + 'history.csv', index=False)
 
-    df_metrics = calculate_metrics(y_true, y_pred, duration)
+    df_metrics = calculate_metrics(y_true, y_pred, learning_time, predicting_time)
 
-    index_best_model = hist_df['loss'].idxmin()
+    index_best_model = hist_df['val_loss'].idxmin()
     row_best_model = hist_df.loc[index_best_model]
 
     df_best_model = pd.DataFrame(data=np.zeros((1, 6), dtype=np.float), index=[0],
@@ -472,7 +471,6 @@ def save_logs(output_directory, hist, y_pred, y_true, learning_time, predicting_
     hist_df.to_csv(output_directory + 'history.csv', index=False)
 
     df_metrics = calculate_metrics(y_true, y_pred, learning_time, predicting_time, y_true_val, y_pred_val)
-    df_metrics.to_csv(output_directory + 'df_metrics.csv', index=False)
 
     index_best_model = hist_df['val_loss'].idxmin()
     row_best_model = hist_df.loc[index_best_model]
@@ -485,6 +483,9 @@ def save_logs(output_directory, hist, y_pred, y_true, learning_time, predicting_
     df_best_model['best_model_val_loss'] = row_best_model['val_loss']
     df_best_model['best_model_train_acc'] = row_best_model['accuracy']
     df_best_model['best_model_val_acc'] = row_best_model['val_accuracy']
+
+    df_metrics['best_model_nb_epoch'] = index_best_model
+    df_metrics.to_csv(output_directory + 'df_metrics.csv', index=False)
 
     if lr:
         df_best_model['best_model_learning_rate'] = row_best_model['lr']

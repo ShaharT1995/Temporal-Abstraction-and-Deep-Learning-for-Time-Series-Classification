@@ -164,11 +164,8 @@ class Classifier_MCDCNN:
         x_val = self.prepare_input(x_val)
 
         start_time = time.time()
-
         hist = self.model.fit(x_train, y_train, batch_size=mini_batch_size, epochs=nb_epochs,
                               verbose=self.verbose, validation_data=(x_val, y_val), callbacks=self.callbacks)
-
-        #duration = time.time() - start_time
         learning_time = time.time() - start_time
 
         self.model.save(self.output_directory + 'last_model.hdf5')
