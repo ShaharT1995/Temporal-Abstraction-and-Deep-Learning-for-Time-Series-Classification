@@ -90,11 +90,6 @@ def transformation_1(path, output_path, file_type, number_of_entities, time_seri
                                                                                             min_property] = parse_data[2]
                     except:
                         print("error")
-                        print(arr.shape)
-                        print(int(entity_id))
-                        print(int(parse_data[0]) - 1, int(parse_data[1]) - 1)
-                        print(min_property)
-                        print(int(parse_data[3]))
 
     # Save the file
     np.save(output_path + 'type1_' + file_type + '.npy', arr)

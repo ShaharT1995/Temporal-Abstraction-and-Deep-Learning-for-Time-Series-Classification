@@ -31,7 +31,7 @@ class ConfigClass:
         self.gradient_window_size = [10]
         #todo -'Coffee'
 
-        self.UNIVARIATE_DATASET_NAMES_2018 = ['Beef', 'ACSF1', 'Adiac', 'Beef', 'Computers', 'CricketX', 'CricketY', 'CricketZ',
+        self.UNIVARIATE_DATASET_NAMES_2018 = ['Beef', 'ACSF1', 'Adiac', 'Computers', 'CricketX', 'CricketY', 'CricketZ',
                                               'Crop', 'Earthquakes', 'ECG200', 'ElectricDevices', 'EthanolLevel',
                                               'FordA', 'FordB', 'HandOutlines', 'Herring', 'LargeKitchenAppliances',
                                               'MiddlePhalanxOutlineCorrect', 'MiddlePhalanxTW',
@@ -39,8 +39,11 @@ class ConfigClass:
                                               'SemgHandSubjectCh2', 'ShapesAll', 'SmoothSubspace', 'Strawberry',
                                               'SyntheticControl', 'Worms', 'WormsTwoClass']
 
+        # self.MTS_DATASET_NAMES = ['Libras', 'ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
+        #                           'JapaneseVowels', 'KickvsPunch', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
+
         self.MTS_DATASET_NAMES = ['Libras', 'ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
-                                  'JapaneseVowels', 'KickvsPunch', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
+                                  'JapaneseVowels', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
 
         #self.MTS_DATASET_NAMES = ['ArabicDigits', 'AUSLAN']
 
