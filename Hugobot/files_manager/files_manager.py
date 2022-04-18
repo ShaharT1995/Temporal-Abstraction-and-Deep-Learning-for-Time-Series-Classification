@@ -76,7 +76,7 @@ class FilesManager(ABC):
 
     def read_entity_class_relations(self):
         entity_class_relations_path = self.__get_entity_class_relations_file_path()
-        #return pd.read_csv(entity_class_relations_path)
+        # return pd.read_csv(entity_class_relations_path)
         return wait_for_files(entity_class_relations_path, cli= True)
 
     def write_entity_class_relations(self, entity_class_relations):

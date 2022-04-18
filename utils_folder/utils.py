@@ -85,181 +85,69 @@ def create_directory(directory_path):
             return None
         return directory_path
 
-#
-# def read_all_datasets(config):
-#     datasets_dict = {}
-#
-#     if config.archive == 'MTS':
-#         for dataset_name in config.MTS_DATASET_NAMES:
-#             root_dir_dataset = config.mts_path + '/' + dataset_name + '/'
-#
-#             if config.afterTA:
-#                 x_train = np.load(config.path_transformation2 + dataset_name + "//type" + config.transformation_number
-#                                   + '_train.npy')
-#                 y_train = np.load(root_dir_dataset + 'y_train.npy')
-#                 x_test = np.load(config.path_transformation2 + dataset_name + "//type" + config.transformation_number
-#                                   + '_test.npy')
-#                 y_test = np.load(root_dir_dataset + 'y_test.npy')
-#
-#             # Raw data
-#             else:
-#                 x_train = np.load(root_dir_dataset + 'x_train.npy')
-#                 y_train = np.load(root_dir_dataset + 'y_train.npy')
-#                 x_test = np.load(root_dir_dataset + 'x_test.npy')
-#                 y_test = np.load(root_dir_dataset + 'y_test.npy')
-#
-#             datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(), y_test.copy())
-#     # UCR
-#     else:
-#         for dataset_name in config.UNIVARIATE_DATASET_NAMES_2018:
-#             if config.afterTA:
-#                 if config.combination:
-#                     x_train = np.load(config.path_transformation2 + dataset_name + "//type" +
-#                                        config.transformation_number + '_train.npy')
-#                     y_train = np.load(config.path_transformation2 + dataset_name + "//type" +
-#                                       config.transformation_number + '_train_classes.npy')
-#                     x_test = np.load(config.path_transformation2 + dataset_name + "//type" +
-#                                      config.transformation_number + '_test.npy')
-#                     y_test = np.load(config.path_transformation2 + dataset_name + "//type" +
-#                                      config.transformation_number + '_test_classes.npy')
-#
-#                     datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(), y_test.copy())
-#
-#                     return datasets_dict
-#
-#                 else:
-#                     df_train = pd.read_csv(config.path_transformation2 + dataset_name + "//type" +
-#                                            config.transformation_number + '_Train.csv', sep=',', header=None)
-#
-#                     df_test = pd.read_csv(config.path_transformation2 + dataset_name + "//type" +
-#                                            config.transformation_number + '_Test.csv', sep=',', header=None)
-#
-#             # Raw data
-#             else:
-#                 root_dir_dataset = config.ucr_path + '/' + dataset_name + '/'
-#
-#                 df_train = pd.read_csv(root_dir_dataset + '/' + dataset_name + '_TRAIN.tsv', sep='\t', header=None)
-#                 df_test = pd.read_csv(root_dir_dataset + '/' + dataset_name + '_TEST.tsv', sep='\t', header=None)
-#
-#             # Padding missing values
-#             if df_train.isnull().sum().sum() != 0:
-#                 df_train = df_train.interpolate(method='linear', limit_direction='both', axis=1)
-#
-#             if df_test.isnull().sum().sum() != 0:
-#                 df_test = df_test.interpolate(method='linear', limit_direction='both', axis=1)
-#
-#             y_train = df_train.values[:, 0]
-#             y_test = df_test.values[:, 0]
-#
-#             x_train = df_train.drop(columns=[0])
-#             x_test = df_test.drop(columns=[0])
-#
-#             x_train.columns = range(x_train.shape[1])
-#             x_test.columns = range(x_test.shape[1])
-#
-#             x_train = x_train.values
-#             x_test = x_test.values
-#
-#             # Z-Normalization if we work on the RawData
-#             # if not config.afterTA:
-#             #     std_ = x_train.std(axis=1, keepdims=True)
-#             #     std_[std_ == 0] = 1.0
-#             #     x_train = (x_train - x_train.mean(axis=1, keepdims=True)) / std_
-#             #
-#             #     std_ = x_test.std(axis=1, keepdims=True)
-#             #     std_[std_ == 0] = 1.0
-#             #     x_test = (x_test - x_test.mean(axis=1, keepdims=True)) / std_
-#
-#             datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(), y_test.copy())
-#
-#     return datasets_dict
-
 
 def read_all_datasets(config):
     datasets_dict = {}
 
     if config.archive == 'MTS':
-        for dataset_name in config.MTS_DATASET_NAMES:
-            root_dir_dataset = config.mts_path + '/' + dataset_name + '/'
+        datasets = config.MTS_DATASET_NAMES
+        path = config.mts_path
+    else:
+        datasets = config.UNIVARIATE_DATASET_NAMES_2018
+        path = config.ucr_path
 
-            if config.afterTA:
+    for dataset_name in datasets:
+        root_dir_dataset = path + '/' + dataset_name + '/'
+
+        if config.afterTA:
+            if config.combination:
+                x_train = wait_for_files(config.path_transformation2 + dataset_name + "//type" +
+                                         config.transformation_number + '_train_combination.npy')
+                x_test = wait_for_files(config.path_transformation2 + dataset_name + "//type" +
+                                        config.transformation_number + '_test_combination.npy')
+            else:
                 x_train = wait_for_files(config.path_transformation2 + dataset_name + "//type" +
                                          config.transformation_number + '_train.npy')
-                y_train = wait_for_files(root_dir_dataset + 'y_train.npy')
                 x_test = wait_for_files(config.path_transformation2 + dataset_name + "//type" +
                                         config.transformation_number + '_test.npy')
-                y_test = wait_for_files(root_dir_dataset + 'y_test.npy')
-            # Raw data
-            else:
+
+            y_train = wait_for_files(root_dir_dataset + 'y_train.npy')
+            y_test = wait_for_files(root_dir_dataset + 'y_test.npy')
+
+        # Raw data
+        else:
+            if config.archive == "MTS":
                 x_train = wait_for_files(root_dir_dataset + 'x_train.npy')
                 y_train = wait_for_files(root_dir_dataset + 'y_train.npy')
                 x_test = wait_for_files(root_dir_dataset + 'x_test.npy')
                 y_test = wait_for_files(root_dir_dataset + 'y_test.npy')
 
-            datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(), y_test.copy())
-    # UCR
-    else:
-        for dataset_name in config.UNIVARIATE_DATASET_NAMES_2018:
-            if config.afterTA:
-                if config.combination:
-                    x_train = wait_for_files(config.path_transformation2 + dataset_name + "//type" +
-                                             config.transformation_number + '_train.npy')
-                    y_train = wait_for_files(config.path_transformation2 + dataset_name + "//type" +
-                                             config.transformation_number + '_train_classes.npy')
-                    x_test = wait_for_files(config.path_transformation2 + dataset_name + "//type" +
-                                            config.transformation_number + '_test.npy')
-                    y_test = wait_for_files(config.path_transformation2 + dataset_name + "//type" +
-                                            config.transformation_number + '_test_classes.npy')
-
-                    datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(), y_test.copy())
-
-                    return datasets_dict
-
-                # Combination
-                else:
-                    df_train = wait_for_files(config.path_transformation2 + dataset_name + "//type" +
-                                              config.transformation_number + '_Train.csv')
-
-                    df_test = wait_for_files(config.path_transformation2 + dataset_name + "//type" +
-                                             config.transformation_number + '_Test.csv')
-
-            # Raw data
             else:
                 root_dir_dataset = config.ucr_path + '/' + dataset_name + '/'
 
                 df_train = wait_for_files(root_dir_dataset + '/' + dataset_name + '_TRAIN.tsv', sep='\t')
                 df_test = wait_for_files(root_dir_dataset + '/' + dataset_name + '_TEST.tsv', sep='\t')
 
-            # Padding missing values
-            if df_train.isnull().sum().sum() != 0:
-                df_train = df_train.interpolate(method='linear', limit_direction='both', axis=1)
+                # Padding missing values
+                if df_train.isnull().sum().sum() != 0:
+                    df_train = df_train.interpolate(method='linear', limit_direction='both', axis=1)
 
-            if df_test.isnull().sum().sum() != 0:
-                df_test = df_test.interpolate(method='linear', limit_direction='both', axis=1)
+                if df_test.isnull().sum().sum() != 0:
+                    df_test = df_test.interpolate(method='linear', limit_direction='both', axis=1)
 
-            y_train = df_train.values[:, 0]
-            y_test = df_test.values[:, 0]
+                y_train = df_train.values[:, 0]
+                y_test = df_test.values[:, 0]
 
-            x_train = df_train.drop(columns=[0])
-            x_test = df_test.drop(columns=[0])
+                x_train = df_train.drop(columns=[0])
+                x_test = df_test.drop(columns=[0])
 
-            x_train.columns = range(x_train.shape[1])
-            x_test.columns = range(x_test.shape[1])
+                x_train.columns = range(x_train.shape[1])
+                x_test.columns = range(x_test.shape[1])
 
-            x_train = x_train.values
-            x_test = x_test.values
+                x_train = x_train.values
+                x_test = x_test.values
 
-            # Z-Normalization if we work on the RawData
-            # if not config.afterTA:
-            #     std_ = x_train.std(axis=1, keepdims=True)
-            #     std_[std_ == 0] = 1.0
-            #     x_train = (x_train - x_train.mean(axis=1, keepdims=True)) / std_
-            #
-            #     std_ = x_test.std(axis=1, keepdims=True)
-            #     std_[std_ == 0] = 1.0
-            #     x_test = (x_test - x_test.mean(axis=1, keepdims=True)) / std_
-
-            datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(), y_test.copy())
+        datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(), y_test.copy())
 
     return datasets_dict
 

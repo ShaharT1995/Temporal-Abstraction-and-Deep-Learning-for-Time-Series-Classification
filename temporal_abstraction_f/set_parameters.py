@@ -14,9 +14,13 @@ def create_three_files(config, path, method, nb_bins, paa_window_size, std_coeff
     :param gradient_window_size: the window size of the gradient method
     :return:
     """
-    #next_attribute = open_pickle("next_property_index" + config.archive)["ID"]
-    attribute_dict = open_pickle("attributes_dict_ucr") if config.archive == "UCR" else open_pickle("attributes_dict_mts")
-    dataset_list = config.UNIVARIATE_DATASET_NAMES_2018 if config.archive == "UCR" else config.MTS_DATASET_NAMES
+    if config.archive == "UCR":
+        attribute_dict = open_pickle("attributes_dict_ucr")
+        dataset_list = config.UNIVARIATE_DATASET_NAMES_2018
+    else:
+        attribute_dict = open_pickle("attributes_dict_mts")
+        dataset_list = config.MTS_DATASET_NAMES
+
     for ds in dataset_list:
         # GKB
         index = 0
@@ -39,8 +43,8 @@ def create_three_files(config, path, method, nb_bins, paa_window_size, std_coeff
 
             # PP
             new_row = pd.Series(
-                data={"TemporalPropertyID": property_id, "PAAWindowSize": paa_window_size, "StdCoefficient": std_coefficient,
-                      "MaxGap": max_gap})
+                data={"TemporalPropertyID": property_id, "PAAWindowSize": paa_window_size, "MaxGap": max_gap,
+                      "StdCoefficient": std_coefficient})
             df_pp = df_pp.append(new_row, ignore_index=True)
 
             if method == "gradient":
@@ -57,7 +61,7 @@ def create_three_files(config, path, method, nb_bins, paa_window_size, std_coeff
 
         create_directory(path + ds)
         if method == "gradient":
-            df_gkb.to_csv(path + ds +'//gkb.csv', index=False)
+            df_gkb.to_csv(path + ds + '//gkb.csv', index=False)
         # Save all data frames to csv
         df_ta.to_csv(path + ds + '//ta.csv', index=False)
         df_pp.to_csv(path + ds + '//pp.csv', index=False)

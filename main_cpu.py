@@ -7,22 +7,21 @@ def create_files():
 
     if config.archive == "UCR":
         uni_ta_1 = UnivariateTA1(config, 0)
-        next_attribute = uni_ta_1.convert_all_UTS()
+        uni_ta_1.convert_all_UTS()
     # config.archive == "MTS"
     else:
         multi_ta_1 = MultivariateTA1(config, 0)
-        next_attribute = multi_ta_1.convert_all_MTS()
-
-    write_pickle("next_property_index" + config.archive, {"ID": next_attribute})
+        multi_ta_1.convert_all_MTS()
 
     print()
 
 
 def run_cpu():
-    prop_path = config.path_files_for_TA + config.archive + "//" + config.classifier + "//" + config.method + "//"
+    prop_path = config.path_files_for_TA
+    if config.perEntity:
+        prop_path += "PerProperty//"
+    prop_path += config.archive + "//" + config.classifier + "//" + config.method + "//"
 
-    if config.combination:
-        prop_path += "combination//"
     create_directory(prop_path)
 
     # Make the 3 files - gkb.csv, ta.csv and ppa.csv
@@ -34,6 +33,8 @@ def run_cpu():
     running_dict = open_pickle("create_files_dict_" + config.archive)
 
     for nb_bin in config.nb_bin:
+        config.set_path_transformations_2(nb_bin)
+
         for std in config.std_coefficient:
             for max_gap in config.max_gap:
                 if config.method == "gradient":
@@ -49,35 +50,44 @@ def run_cpu():
 def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, gradient_window=None):
     print("-------------------------------------------------------------------------------------")
     print("Classifier: " + config.classifier + ", Method: " + method + ", Bins: " + str(nb_bin) + " Combination: " +
-          str(config.combination) + ", Transformation Number: " + str(config.transformation_number))
+          str(config.combination) + ", Transformation Number: " + str(config.transformation_number) + ", PerEntity: "
+          + str(config.perEntity))
     print("------------------------------------------------------------------------------------- \n")
 
-    key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window, config.combination)
+    key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window, config.combination,
+           config.perEntity)
 
-    if key in running_dict:
-        print("Already Done! \n")
-        return running_dict
+    # if key in running_dict:
+    #     print("Already Done! \n")
+    #     return running_dict
+    if False:
+        print()
 
     else:
         prop_path = path + "number_bin_" + str(nb_bin) + "//"
         create_directory(prop_path)
 
-        # create_three_files(config=config,
-        #                    path=prop_path,
-        #                    method=method,
-        #                    nb_bins=nb_bin,
-        #                    paa_window_size=paa,
-        #                    std_coefficient=std,
-        #                    max_gap=max_gap,
-        #                    gradient_window_size=gradient_window)
-        #
-        # print("Step 3: run hugobot")
-        # run_cli(config, prop_path, max_gap)
+        create_three_files(config=config,
+                           path=prop_path,
+                           method=method,
+                           nb_bins=nb_bin,
+                           paa_window_size=paa,
+                           std_coefficient=std,
+                           max_gap=max_gap,
+                           gradient_window_size=gradient_window)
+
+        print("Step 3: run hugobot")
+        run_cli(config, prop_path, max_gap)
 
         if config.combination and config.method != "gradient":
             print("Step 3.1: make the gkb.csv, ta.csv and ppa.csv for " + method + " method\n")
 
-            gradient_prop_path = config.path_files_for_TA + config.archive + "//" + config.classifier + "//gradient//"
+            gradient_prop_path = config.path_files_for_TA
+            if config.perEntity:
+                gradient_prop_path += "PerProperty//"
+            gradient_prop_path += config.archive + "//" + config.classifier + "//gradient//number_bin_" + str(nb_bin) \
+                                  + "//"
+
             create_directory(gradient_prop_path)
 
             # TODO Change the gradient window size
@@ -98,13 +108,13 @@ def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, g
 
             config.set_method(method)
 
-            combining_two_methods(config, prop_path)
+            combining_two_methods_ucr(config, prop_path, gradient_prop_path) if config.archive == "UCR" else \
+                combining_two_methods_mts(config, prop_path, gradient_prop_path)
 
         else:
             # Make the second temporal abstraction -> hugobot output files to original format
             print("Step 4: transformation 2")
 
-            config.set_path_transformations_2(nb_bin)
             new_ucr_files(config, prop_path) if config.archive == "UCR" else new_mts_files(config, prop_path)
 
         running_dict[key] = True
@@ -124,12 +134,9 @@ if __name__ == '__main__':
     config = ConfigClass()
     config.set_archive(sys.argv[2])
 
-    from temporal_abstraction_f.multivariate_ta_1 import MultivariateTA1
-    from temporal_abstraction_f.univariate_ta_1 import UnivariateTA1
     from temporal_abstraction_f.set_parameters import create_three_files
-    from temporal_abstraction_f.multivariate_ta_2 import new_mts_files
-    from temporal_abstraction_f.univariate_ta_2 import new_ucr_files
-    from temporal_abstraction_f.ucr_to_mts import combining_two_methods
+    from temporal_abstraction_f.tensor_transformation import new_ucr_files, new_mts_files
+    from temporal_abstraction_f.combination_gradient_state import combining_two_methods_ucr, combining_two_methods_mts
 
     sys.path.insert(0, '/sise/robertmo-group/TA-DL-TSC/Project/Hugobot')
     from Hugobot.cli import run_cli
@@ -138,6 +145,16 @@ if __name__ == '__main__':
         transform_mts_to_ucr_format()
 
     elif sys.argv[1] == 'create_files_for_hugobot':
+        config.set_perEntity(sys.argv[3])
+
+        if config.perEntity:
+            from temporal_abstraction_f.univariate_ta_1_per_entity import UnivariateTA1
+            from temporal_abstraction_f.multivariate_ta_1_per_entity import MultivariateTA1
+
+        else:
+            from temporal_abstraction_f.univariate_ta_1 import UnivariateTA1
+            from temporal_abstraction_f.multivariate_ta_1 import MultivariateTA1
+
         config.set_path_transformations()
         create_files()
 
@@ -148,6 +165,16 @@ if __name__ == '__main__':
         config.set_method(sys.argv[5])
         config.set_combination(sys.argv[6])
         config.set_transformation(sys.argv[7])
+        config.set_perEntity(sys.argv[8])
+
+        if config.perEntity:
+            from temporal_abstraction_f.univariate_ta_1_per_entity import UnivariateTA1
+            from temporal_abstraction_f.multivariate_ta_1_per_entity import MultivariateTA1
+
+        else:
+            from temporal_abstraction_f.univariate_ta_1 import UnivariateTA1
+            from temporal_abstraction_f.multivariate_ta_1 import MultivariateTA1
+
         config.set_path_transformations()
 
         if config.afterTA:

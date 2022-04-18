@@ -18,15 +18,14 @@ def run():
 
 
 def execute_running(config, running_dict, max_gap, method, nb_bin, paa, std, gradient_window=None):
-    # TODO - COMBINATION
-    # todo - Add gradient to the print
     print("-------------------------------------------------------------------------------------")
     print("Classifier: " + config.classifier + ", Method: " + method + ", Bins: " + str(nb_bin) + " Combination: " +
-          str(config.combination) + ", Transformation Number: " + str(config.transformation_number))
+          str(config.combination) + ", Transformation Number: " + str(config.transformation_number) + ", PerEntity: "
+          + str(config.perEntity))
     print("------------------------------------------------------------------------------------- \n")
 
     key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window,
-           config.transformation_number, config.combination)
+           config.transformation_number, config.combination, config.perEntity)
     # set number of bins in the path
     config.set_path_transformations_2(nb_bin)
 
@@ -38,7 +37,7 @@ def execute_running(config, running_dict, max_gap, method, nb_bin, paa, std, gra
         print("Step 5: Run all:")
         params = "res_" + str(method) + "_" + str(nb_bin) + "_" + str(paa) + "_" + str(std) \
                         + "_" + str(max_gap) + "_" + str(gradient_window) + "_" + str(config.transformation_number)\
-                        + "_" + str(config.combination)
+                        + "_" + str(config.combination) + "_" + str(config.perEntity)
 
         run_models.run_all(config, params)
         print("")

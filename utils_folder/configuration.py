@@ -11,6 +11,7 @@ class ConfigClass:
     archive = ""
     afterTA = False
     combination = False
+    perEntity = False
 
     transformation_number = ""
 
@@ -29,32 +30,39 @@ class ConfigClass:
         self.max_gap = [1]
         self.paa_window_size = 1
         self.gradient_window_size = [10]
-        #todo -'Coffee'
 
-        self.UNIVARIATE_DATASET_NAMES_2018 = ['Beef', 'ACSF1', 'Adiac', 'Computers', 'CricketX', 'CricketY', 'CricketZ',
-                                              'Crop', 'Earthquakes', 'ECG200', 'ElectricDevices', 'EthanolLevel',
-                                              'FordA', 'FordB', 'HandOutlines', 'Herring', 'LargeKitchenAppliances',
-                                              'MiddlePhalanxOutlineCorrect', 'MiddlePhalanxTW',
-                                              'PhalangesOutlinesCorrect', 'PLAID', 'PowerCons', 'SemgHandMovementCh2',
-                                              'SemgHandSubjectCh2', 'ShapesAll', 'SmoothSubspace', 'Strawberry',
-                                              'SyntheticControl', 'Worms', 'WormsTwoClass']
+        # self.UNIVARIATE_DATASET_NAMES_2018 = ['Beef', 'ACSF1', 'Adiac', 'Coffee', 'Computers', 'CricketX', 'CricketY', 'CricketZ',
+        #                                       'Crop', 'Earthquakes', 'ECG200', 'ElectricDevices', 'EthanolLevel',
+        #                                       'FordA', 'FordB', 'HandOutlines', 'Herring', 'LargeKitchenAppliances',
+        #                                       'MiddlePhalanxOutlineCorrect', 'MiddlePhalanxTW',
+        #                                       'PhalangesOutlinesCorrect', 'PLAID', 'PowerCons', 'SemgHandMovementCh2',
+        #                                       'SemgHandSubjectCh2', 'ShapesAll', 'SmoothSubspace', 'Strawberry',
+        #                                       'SyntheticControl', 'Worms', 'WormsTwoClass']
+
+        self.UNIVARIATE_DATASET_NAMES_2018 = ['SmoothSubspace']
 
         # self.MTS_DATASET_NAMES = ['Libras', 'ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
         #                           'JapaneseVowels', 'KickvsPunch', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
 
-        self.MTS_DATASET_NAMES = ['Libras', 'ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
-                                  'JapaneseVowels', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
+        # self.MTS_DATASET_NAMES = ['Libras', 'ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
+        #                           'JapaneseVowels', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
 
-        #self.MTS_DATASET_NAMES = ['ArabicDigits', 'AUSLAN']
+        self.MTS_DATASET_NAMES = ['Libras']
 
     def set_path_transformations(self):
-        self.path_transformation1 = self.path_files_for_TA + "Transformation1//" + self.archive + "//"
-        self.path_transformation2 = self.path_after_TA + self.archive + "//" + self.classifier + "//" + self.method \
-                                    + "//"
+        if self.perEntity:
+            self.path_transformation1 = self.path_files_for_TA + "Transformation1 PerEntity//" + self.archive + "//"
+        else:
+            self.path_transformation1 = self.path_files_for_TA + "Transformation1//" + self.archive + "//"
 
-    def set_path_transformations_2(self, nb_bin ):
-        self.path_transformation2 = self.path_after_TA + self.archive + "//" + self.classifier + "//" + self.method \
-                                    + "//" + "number_bin_" + str(nb_bin) + "//"
+    def set_path_transformations_2(self, nb_bin):
+        if self.perEntity:
+            self.path_transformation2 = self.path_after_TA + "PerEntity" + "//" + self.archive + "//" + self.classifier\
+                                        + "//" + self.method + "//" + "number_bin_" + str(nb_bin) + "//"
+        else:
+            self.path_transformation2 = self.path_after_TA + self.archive + "//" + self.classifier + "//" + \
+                                        self.method + "//" + "number_bin_" + str(nb_bin) + "//"
+
     @staticmethod
     def set_method(method):
         ConfigClass.method = method
@@ -75,6 +83,10 @@ class ConfigClass:
     @staticmethod
     def set_afterTA(after_TA):
         ConfigClass.afterTA = eval(after_TA)
+
+    @staticmethod
+    def set_perEntity(perEntity):
+        ConfigClass.perEntity = eval(perEntity)
 
     @staticmethod
     def set_combination(combination):

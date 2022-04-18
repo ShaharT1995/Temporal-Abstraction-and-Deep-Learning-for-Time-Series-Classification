@@ -20,7 +20,7 @@ def new_ucr_files(config, prop_path):
 
         create_directory(output_path)
 
-        print("\t" + dataset_name + ":")
+        print("\t" + dataset_name)
 
         states_path = path + "train//states.csv"
         states_df = pd.read_csv(states_path, header=0)
@@ -34,8 +34,8 @@ def new_ucr_files(config, prop_path):
             classification_path = config.ucr_path + '/' + dataset_name + '/y_' + file_type.lower() + '.npy'
 
             # Run the three transformation on the Train and Test files
-            create_transformations(path, output_path, file_type, number_of_rows, number_of_columns, 1, classes,
-                                     states_df, univariate=True, classification_path=classification_path)
+            create_transformations(config, path, output_path, file_type, number_of_rows, number_of_columns, 1, classes,
+                                   states_df, univariate=True, classification_path=classification_path)
         print("")
 
 
@@ -72,16 +72,16 @@ def new_mts_files(config, prop_path):
         for file_type in files_type:
             # Run the three transformation on the Train and Test files
             if file_type == "train":
-                create_transformations(path, output_path, file_type, number_of_entities_train,
-                                         time_serious_length, number_of_attributes, classes, states_df)
+                create_transformations(config, path, output_path, file_type, number_of_entities_train,
+                                       time_serious_length, number_of_attributes, classes, states_df)
             else:
-                create_transformations(path, output_path, file_type, number_of_entities_test, time_serious_length,
-                                         number_of_attributes, classes, states_df)
+                create_transformations(config, path, output_path, file_type, number_of_entities_test,
+                                       time_serious_length, number_of_attributes, classes, states_df)
         print("")
 
 
-def create_transformations(path, output_path, file_type, number_of_entities, time_serious_length, number_of_attributes,
-                     classes, states_df, univariate=False, classification_path=""):
+def create_transformations(config, path, output_path, file_type, number_of_entities, time_serious_length,
+                           number_of_attributes, classes, states_df, univariate=False, classification_path=""):
     """
     :param path: the location of the hugobot output
     :param file_type: train/test
@@ -91,15 +91,18 @@ def create_transformations(path, output_path, file_type, number_of_entities, tim
     :param classes: the classes in the database
     :return: the function do the transformation and save the data after it
     """
+
     # Get the number of state from state.csv file
     number_of_states = states_df.shape[0]
-    states = states_df.iloc[:, 0]
+
+    if config.perEntity:
+        number_of_states = int(number_of_states / number_of_entities)
 
     rows_dict = {}
     index = 0
 
     # Create key value for the output table -> key: (attribute, state), value: row in table
-    for state in states:
+    for state in range(1, number_of_states + 1):
         rows_dict[(state, '+')] = index
         rows_dict[(state, '-')] = index + 1
         index += 2
@@ -141,14 +144,27 @@ def create_transformations(path, output_path, file_type, number_of_entities, tim
                     # Extract the start time, end time and state id
                     parse_data = data[info].split(',')
 
+                    if config.perEntity:
+                        temporal_property_ID = 0 if univariate else int(parse_data[3]) - (int(parse_data[3]) // 10) * 10
+
+                        modulo = int(parse_data[2]) % int(number_of_states / number_of_attributes)
+                        if modulo == 0:
+                            modulo = int(number_of_states / number_of_attributes)
+
+                        symbol = int(modulo + temporal_property_ID * (number_of_states / number_of_attributes))
+
+                    else:
+                        temporal_property_ID = int(parse_data[3]) - min_property
+                        symbol = int(parse_data[2])
+
                     # Get the row index of the (attribute, symbol)
-                    dict_value_1 = rows_dict[(int(parse_data[2]), '+')]
-                    dict_value_2 = rows_dict[(int(parse_data[2]), '-')]
+                    dict_value_1 = rows_dict[(symbol, '+')]
+                    dict_value_2 = rows_dict[(symbol, '-')]
 
-                    arr_1[int(entity_id)][int(parse_data[0]) - 1: int(parse_data[1]) - 1, int(parse_data[3]) -
-                                                                                        min_property] = parse_data[2]
+                    arr_1[int(entity_id)][int(parse_data[0]) - 1: int(parse_data[1]) - 1, temporal_property_ID] = \
+                        symbol
 
-                    arr_2[int(entity_id)][int(parse_data[0]) - 1: int(parse_data[1]) - 1, int(parse_data[2]) - 1] = True
+                    arr_2[int(entity_id)][int(parse_data[0]) - 1: int(parse_data[1]) - 1, symbol - 1] = True
 
                     arr_3[int(entity_id)][int(parse_data[0]) - 1][dict_value_1] = True
                     arr_3[int(entity_id)][int(parse_data[1]) - 2][dict_value_2] = True
