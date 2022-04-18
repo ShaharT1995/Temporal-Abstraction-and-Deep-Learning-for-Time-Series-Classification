@@ -48,11 +48,11 @@ def run_cpu():
 
 
 def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, gradient_window=None):
-    print("-------------------------------------------------------------------------------------")
+    print("-----------------------------------------------------------------------------------------------------")
     print("Classifier: " + config.classifier + ", Method: " + method + ", Bins: " + str(nb_bin) + " Combination: " +
           str(config.combination) + ", Transformation Number: " + str(config.transformation_number) + ", PerEntity: "
           + str(config.perEntity))
-    print("------------------------------------------------------------------------------------- \n")
+    print("----------------------------------------------------------------------------------------------------- \n")
 
     key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window, config.combination,
            config.perEntity)
@@ -108,6 +108,7 @@ def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, g
 
             config.set_method(method)
 
+            print("Step 4: transformation 2")
             combining_two_methods_ucr(config, prop_path, gradient_prop_path) if config.archive == "UCR" else \
                 combining_two_methods_mts(config, prop_path, gradient_prop_path)
 

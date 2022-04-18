@@ -90,29 +90,25 @@ def combining_two_methods_mts(config, prop_path, gradient_path):
         print("")
 
 
-def organize_df_per_entity(config, states_df, states_df_gradient, number_of_attributes):
-    number_of_states = states_df.shape[0]
-
+def organize_df_per_entity(config, states_df, states_df_gradient, number_of_attributes, number_of_states):
     if config.archive == "UCR":
         states_df["TemporalPropertyID"] = 0
         states_df_gradient["TemporalPropertyID"] = 0
     else:
-        states_df["TemporalPropertyID"] = int(states_df["TemporalPropertyID"]) - \
-                                          (int(states_df["TemporalPropertyID"]) // 10) * 10
-        states_df_gradient["TemporalPropertyID"] = int(states_df_gradient["TemporalPropertyID"]) - \
-                                                   (int(states_df_gradient["TemporalPropertyID"]) // 10) * 10
+        states_df["TemporalPropertyID"] = states_df["TemporalPropertyID"] - (states_df["TemporalPropertyID"] // 10) * 10
+        states_df_gradient["TemporalPropertyID"] = states_df_gradient["TemporalPropertyID"] - \
+                                                   (states_df_gradient["TemporalPropertyID"] // 10) * 10
 
-    modulo = int(states_df["StateID"]) % int(number_of_states / number_of_attributes)
-    if modulo == 0:
-        modulo = int(number_of_states / number_of_attributes)
+    states_df["StateID"] = states_df["StateID"] % int(number_of_states / number_of_attributes)
+    states_df.loc[states_df["StateID"] == 0, "StateID"] = int(number_of_states / number_of_attributes)
 
-    modulo_gradient = int(states_df_gradient["StateID"]) % int(number_of_states / number_of_attributes)
-    if modulo_gradient == 0:
-        modulo_gradient = int(number_of_states / number_of_attributes)
+    states_df_gradient["StateID"] = states_df_gradient["StateID"] % int(number_of_states / number_of_attributes)
+    states_df_gradient.loc[states_df_gradient["StateID"] == 0, "StateID"] = int(number_of_states / number_of_attributes)
 
-    states_df["StateID"] = int(modulo + states_df["TemporalPropertyID"] * (number_of_states / number_of_attributes))
-    states_df_gradient["StateID"] = int(modulo_gradient + states_df_gradient["TemporalPropertyID"] *
-                                        (number_of_states / number_of_attributes))
+    states_df["StateID"] = states_df["StateID"] + states_df["TemporalPropertyID"] * (number_of_states /
+                                                                                         number_of_attributes)
+    states_df_gradient["StateID"] = states_df_gradient["StateID"] + states_df_gradient["TemporalPropertyID"] * \
+                                    (number_of_states / number_of_attributes)
 
     return states_df, states_df_gradient
 
@@ -120,14 +116,13 @@ def organize_df_per_entity(config, states_df, states_df_gradient, number_of_attr
 def create_transformations(config, path, gradient_path, output_path, file_type, number_of_entities, time_serious_length,
                            number_of_attributes, classes, states_df, states_df_gradient):
     number_of_states = states_df.shape[0]
+
     if config.perEntity:
         number_of_states = int(number_of_states / number_of_entities)
-
-    if config.perEntity:
         states_df, states_df_gradient = organize_df_per_entity(config, states_df, states_df_gradient,
-                                                               number_of_attributes)
+                                                               number_of_attributes, number_of_states)
 
-    max_state = max(states_df["StateID"])
+    max_state = int(max(states_df["StateID"]))
 
     # Get the number of state from state.csv file- for gradient
     number_of_states = number_of_states * 2
@@ -150,11 +145,12 @@ def create_transformations(config, path, gradient_path, output_path, file_type, 
     arr_2 = np.full((number_of_entities, time_serious_length, number_of_states), False, dtype=bool)
     arr_3 = np.full((number_of_entities, time_serious_length, number_of_states * 2), False, dtype=bool)
 
-    arr_1, arr_2, arr_3 = fill_transformations(config, arr_1, arr_2, arr_3, path, file_type, classes, 0, 0, rows_dict,
-                                               min_property, number_of_states)
+    arr_1, arr_2, arr_3 = fill_transformations(config, arr_1, arr_2, arr_3, path, file_type, classes,
+                                               number_of_attributes, 0, rows_dict, min_property, number_of_states, 0)
+
     arr_1, arr_2, arr_3 = fill_transformations(config, arr_1, arr_2, arr_3, gradient_path, file_type, classes,
                                                number_of_attributes, max_state, rows_dict, min_property,
-                                               number_of_states)
+                                               number_of_states, number_of_attributes)
 
     # Save the arrays
     np.save(output_path + 'type1_' + file_type.lower() + '_combination.npy', arr_1)
@@ -162,8 +158,8 @@ def create_transformations(config, path, gradient_path, output_path, file_type, 
     np.save(output_path + 'type3_' + file_type.lower() + '_combination.npy', arr_3)
 
 
-def fill_transformations(config, arr_1, arr_2, arr_3, path, file_type, classes, number_of_attributes, max_state, rows_dict,
-                         min_property, number_of_states):
+def fill_transformations(config, arr_1, arr_2, arr_3, path, file_type, classes, number_of_attributes, max_state,
+                         rows_dict, min_property, number_of_states, start_from):
     for class_id in classes:
         # For the first method
         ta_output = path + file_type.lower() + "//KL-class-"
@@ -189,9 +185,9 @@ def fill_transformations(config, arr_1, arr_2, arr_3, path, file_type, classes, 
                         temporal_property_ID = 0 if config.archive == "UCR" else int(parse_data[3]) - \
                                                                                  (int(parse_data[3]) // 10) * 10
 
-                        modulo = int(parse_data[2]) % int(number_of_states / number_of_attributes)
+                        modulo = int(parse_data[2]) % int(number_of_states / (number_of_attributes * 2))
                         if modulo == 0:
-                            modulo = int(number_of_states / number_of_attributes)
+                            modulo = int(number_of_states / (number_of_attributes * 2))
 
                         symbol = int(modulo + temporal_property_ID * (number_of_states / number_of_attributes))
 
@@ -201,14 +197,15 @@ def fill_transformations(config, arr_1, arr_2, arr_3, path, file_type, classes, 
 
                     # Transformation 1
                     arr_1[int(entity_id)][int(parse_data[0]) - 1: int(parse_data[1]) - 1, temporal_property_ID +
-                                                                                          number_of_attributes] =\
-                        symbol + max_state
+                                                                                          start_from] = symbol + \
+                                                                                                        max_state
 
                     # Transformation 2
                     arr_2[int(entity_id)][int(parse_data[0]) - 1: int(parse_data[1]) - 1, symbol + max_state - 1] = True
+
                     # Transformation 3
-                    dict_value_1 = rows_dict[(symbol, '+')]
-                    dict_value_2 = rows_dict[(symbol, '-')]
+                    dict_value_1 = rows_dict[(symbol + max_state, '+')]
+                    dict_value_2 = rows_dict[(symbol + max_state, '-')]
 
                     arr_3[int(entity_id)][int(parse_data[0]) - 1][dict_value_1] = True
                     arr_3[int(entity_id)][int(parse_data[1]) - 2][dict_value_2] = True
