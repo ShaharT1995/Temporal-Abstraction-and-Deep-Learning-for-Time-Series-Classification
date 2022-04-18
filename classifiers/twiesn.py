@@ -176,13 +176,12 @@ class Classifier_TWIESN:
         start_time = time.time()
         y_pred = ridge_classifier.predict(new_x_test)
         predicting_time = time.time() - start_time
-        y_pred_prob = y_pred
 
         # reconstruct the test predictions
         y_pred = self.reshape_prediction(y_pred, self.x_test.shape[0], self.T)
 
         # get the metrics for the test predictions
-        df_metrics = calculate_metrics(self.y_true, y_pred, learning_time, predicting_time,y_pred_prob)
+        df_metrics = calculate_metrics(self.y_true, y_pred, learning_time, predicting_time)
 
         # get the output layer weights
         self.W_out = ridge_classifier.coef_
