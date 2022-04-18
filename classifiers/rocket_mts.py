@@ -162,12 +162,13 @@ class RocketClassifier:
         start_time = time.time()
         y_pred = self.predict(x_test)
         predicting_time = time.time() - start_time
+        y_pred_prob = y_pred
 
         # convert the predicted from binary to integer
         y_pred = np.argmax(y_pred, axis=1)
 
         # Save Metrics
-        df_metrics = calculate_metrics(y_true, y_pred, learning_time, predicting_time)
+        df_metrics = calculate_metrics(y_true, y_pred, learning_time, predicting_time,y_pred_prob)
         df_metrics.to_csv(self.output_folder + 'df_metrics.csv', index=False)
 
     def predict(self, x_test: np.array):

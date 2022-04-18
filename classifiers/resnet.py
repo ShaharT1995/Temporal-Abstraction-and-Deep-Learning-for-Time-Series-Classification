@@ -154,6 +154,7 @@ class Classifier_RESNET:
         start_time = time.time()
         y_pred = self.predict(x_test, y_true, x_train, y_train, y_val, return_df_metrics=False)
         predicting_time = time.time() - start_time
+        y_pred_prob = y_pred
 
         # save predictions
         np.save(self.output_directory + 'y_pred.npy', y_pred)
@@ -161,7 +162,7 @@ class Classifier_RESNET:
         # convert the predicted from binary to integer
         y_pred = np.argmax(y_pred, axis=1)
 
-        df_metrics = save_logs(self.output_directory, hist, y_pred, y_true, learning_time, predicting_time)
+        df_metrics = save_logs(self.output_directory, hist, y_pred, y_true, learning_time, predicting_time,y_pred_prob)
 
         keras.backend.clear_session()
 

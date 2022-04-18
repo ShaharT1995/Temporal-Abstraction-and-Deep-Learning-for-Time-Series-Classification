@@ -6,6 +6,8 @@ import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 import os, time
+from sklearn import metrics
+from sklearn.metrics import roc_auc_score
 
 from utils_folder.configuration import ConfigClass
 from utils_folder.ranking_graph import draw_cd_diagram
@@ -246,10 +248,10 @@ def transform_mts_to_ucr_format():
     write_pickle("length_dict", length_dict)
 
 
-def calculate_metrics(y_true, y_pred, learning_time, predicting_time, y_true_val=None, y_pred_val=None):
-    res = pd.DataFrame(data=np.zeros((1, 10), dtype=np.float), index=[0],
+def calculate_metrics(y_true, y_pred, learning_time, predicting_time, y_true_val=None, y_pred_val=None,y_pred_new =None):
+    res = pd.DataFrame(data=np.zeros((1, 11), dtype=np.float), index=[0],
                        columns=['precision', 'accuracy', 'recall', 'mcc', 'cohen_kappa', 'learning_time',
-                                'predicting_time', 'f1_score_macro', 'f1_score_micro', 'f1_score_weighted'])
+                                'predicting_time', 'f1_score_macro', 'f1_score_micro', 'f1_score_weighted','auc'])
 
     res['precision'] = precision_score(y_true, y_pred, average='macro')
     res['recall'] = recall_score(y_true, y_pred, average='macro')
@@ -264,11 +266,26 @@ def calculate_metrics(y_true, y_pred, learning_time, predicting_time, y_true_val
     res['mcc'] = matthews_corrcoef(y_true, y_pred)
 
     # Cohen’s kappa
-    res['cohen_kappa'] = cohen_kappa_score(y_true, y_pred)
+
+    if len(set(y_true + y_pred)) == 1:
+        res['cohen_kappa'] = 1
+    else:
+        res['cohen_kappa'] = cohen_kappa_score(y_true, y_pred)
+
+    #res['cohen_kappa'] = cohen_kappa_score(y_true, y_pred)
+
 
     # This is useful when transfer learning is used with cross validation
     if y_true_val is not None:
         res['accuracy_val'] = balanced_accuracy_score(y_true_val, y_pred_val)
+
+    # AUC
+    #y_pred = np.transpose([pred[:, 1] for pred in y_pred])
+    if y_pred_new is None:
+        res['auc'] = roc_auc_score(y_true, y_pred, multi_class='ovr')
+    else:
+        res['auc'] = roc_auc_score(y_true, y_pred_new, multi_class='ovr')  # todo - think if ovo / ovr/ raise
+
 
     res['learning_time'] = learning_time
     res['predicting_time'] = predicting_time
@@ -283,10 +300,10 @@ def save_test_duration(file_name, test_duration):
 
 
 def generate_results_csv(config, params):
-    res = pd.DataFrame(data=np.zeros((0, 13), dtype=np.float), index=[],
+    res = pd.DataFrame(data=np.zeros((0, 14), dtype=np.float), index=[],
                        columns=['classifier_name', 'archive_name', 'dataset_name', 'precision', 'recall', 'accuracy',
                                 'mcc', "cohen_kappa", "f1_score_macro", "f1_score_micro",
-                                "f1_score_weighted", 'learning_time', 'predicting_time'])
+                                "f1_score_weighted", 'learning_time', 'predicting_time','auc'])
 
     dataset_list = config.UNIVARIATE_DATASET_NAMES_2018 if config.archive == "UCR" else config.MTS_DATASET_NAMES
 
@@ -353,12 +370,12 @@ def save_logs_t_leNet(output_directory, hist, y_pred, y_true, learning_time, pre
     plot_epochs_metric(hist, output_directory + 'epochs_loss.png')
 
 
-def save_logs(output_directory, hist, y_pred, y_true, learning_time, predicting_time,  lr=True, y_true_val=None,
+def save_logs(output_directory, hist, y_pred, y_true, learning_time, predicting_time,y_pred_new=None,lr=True, y_true_val=None,
               y_pred_val=None):
     hist_df = pd.DataFrame(hist.history)
     hist_df.to_csv(output_directory + 'history.csv', index=False)
 
-    df_metrics = calculate_metrics(y_true, y_pred, learning_time, predicting_time, y_true_val, y_pred_val)
+    df_metrics = calculate_metrics(y_true, y_pred, learning_time, predicting_time, y_true_val, y_pred_val,y_pred_new)
 
     index_best_model = hist_df['val_loss'].idxmin()
     row_best_model = hist_df.loc[index_best_model]

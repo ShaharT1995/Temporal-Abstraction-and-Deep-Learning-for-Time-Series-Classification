@@ -76,6 +76,8 @@ def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, g
                            max_gap=max_gap,
                            gradient_window_size=gradient_window)
 
+        #todo
+        #print("hugobot is off")
         print("Step 3: run hugobot")
         run_cli(config, prop_path, max_gap)
 

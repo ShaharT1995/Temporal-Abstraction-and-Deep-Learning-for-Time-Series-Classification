@@ -117,11 +117,12 @@ class Classifier_MLSTM_FCN:
         start_time = time.time()
         y_pred = model.predict(x_test)
         predicting_time = time.time() - start_time
+        y_pred_prob = y_pred
 
         # convert the predicted from binary to integer
         y_pred = np.argmax(y_pred, axis=1)
 
-        save_logs(self.output_directory, self.hist, y_pred, y_true, learning_time, predicting_time)
+        save_logs(self.output_directory, self.hist, y_pred, y_true, learning_time, predicting_time,y_pred_prob)
         keras.backend.clear_session()
 
 
