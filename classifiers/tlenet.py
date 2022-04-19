@@ -265,5 +265,6 @@ class Classifier_TLENET:
 
         y_pred = np.array(y_predicted)
 
+        # TODO - 0.0 Why???
         df_metrics = calculate_metrics(y_true, y_pred, 0.0)
         return df_metrics

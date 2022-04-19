@@ -13,9 +13,9 @@ import time
 from tensorflow.python.keras.callbacks import EarlyStopping
 
 from utils_folder.configuration import ConfigClass
-from utils_folder.utils import save_logs, calculate_metrics
+from utils_folder.utils import save_logs
 
-# TODO
+# The source of this code
 # https://github.com/lilly9117/Sensor-data-classification/blob/77166bec9339965b1bfff58cb477853ef92e7f0d/time_series_classification/classifiers/lstm_fcn.py
 
 
@@ -55,52 +55,6 @@ class Classifier_LSTMFCN:
             self.verbose = verbose
             self.model.save_weights(self.output_directory + 'model_init.hdf5')
         return
-
-    # def build_model(self, input_shape, nb_classes):
-    #     ip = Input(input_shape)
-    #
-    #     x = Masking()(ip)
-    #     x = LSTM(64)(x)
-    #     x = Dropout(0.8)(x)
-    #
-    #     y = Permute((2, 1))(ip)
-    #     y = Conv1D(128, 8, padding='same', kernel_initializer='he_uniform')(y)
-    #     y = BatchNormalization()(y)
-    #     y = Activation('relu')(y)
-    #     y = squeeze_excite_block(y)
-    #
-    #     y = Conv1D(256, 5, padding='same', kernel_initializer='he_uniform')(y)
-    #     y = BatchNormalization()(y)
-    #     y = Activation('relu')(y)
-    #     y = squeeze_excite_block(y)
-    #
-    #     y = Conv1D(128, 3, padding='same', kernel_initializer='he_uniform')(y)
-    #     y = BatchNormalization()(y)
-    #     y = Activation('relu')(y)
-    #
-    #     y = GlobalAveragePooling1D()(y)
-    #
-    #     x = concatenate([x, y])
-    #
-    #     out = Dense(nb_classes, activation='softmax')(x)
-    #
-    #     model = Model(ip, out)
-    #
-    #     model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(),
-    #                   metrics=['accuracy'])
-    #
-    #     reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=50,
-    #                                                   min_lr=0.0001)
-    #
-    #     file_path = self.output_directory + 'best_model.hdf5'
-    #
-    #     es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=30, min_delta=0)
-    #     model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='val_loss',
-    #                                                        save_best_only=True)
-    #
-    #     self.callbacks = [es, reduce_lr, model_checkpoint]
-    #
-    #     return model
 
     def build_model(self, input_shape, nb_classes):
         ip = Input(input_shape)
@@ -184,6 +138,6 @@ class Classifier_LSTMFCN:
         # convert the predicted from binary to integer
         y_pred = np.argmax(y_pred, axis=1)
 
-        save_logs(self.output_directory, hist, y_pred, y_true, learning_time, predicting_time,y_pred_prob)
+        save_logs(self.output_directory, hist, y_pred, y_true, learning_time, predicting_time, y_pred_prob)
 
         keras.backend.clear_session()

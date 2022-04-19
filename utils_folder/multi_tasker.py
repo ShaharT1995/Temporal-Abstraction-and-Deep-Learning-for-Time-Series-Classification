@@ -27,8 +27,9 @@ def create_combination_list():
                                 'lstm_fcn', 'mlstm_fcn', 'rocket'],
                  "afterTA": ['True'],
                  "method": ['sax', 'td4c-cosine', 'gradient'],
-                 "combination": ['False'],
-                 "transformation": ["1"]}
+                 "combination": ['False', 'True'],
+                 "transformation": ['1'],
+                 "perEntity": ['False', 'True']}
 
     keys_list = list(itertools.product(*dict_name.values()))
 
@@ -45,20 +46,32 @@ def create_combination_gpu():
     dict_name = {"archive": ['UCR', 'MTS'],
                  "classifier": ['fcn', 'mlp', 'resnet', 'tlenet', 'encoder', 'mcdcnn', 'cnn', 'inception', 'lstm_fcn',
                                 'mlstm_fcn'],
-                 "afterTA": ['False', "True"],
+                 "afterTA": ['False', 'True'],
                  "method": ['sax', 'td4c-cosine', 'gradient', 'RawData'],
-                 "combination": ['False'],
-                 "transformation": ["1", "2", "3"]}
+                 "combination": ['False', 'True'],
+                 "transformation": ['1', '2', '3'],
+                 "perEntity": ['False', 'True']}
 
     keys_list = list(itertools.product(*dict_name.values()))
 
     combination_lst = []
     for combination in keys_list:
+        # combination[3] - Method, combination[2] - afterTA, combination[4] - Gradient combination,
+        # combination[5] - Transformation number, combination[6] - Per entity
+
+        # Raw data cannot be with afterTA
         if not (combination[3] == "RawData" and combination[2] == "True"):
-            if not (combination[3] != "RawData" and combination[2] == "False"):
-                if not (combination[3] == "RawData" and combination[2] == "False" and (combination[5] == "2" or
-                                                                                       combination[5] == "3")):
-                    combination_lst.append(list(combination))
+            # Raw data cannot be with per entity
+            if not (combination[3] == "RawData" and combination[6] == "True"):
+                # Raw data cannot be with gradient combination
+                if not (combination[3] == "RawData" and combination[4] == "True"):
+                    # TA method cannot be without afterTA
+                    if not (combination[3] != "RawData" and combination[2] == "False"):
+                        # Raw data can be only with transformation 1 (without gradient combination, per entity, and TA)
+                        if not (combination[3] == "RawData" and combination[2] == "False" and combination[6] == "False"
+                                and combination[4] == "False" and (combination[5] == "2" or combination[5] == "3")):
+                            print(combination)
+                            combination_lst.append(list(combination))
 
     # Save the pickle file
     save_combination_pickle(combination_lst, gpu=True)
@@ -67,21 +80,33 @@ def create_combination_gpu():
 # We run this function one time. The function create all the possible combination
 def create_combination_cpu():
     dict_name = {"archive": ['UCR', 'MTS'],
-                 "classifier": ['rocket'],
-                 "afterTA": ['False', "True"],
-                 "method": ['sax', 'td4c-cosine', 'gradient'],
-                 "combination": ['False'],
-                 "transformation": ["1", "2", "3"]}
+                 "classifier": ['twiesn', 'rocket'],
+                 "afterTA": ['False', 'True'],
+                 "method": ['sax', 'td4c-cosine', 'gradient', 'RawData'],
+                 "combination": ['False', 'True'],
+                 "transformation": ['1', '2', '3'],
+                 "perEntity": ['False', 'True']}
 
     keys_list = list(itertools.product(*dict_name.values()))
 
     combination_lst = []
     for combination in keys_list:
+        # combination[3] - Method, combination[2] - afterTA, combination[4] - Gradient combination,
+        # combination[5] - Transformation number, combination[6] - Per entity
+
+        # Raw data cannot be with afterTA
         if not (combination[3] == "RawData" and combination[2] == "True"):
-            if not (combination[3] != "RawData" and combination[2] == "False"):
-                if not (combination[3] == "RawData" and combination[2] == "False" and (combination[5] == "2" or
-                                                                                       combination[5] == "3")):
-                    combination_lst.append(list(combination))
+            # Raw data cannot be with per entity
+            if not (combination[3] == "RawData" and combination[6] == "True"):
+                # Raw data cannot be with gradient combination
+                if not (combination[3] == "RawData" and combination[4] == "True"):
+                    # TA method cannot be without afterTA
+                    if not (combination[3] != "RawData" and combination[2] == "False"):
+                        # Raw data can be only with transformation 1 (without gradient combination, per entity, and TA)
+                        if not (combination[3] == "RawData" and combination[2] == "False" and combination[6] == "False"
+                                and combination[4] == "False" and (combination[5] == "2" or combination[5] == "3")):
+                            print(combination)
+                            combination_lst.append(list(combination))
 
     # Save the pickle file
     save_combination_pickle(combination_lst, gpu=False)

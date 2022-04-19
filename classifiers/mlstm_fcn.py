@@ -12,7 +12,7 @@ from utils_folder.utils import save_logs, calculate_metrics
 from utils_folder.configuration import ConfigClass
 from sklearn.model_selection import train_test_split
 
-# TODO
+# The source of this code
 # https://github.com/Navidfoumani/Disjoint-CNN
 
 
@@ -26,9 +26,6 @@ class Classifier_MLSTM_FCN:
 
         if build:
             self.model = self.build_model(input_shape, nb_classes)
-
-            # if verbose:
-            #     self.model.summary()
 
             self.verbose = verbose
             self.model.save_weights(self.output_directory + 'model_init.h5')
@@ -122,7 +119,7 @@ class Classifier_MLSTM_FCN:
         # convert the predicted from binary to integer
         y_pred = np.argmax(y_pred, axis=1)
 
-        save_logs(self.output_directory, self.hist, y_pred, y_true, learning_time, predicting_time,y_pred_prob)
+        save_logs(self.output_directory, self.hist, y_pred, y_true, learning_time, predicting_time, y_pred_prob)
         keras.backend.clear_session()
 
 

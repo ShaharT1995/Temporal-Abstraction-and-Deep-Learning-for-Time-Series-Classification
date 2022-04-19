@@ -1,24 +1,21 @@
+import os
 import pickle
 import random
+import time
+from builtins import print
 
-import numpy as np
-import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
-import os, time
-from sklearn import metrics
+import numpy as np
+import pandas as pd
+from scipy.interpolate import interp1d
+from scipy.io import loadmat
+from sklearn.metrics import precision_score, recall_score, f1_score, balanced_accuracy_score, \
+    matthews_corrcoef, cohen_kappa_score
 from sklearn.metrics import roc_auc_score
 
 from utils_folder.configuration import ConfigClass
 from utils_folder.ranking_graph import draw_cd_diagram
-
-from builtins import print
-
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, balanced_accuracy_score, \
-    matthews_corrcoef, cohen_kappa_score
-
-from scipy.interpolate import interp1d
-from scipy.io import loadmat
 
 matplotlib.use('agg')
 matplotlib.rcParams['font.family'] = 'sans-serif'
@@ -54,9 +51,9 @@ def is_locked(filepath, cli, sep):
 
             # Read all datasets
             else:
-                if config.archive == "UCR" and not config.combination:
+                # For the raw data in the UCR archive only
+                if config.archive == "UCR" and not config.afterTA:
                     file_object = pd.read_csv(filepath, sep=sep, header=None)
-                # MTS
                 else:
                     file_object = np.load(filepath)
 
@@ -248,10 +245,11 @@ def transform_mts_to_ucr_format():
     write_pickle("length_dict", length_dict)
 
 
-def calculate_metrics(y_true, y_pred, learning_time, predicting_time, y_true_val=None, y_pred_val=None,y_pred_new =None):
+def calculate_metrics(y_true, y_pred, learning_time, predicting_time, y_true_val=None, y_pred_val=None,
+                      y_pred_prob=None):
     res = pd.DataFrame(data=np.zeros((1, 11), dtype=np.float), index=[0],
                        columns=['precision', 'accuracy', 'recall', 'mcc', 'cohen_kappa', 'learning_time',
-                                'predicting_time', 'f1_score_macro', 'f1_score_micro', 'f1_score_weighted','auc'])
+                                'predicting_time', 'f1_score_macro', 'f1_score_micro', 'f1_score_weighted', 'auc'])
 
     res['precision'] = precision_score(y_true, y_pred, average='macro')
     res['recall'] = recall_score(y_true, y_pred, average='macro')
@@ -265,27 +263,21 @@ def calculate_metrics(y_true, y_pred, learning_time, predicting_time, y_true_val
     # Matthews correlation coefficient
     res['mcc'] = matthews_corrcoef(y_true, y_pred)
 
-    # Cohen’s kappa
-
+    # Cohen’s kappa #TODO - Why?
     if len(set(y_true + y_pred)) == 1:
         res['cohen_kappa'] = 1
     else:
         res['cohen_kappa'] = cohen_kappa_score(y_true, y_pred)
-
-    #res['cohen_kappa'] = cohen_kappa_score(y_true, y_pred)
-
 
     # This is useful when transfer learning is used with cross validation
     if y_true_val is not None:
         res['accuracy_val'] = balanced_accuracy_score(y_true_val, y_pred_val)
 
     # AUC
-    #y_pred = np.transpose([pred[:, 1] for pred in y_pred])
-    if y_pred_new is None:
+    if y_pred_prob is None:
         res['auc'] = roc_auc_score(y_true, y_pred, multi_class='ovr')
     else:
-        res['auc'] = roc_auc_score(y_true, y_pred_new, multi_class='ovr')  # todo - think if ovo / ovr/ raise
-
+        res['auc'] = roc_auc_score(y_true, y_pred_prob, multi_class='ovr')  # todo - think if ovo / ovr/ raise
 
     res['learning_time'] = learning_time
     res['predicting_time'] = predicting_time

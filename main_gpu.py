@@ -29,13 +29,10 @@ def execute_running(config, running_dict, max_gap, method, nb_bin, paa, std, gra
     # set number of bins in the path
     config.set_path_transformations_2(nb_bin)
 
-    """
-    if key in running_dict:
-        print("Already Done! \n")
-    
-
-        return running_dict
-    """
+    # TODO
+    # if key in running_dict:
+    #     print("Already Done! \n")
+    #     return running_dict
     if False:
         print()
     else:
@@ -74,6 +71,7 @@ if __name__ == '__main__':
         config.set_method(sys.argv[5])
         config.set_combination(sys.argv[6])
         config.set_transformation(sys.argv[7])
+        config.set_perEntity(sys.argv[8])
         config.set_path_transformations()
 
         run() if config.afterTA else run_models.run_all(config, "RawData")

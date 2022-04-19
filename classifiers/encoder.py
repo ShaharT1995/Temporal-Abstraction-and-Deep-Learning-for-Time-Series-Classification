@@ -102,7 +102,6 @@ class Classifier_ENCODER:
         nb_epochs = nb_epochs // 10
         mini_batch_size = int(min(x_train.shape[0] / 10, batch_size))
 
-
         # Added lines because model's fit on the testing set - bug in the original code
         x_train, x_val, y_train, y_val = \
             train_test_split(x_train, y_train, test_size=0.3, random_state=(42 + iter))
@@ -124,6 +123,6 @@ class Classifier_ENCODER:
         # convert the predicted from binary to integer
         y_pred = np.argmax(y_pred, axis=1)
 
-        save_logs(self.output_directory, hist, y_pred, y_true, learning_time, predicting_time,y_pred_prob, lr=False)
+        save_logs(self.output_directory, hist, y_pred, y_true, learning_time, predicting_time, y_pred_prob, lr=False)
 
         keras.backend.clear_session()

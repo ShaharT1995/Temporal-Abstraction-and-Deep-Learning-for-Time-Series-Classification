@@ -84,7 +84,6 @@ class Classifier_FCN:
         # Was here before
         mini_batch_size = int(min(x_train.shape[0] / 10, batch_size))
 
-
         # Added lines because model's fit on the testing set - bug in the original code
         x_train, x_val, y_train, y_val = \
             train_test_split(x_train, y_train, test_size=0.3, random_state=(42 + iteration))

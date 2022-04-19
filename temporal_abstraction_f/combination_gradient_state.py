@@ -189,29 +189,26 @@ def fill_transformations(config, arr_1, arr_2, arr_3, path, file_type, classes, 
                         if modulo == 0:
                             modulo = int(number_of_states / (number_of_attributes * 2))
 
-                        symbol = int(modulo + temporal_property_ID * (number_of_states / (number_of_attributes*2)))
+                        symbol = int(modulo + temporal_property_ID * (number_of_states / (number_of_attributes * 2)))
 
                     else:
                         temporal_property_ID = int(parse_data[3]) - min_property
                         symbol = int(parse_data[2])
-                    try:
-                        # Transformation 1
-                        arr_1[int(entity_id)][int(parse_data[0]) - 1: int(parse_data[1]) - 1, temporal_property_ID +
-                                                                                              start_from] = symbol + \
-                                                                                                            max_state
 
-                        # Transformation 2
-                        arr_2[int(entity_id)][int(parse_data[0]) - 1: int(parse_data[1]) - 1, symbol + max_state - 1] = True
+                    # Transformation 1
+                    arr_1[int(entity_id)][int(parse_data[0]) - 1: int(parse_data[1]) - 1, temporal_property_ID +
+                                                                                          start_from] = symbol + \
+                                                                                                        max_state
 
-                        # Transformation 3
-                        dict_value_1 = rows_dict[(symbol + max_state, '+')]
-                        dict_value_2 = rows_dict[(symbol + max_state, '-')]
+                    # Transformation 2
+                    arr_2[int(entity_id)][int(parse_data[0]) - 1: int(parse_data[1]) - 1, symbol + max_state - 1] = True
 
-                        arr_3[int(entity_id)][int(parse_data[0]) - 1][dict_value_1] = True
-                        arr_3[int(entity_id)][int(parse_data[1]) - 2][dict_value_2] = True
+                    # Transformation 3
+                    dict_value_1 = rows_dict[(symbol + max_state, '+')]
+                    dict_value_2 = rows_dict[(symbol + max_state, '-')]
 
-                    except:
-                        print("e")
+                    arr_3[int(entity_id)][int(parse_data[0]) - 1][dict_value_1] = True
+                    arr_3[int(entity_id)][int(parse_data[1]) - 2][dict_value_2] = True
 
     return arr_1, arr_2, arr_3
 

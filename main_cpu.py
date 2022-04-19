@@ -57,6 +57,7 @@ def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, g
     key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window, config.combination,
            config.perEntity)
 
+    # TODO
     # if key in running_dict:
     #     print("Already Done! \n")
     #     return running_dict
@@ -76,8 +77,7 @@ def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, g
                            max_gap=max_gap,
                            gradient_window_size=gradient_window)
 
-        #todo
-        #print("hugobot is off")
+        # print("Hugobot is OFF")
         print("Step 3: run hugobot")
         run_cli(config, prop_path, max_gap)
 
@@ -105,6 +105,7 @@ def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, g
             method = config.method
             config.set_method("gradient")
 
+            # print("Hugobot is OFF")
             print("Step 3.2: run hugobot for Gradient method")
             run_cli(config, gradient_prop_path, max_gap)
 

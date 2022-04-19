@@ -6,7 +6,7 @@ import time
 from tensorflow.python.keras.callbacks import EarlyStopping
 import tensorflow as tf
 
-from utils_folder.utils import save_logs, calculate_metrics
+from utils_folder.utils import save_logs
 from utils_folder.configuration import ConfigClass
 
 
@@ -26,60 +26,6 @@ class Classifier_MCDCNN:
             self.verbose = verbose
             self.model.save_weights(self.output_directory + 'model_init.hdf5')
         return
-
-    # TODO Shahar - I dont know what we did here, the two function is identical, keep for backup
-
-    # def build_NetFlowAndWafer_model(self, input_shape, nb_classes):
-    #     n_t = input_shape[0]
-    #     n_vars = input_shape[1]
-    #
-    #     padding = 'valid'
-    #     # for Italy Power On demand
-    #     if n_t < 60:
-    #         padding = 'same'
-    #
-    #     input_layers = []
-    #     conv2_layers = []
-    #
-    #     for n_var in range(n_vars):
-    #         input_layer = keras.layers.Input((n_t, 1))
-    #         input_layers.append(input_layer)
-    #
-    #         conv1_layer = keras.layers.Conv1D(filters=8, kernel_size=5, activation='relu', padding=padding)(input_layer)
-    #         conv1_layer = keras.layers.MaxPooling1D(pool_size=2)(conv1_layer)
-    #
-    #         conv2_layer = keras.layers.Conv1D(filters=8, kernel_size=5, activation='relu', padding=padding)(conv1_layer)
-    #         conv2_layer = keras.layers.MaxPooling1D(pool_size=2)(conv2_layer)
-    #         conv2_layer = keras.layers.Flatten()(conv2_layer)
-    #
-    #         conv2_layers.append(conv2_layer)
-    #
-    #     if n_vars == 1:
-    #         # to work with univariate time series
-    #         concat_layer = conv2_layers[0]
-    #     else:
-    #         concat_layer = keras.layers.Concatenate(axis=-1)(conv2_layers)
-    #
-    #     # init = tf.keras.initializers.GlorotNormal(seed=123)
-    #     # kernel_initializer = init
-    #     fully_connected = keras.layers.Dense(units=732, activation='tanh')(concat_layer)
-    #
-    #     output_layer = keras.layers.Dense(nb_classes, activation='softmax')(fully_connected)
-    #
-    #     model = keras.models.Model(inputs=input_layers, outputs=output_layer)
-    #
-    #     model.compile(loss='categorical_crossentropy', metrics=['accuracy'],
-    #                   optimizer=keras.optimizers.SGD(lr=0.01, momentum=0.9, decay=0.0005))
-    #
-    #     file_path = self.output_directory + 'best_model.hdf5'
-    #
-    #     es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=30, min_delta=0)
-    #     model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='val_loss',
-    #                                                        save_best_only=True)
-    #
-    #     self.callbacks = [es, model_checkpoint]
-    #
-    #     return model
 
     def build_model(self, input_shape, nb_classes):
         n_t = input_shape[0]
@@ -178,9 +124,8 @@ class Classifier_MCDCNN:
         y_pred_prob = y_pred
 
         # convert the predicted from binary to integer
-        #y_pred_new = np.argmax(y_true, axis=1)
         y_pred = np.argmax(y_pred, axis=1)
 
-        save_logs(self.output_directory, hist, y_pred, y_true, learning_time, predicting_time,y_pred_prob, lr=False)
+        save_logs(self.output_directory, hist, y_pred, y_true, learning_time, predicting_time, y_pred_prob, lr=False)
 
         keras.backend.clear_session()
