@@ -95,7 +95,7 @@ def run_all(config, params):
 
     datasets_dict = read_all_datasets(config)
 
-    print(config.classifier)
+    print("Classifier: " + config.classifier)
 
     for iter in range(config.ITERATIONS):
         print('\titer', iter)

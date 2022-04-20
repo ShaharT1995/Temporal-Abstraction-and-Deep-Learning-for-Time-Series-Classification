@@ -20,8 +20,8 @@ def run():
 def execute_running(config, running_dict, max_gap, method, nb_bin, paa, std, gradient_window=None):
     print("-----------------------------------------------------------------------------------------------------")
     print("Classifier: " + config.classifier + ", Method: " + method + ", Bins: " + str(nb_bin) + " Combination: " +
-          str(config.combination) + ", Transformation Number: " + str(config.transformation_number) + ", PerEntity: "
-          + str(config.perEntity))
+          str(config.combination) + ", PerEntity: " + str(config.perEntity) +
+          ", Transformation Number: " + str(config.transformation_number))
     print("----------------------------------------------------------------------------------------------------- \n")
 
     key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window,

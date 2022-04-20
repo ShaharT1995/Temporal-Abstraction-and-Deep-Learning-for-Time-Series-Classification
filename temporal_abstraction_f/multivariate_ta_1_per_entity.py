@@ -74,4 +74,4 @@ class MultivariateTA1:
             print("\t\t\tTest")
             self.attributes_dict[dataset_name] = self.input_to_csv(root_dir_dataset, dataset_name, "test", output_path)
 
-        write_pickle("attributes_dict_mts", self.attributes_dict)
+        write_pickle("attributes_dict_mts_per_entity", self.attributes_dict)

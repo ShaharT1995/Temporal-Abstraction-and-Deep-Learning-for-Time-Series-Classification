@@ -14,11 +14,16 @@ def create_three_files(config, path, method, nb_bins, paa_window_size, std_coeff
     :param gradient_window_size: the window size of the gradient method
     :return:
     """
+
+    attributes_dict_addition = ""
+    if config.perEntity:
+        attributes_dict_addition = "_per_entity"
+
     if config.archive == "UCR":
-        attribute_dict = open_pickle("attributes_dict_ucr")
+        attribute_dict = open_pickle("attributes_dict_ucr" + attributes_dict_addition)
         dataset_list = config.UNIVARIATE_DATASET_NAMES_2018
     else:
-        attribute_dict = open_pickle("attributes_dict_mts")
+        attribute_dict = open_pickle("attributes_dict_mts" + attributes_dict_addition)
         dataset_list = config.MTS_DATASET_NAMES
 
     for ds in dataset_list:

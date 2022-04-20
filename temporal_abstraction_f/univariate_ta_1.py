@@ -74,12 +74,10 @@ class UnivariateTA1:
                 root_dir_dataset = self.cur_root_dir + dataset_name + '/' + dataset_name
 
                 self.input_to_csv(root_dir_dataset, file_type, dataset_name, output_path)
-                print("\t\t\t" + file_type)
+                print("\t\t\t" + file_type.lower())
 
             attributes_dict[dataset_name] = [self.next_attribute]
             self.next_attribute += 1
-
-            print("")
 
         write_pickle("univariate_dict", self.univariate_dict)
         write_pickle("attributes_dict_ucr", attributes_dict)
