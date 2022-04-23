@@ -168,7 +168,7 @@ class RocketClassifier:
         y_pred = np.argmax(y_pred, axis=1)
 
         # Save Metrics
-        df_metrics = calculate_metrics(y_true, y_pred, learning_time, predicting_time,y_pred_prob)
+        df_metrics = calculate_metrics(y_true, y_pred, learning_time, predicting_time, y_pred_prob=y_pred_prob)
         df_metrics.to_csv(self.output_folder + 'df_metrics.csv', index=False)
 
     def predict(self, x_test: np.array):
@@ -191,7 +191,7 @@ class RocketClassifier:
 
         y_pred = []
         for v in y_pred_des_func:
-            y_pred.append(np.exp(v) / (1 + np.exp(v)))
+            y_pred.append(np.exp(v) / np.sum(np.exp(v)))
 
         test_duration = time.perf_counter() - start_time
 

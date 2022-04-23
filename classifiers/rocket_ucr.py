@@ -177,22 +177,22 @@ class Base_Classifier_ROCKET(BaseEstimator, ClassifierMixin):
 
         if self.verbose:
             print('predict')
-        time_a = time.perf_counter()
 
+        time_a = time.perf_counter()
         y_pred = self.ridge_cv_.predict(self.x_test_)
+        time_b = time.perf_counter()
 
         # Get the probability to be in a class
-        # y_pred_des_func = self.ridge_cv_.decision_function(self.x_test_)
-        # y_pred = []
-        # for v in y_pred_des_func:
-        #     y_pred.append(np.exp(v) / (1 + np.exp(v)))
-        #
-        # y_pred = np.array(y_pred)
+        y_pred_des_func = self.ridge_cv_.decision_function(self.x_test_)
+        y_pred_lst = []
+        for v in y_pred_des_func:
+            y_pred_lst.append(np.exp(v) / np.sum(np.exp(v)))
 
-        time_b = time.perf_counter()
+        y_pred_prob = np.array(y_pred_lst)
+
         self.test_timings_.append(time_b - time_a)
 
-        return y_pred
+        return y_pred, y_pred_prob
 
     def score(self, x, y):
         check_is_fitted(self)
@@ -259,10 +259,12 @@ class Classifier_Rocket:
         test_timings = rocket.test_timings_
 
         # Predict ROCKET Classifier
-        y_pred = rocket.predict(x_test)
+        start_time = time.time()
+        y_pred, y_pred_prob = rocket.predict(x_test)
+        duration_predict = time.time() - start_time
 
         # Save Metrics
-        df_metrics = calculate_metrics(y_true, y_pred, duration, 0)
+        df_metrics = calculate_metrics(y_true, y_pred, duration, duration_predict, y_pred_prob=y_pred_prob)
         df_metrics.to_csv(self.output_dir + 'df_metrics.csv', index=False)
 
         # Save train and test timings

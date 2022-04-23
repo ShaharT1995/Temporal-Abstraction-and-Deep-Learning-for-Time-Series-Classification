@@ -149,11 +149,11 @@ class Classifier_TWIESN:
             self.x_val.shape[0] * self.T, self.num_dim + self.N_x)
         # get the prediction on the train set
         start_time = time.time()
-        y_pred_val = ridge_classifier.predict(new_x_val)
+        y_pred_val_prob = ridge_classifier.predict(new_x_val)
         predicting_time = time.time() - start_time
 
         # reconstruct the training prediction
-        y_pred_val = self.reshape_prediction(y_pred_val, self.x_val.shape[0], self.T)
+        y_pred_val = self.reshape_prediction(y_pred_val_prob, self.x_val.shape[0], self.T)
         # get the metrics for the train
         df_val_metrics = calculate_metrics(np.argmax(self.y_val, axis=1), y_pred_val, learning_time, predicting_time)
         # get the train accuracy

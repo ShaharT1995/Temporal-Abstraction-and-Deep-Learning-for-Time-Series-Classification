@@ -3,7 +3,7 @@ import os
 
 def create_files():
     # Make the first temporal abstraction -> original data sets to hugobot format
-    print("Archive: " + config.archive + ", Per Entity: " + config.perEntity)
+    print("Archive: " + config.archive + ", Per Entity: " + str(config.perEntity))
     print("Step 1: transformation 1")
 
     if config.archive == "UCR":
@@ -47,11 +47,11 @@ def run_cpu():
 
 
 def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, gradient_window=None):
-    print("-----------------------------------------------------------------------------------------------------")
+    print("--------------------------------------------------------------------------------------------------------")
     print("Classifier: " + config.classifier + ", Method: " + method + ", Bins: " + str(nb_bin) + " Combination: " +
           str(config.combination) + ", PerEntity: " + str(config.perEntity) +
           ", Transformation Number: " + str(config.transformation_number))
-    print("----------------------------------------------------------------------------------------------------- \n")
+    print("-------------------------------------------------------------------------------------------------------- \n")
 
     key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window, config.combination,
            config.perEntity)

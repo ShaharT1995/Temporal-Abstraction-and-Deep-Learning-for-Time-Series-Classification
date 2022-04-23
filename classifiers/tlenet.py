@@ -33,7 +33,7 @@ class Classifier_TLENET:
         increase_num = length - length_sliced + 1  # if increase_num =5, it means one ori becomes 5 new instances.
         n_sliced = n * increase_num
 
-        print((n_sliced, length_sliced, n_dim))
+        # print((n_sliced, length_sliced, n_dim))
 
         new_x = np.zeros((n_sliced, length_sliced, n_dim))
         new_y = np.zeros((n_sliced, nb_classes))
@@ -181,7 +181,7 @@ class Classifier_TLENET:
 
         x_train, y_train, x_test, y_test, tot_increase_num = self.pre_processing(x_train, y_train, x_test, y_test)
 
-        print('Total increased number for each MTS: ', tot_increase_num)
+        # print('Total increased number for each MTS: ', tot_increase_num)
 
         #########################
         ## done pre-processing ##
@@ -190,8 +190,8 @@ class Classifier_TLENET:
         input_shape = x_train.shape[1:]
         model = self.build_model(input_shape, nb_classes)
 
-        if self.verbose:
-            model.summary()
+        # if self.verbose:
+        #     model.summary()
 
         start_time = time.time()
         hist = model.fit(x_train, y_train, batch_size=mini_batch_size, epochs=nb_epochs,
@@ -202,9 +202,10 @@ class Classifier_TLENET:
 
         model = keras.models.load_model(self.output_directory + 'best_model.hdf5')
 
-        y_pred = model.predict(x_test, batch_size=batch_size)
+        y_pred_prob = model.predict(x_test, batch_size=batch_size)
+
         # convert the predicted from binary to integer 
-        y_pred = np.argmax(y_pred, axis=1)
+        y_pred = np.argmax(y_pred_prob, axis=1)
 
         # get the true predictions of the test set
         start_time = time.time()
@@ -222,7 +223,7 @@ class Classifier_TLENET:
         y_pred = np.array(y_predicted)
         predicting_time = time.time() - start_time
 
-        save_logs(self.output_directory, hist, y_pred, y_true, learning_time, predicting_time)
+        save_logs(self.output_directory, hist, y_pred, y_true, learning_time, predicting_time, y_pred_prob)
 
         keras.backend.clear_session()
 

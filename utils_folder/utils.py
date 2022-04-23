@@ -334,11 +334,11 @@ def plot_epochs_metric(hist, file_name, metric='loss'):
     plt.close()
 
 
-def save_logs_t_leNet(output_directory, hist, y_pred, y_true, learning_time, predicting_time):
+def save_logs_t_leNet(output_directory, hist, y_pred, y_true, learning_time, predicting_time, y_pred_prob=None):
     hist_df = pd.DataFrame(hist.history)
     hist_df.to_csv(output_directory + 'history.csv', index=False)
 
-    df_metrics = calculate_metrics(y_true, y_pred, learning_time, predicting_time)
+    df_metrics = calculate_metrics(y_true, y_pred, learning_time, predicting_time, y_pred_prob=y_pred_prob)
 
     index_best_model = hist_df['val_loss'].idxmin()
     row_best_model = hist_df.loc[index_best_model]
@@ -362,12 +362,12 @@ def save_logs_t_leNet(output_directory, hist, y_pred, y_true, learning_time, pre
     plot_epochs_metric(hist, output_directory + 'epochs_loss.png')
 
 
-def save_logs(output_directory, hist, y_pred, y_true, learning_time, predicting_time,y_pred_new=None,lr=True, y_true_val=None,
-              y_pred_val=None):
+def save_logs(output_directory, hist, y_pred, y_true, learning_time, predicting_time, y_pred_prob=None, lr=True,
+              y_true_val=None, y_pred_val=None):
     hist_df = pd.DataFrame(hist.history)
     hist_df.to_csv(output_directory + 'history.csv', index=False)
 
-    df_metrics = calculate_metrics(y_true, y_pred, learning_time, predicting_time, y_true_val, y_pred_val,y_pred_new)
+    df_metrics = calculate_metrics(y_true, y_pred, learning_time, predicting_time, y_true_val, y_pred_val, y_pred_prob)
 
     index_best_model = hist_df['val_loss'].idxmin()
     row_best_model = hist_df.loc[index_best_model]
