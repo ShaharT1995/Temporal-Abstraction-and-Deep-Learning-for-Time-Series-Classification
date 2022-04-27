@@ -117,7 +117,6 @@ class Classifier_TWIESN:
 
         # Average the predictions of instances
         new_y_pred = np.average(new_y_pred, axis=1)
-        # TODO - Check if new_y_pred is the same struct like rocket-ucr
 
         y_pred_lst = []
         for v in new_y_pred:
@@ -125,11 +124,9 @@ class Classifier_TWIESN:
 
         y_pred_prob = np.array(y_pred_lst)
 
-        # TODO
-
         # get the label with maximum prediction over the last label axis
         new_y_pred = np.argmax(new_y_pred, axis=1)
-        return new_y_pred
+        return new_y_pred, y_pred_prob
 
     def train(self, iter):
         # Training
@@ -170,9 +167,10 @@ class Classifier_TWIESN:
         predicting_time = time.time() - start_time
 
         # reconstruct the training prediction
-        y_pred_val = self.reshape_prediction(y_pred_val_prob, self.x_val.shape[0], self.T)
+        y_pred_val, y_pred_val_prob_new = self.reshape_prediction(y_pred_val_prob, self.x_val.shape[0], self.T)
         # get the metrics for the train
-        df_val_metrics = calculate_metrics(np.argmax(self.y_val, axis=1), y_pred_val, learning_time, predicting_time)
+        df_val_metrics = calculate_metrics(np.argmax(self.y_val, axis=1), y_pred_val, learning_time, predicting_time,
+                                           y_pred_prob=y_pred_val_prob_new)
         # get the train accuracy
         train_acc = df_val_metrics['accuracy'][0]
 
@@ -195,10 +193,10 @@ class Classifier_TWIESN:
         predicting_time = time.time() - start_time
 
         # reconstruct the test predictions
-        y_pred = self.reshape_prediction(y_pred, self.x_test.shape[0], self.T)
+        y_pred, y_pred_prob = self.reshape_prediction(y_pred, self.x_test.shape[0], self.T)
 
         # get the metrics for the test predictions
-        df_metrics = calculate_metrics(self.y_true, y_pred, learning_time, predicting_time)
+        df_metrics = calculate_metrics(self.y_true, y_pred, learning_time, predicting_time, y_pred_prob=y_pred_prob)
 
         # get the output layer weights
         self.W_out = ridge_classifier.coef_

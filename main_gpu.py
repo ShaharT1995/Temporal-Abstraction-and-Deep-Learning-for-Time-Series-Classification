@@ -29,12 +29,10 @@ def execute_running(config, running_dict, max_gap, method, nb_bin, paa, std, gra
     # set number of bins in the path
     config.set_path_transformations_2(nb_bin)
 
-    # TODO
-    # if key in running_dict:
-    #     print("Already Done! \n")
-    #     return running_dict
-    if False:
-        print()
+    if key in running_dict:
+        print("Already Done! \n")
+        return running_dict
+
     else:
         print("Step 5: Run all:")
         params = "res_" + str(method) + "_" + str(nb_bin) + "_" + str(paa) + "_" + str(std) \

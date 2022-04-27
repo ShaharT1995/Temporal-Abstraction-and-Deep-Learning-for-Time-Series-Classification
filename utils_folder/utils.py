@@ -275,7 +275,7 @@ def calculate_metrics(y_true, y_pred, learning_time, predicting_time, y_true_val
 
     # AUC
     if y_pred_prob is None:
-        res['auc'] = roc_auc_score(y_true, y_pred, multi_class='ovr')
+        res['auc'] = 0
     else:
         res['auc'] = roc_auc_score(y_true, y_pred_prob, multi_class='ovr')  # todo - think if ovo / ovr/ raise
 

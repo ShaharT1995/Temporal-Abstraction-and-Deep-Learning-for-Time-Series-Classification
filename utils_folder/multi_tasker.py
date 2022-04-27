@@ -23,7 +23,7 @@ def run_job_using_sbatch(sbatch_path, arguments):
 # for step one running hugobot
 def create_combination_list():
     dict_name = {"archive": ['UCR', 'MTS'],
-                 "classifier": ['fcn', 'mlp', 'resnet', 'tlenet', 'twiesn', 'encoder', 'mcdcnn', 'cnn', 'inception',
+                 "classifier": ['fcn', 'mlp', 'resnet', 'twiesn', 'encoder', 'mcdcnn', 'cnn', 'inception',
                                 'lstm_fcn', 'mlstm_fcn', 'rocket'],
                  "afterTA": ['True'],
                  "method": ['sax', 'td4c-cosine', 'gradient'],
@@ -44,7 +44,7 @@ def create_combination_list():
 # We run this function one time. The function create all the possible combination
 def create_combination_gpu():
     dict_name = {"archive": ['UCR', 'MTS'],
-                 "classifier": ['fcn', 'mlp', 'resnet', 'tlenet', 'encoder', 'mcdcnn', 'cnn', 'inception', 'lstm_fcn',
+                 "classifier": ['fcn', 'mlp', 'resnet', 'encoder', 'mcdcnn', 'cnn', 'inception', 'lstm_fcn',
                                 'mlstm_fcn'],
                  "afterTA": ['False', 'True'],
                  "method": ['sax', 'td4c-cosine', 'gradient', 'RawData'],
@@ -105,7 +105,6 @@ def create_combination_cpu():
                         # Raw data can be only with transformation 1 (without gradient combination, per entity, and TA)
                         if not (combination[3] == "RawData" and combination[2] == "False" and combination[6] == "False"
                                 and combination[4] == "False" and (combination[5] == "2" or combination[5] == "3")):
-                            print(combination)
                             combination_lst.append(list(combination))
 
     # Save the pickle file

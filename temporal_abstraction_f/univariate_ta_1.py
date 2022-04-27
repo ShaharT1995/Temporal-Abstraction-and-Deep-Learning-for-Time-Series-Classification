@@ -43,7 +43,7 @@ class UnivariateTA1:
 
         self.univariate_dict[(dataset_name, file_type.lower())] = {"classes": np.unique(classifier_data),
                                                                    "rows": tsv_data.shape[0],
-                                                                   "columns": tsv_data.shape[1]}
+                                                                   "columns": tsv_data.shape[1] - 1}
 
         df_classifier = pd.DataFrame(classifier_data).reset_index().melt('index')
         df_classifier.columns = ["EntityID", "TimeStamp", "TemporalPropertyValue"]

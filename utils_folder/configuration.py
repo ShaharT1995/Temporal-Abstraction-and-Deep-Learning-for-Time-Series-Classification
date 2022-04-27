@@ -31,23 +31,16 @@ class ConfigClass:
         self.paa_window_size = 1
         self.gradient_window_size = [10]
 
-        # self.UNIVARIATE_DATASET_NAMES_2018 = ['Beef', 'ACSF1', 'Adiac', 'Coffee', 'Computers', 'CricketX', 'CricketY', 'CricketZ',
-        #                                       'Crop', 'Earthquakes', 'ECG200', 'ElectricDevices', 'EthanolLevel',
-        #                                       'FordA', 'FordB', 'HandOutlines', 'Herring', 'LargeKitchenAppliances',
-        #                                       'MiddlePhalanxOutlineCorrect', 'MiddlePhalanxTW',
-        #                                       'PhalangesOutlinesCorrect', 'PLAID', 'PowerCons', 'SemgHandMovementCh2',
-        #                                       'SemgHandSubjectCh2', 'ShapesAll', 'SmoothSubspace', 'Strawberry',
-        #                                       'SyntheticControl', 'Worms', 'WormsTwoClass']
+        self.UNIVARIATE_DATASET_NAMES_2018 = ['Beef', 'ACSF1', 'Adiac', 'Coffee', 'Computers', 'CricketX', 'CricketY', 'CricketZ',
+                                              'Crop', 'Earthquakes', 'ECG200', 'ElectricDevices', 'EthanolLevel',
+                                              'FordA', 'FordB', 'HandOutlines', 'Herring', 'LargeKitchenAppliances',
+                                              'MiddlePhalanxOutlineCorrect', 'MiddlePhalanxTW',
+                                              'PhalangesOutlinesCorrect', 'PLAID', 'PowerCons', 'SemgHandMovementCh2',
+                                              'SemgHandSubjectCh2', 'ShapesAll', 'SmoothSubspace', 'Strawberry',
+                                              'SyntheticControl', 'Worms', 'WormsTwoClass']
 
-        self.UNIVARIATE_DATASET_NAMES_2018 = ['SmoothSubspace']
-
-        # self.MTS_DATASET_NAMES = ['Libras', 'ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
-        #                           'JapaneseVowels', 'KickvsPunch', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
-
-        # self.MTS_DATASET_NAMES = ['Libras', 'ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
-        #                           'JapaneseVowels', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
-
-        self.MTS_DATASET_NAMES = ['Libras']
+        self.MTS_DATASET_NAMES = ['Libras', 'ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
+                                  'JapaneseVowels', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
 
     def set_path_transformations(self):
         if self.perEntity:

@@ -56,12 +56,9 @@ def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, g
     key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window, config.combination,
            config.perEntity)
 
-    # TODO
-    # if key in running_dict:
-    #     print("Already Done! \n")
-    #     return running_dict
-    if False:
-        print()
+    if key in running_dict:
+        print("Already Done! \n")
+        return running_dict
 
     else:
         prop_path = path + "number_bin_" + str(nb_bin) + "//"
@@ -86,8 +83,8 @@ def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, g
             gradient_prop_path = config.path_files_for_TA
             if config.perEntity:
                 gradient_prop_path += "PerEntity//"
-            gradient_prop_path += config.archive + "//" + config.classifier + "//gradient//number_bin_" + str(nb_bin) \
-                                  + "//"
+            gradient_prop_path += config.archive + "//" + config.classifier + "//gradient//number_bin_"\
+                                  + str(nb_bin) + "//"
 
             create_directory(gradient_prop_path)
 
@@ -106,7 +103,7 @@ def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, g
 
             # print("Hugobot is OFF")
             print("Step 3.2: run hugobot for Gradient method")
-            run_cli(config, gradient_prop_path, max_gap)
+            # run_cli(config, gradient_prop_path, max_gap)
 
             config.set_method(method)
 

@@ -35,10 +35,24 @@ def combining_two_methods_ucr(config, prop_path, gradient_path):
             number_of_entities = univariate_dict[(dataset_name, file_type.lower())]["rows"]
             time_serious_length = univariate_dict[(dataset_name, file_type.lower())]["columns"] - 1
 
+            number_of_states = states_df.shape[0]
+
+            if config.perEntity:
+                number_of_states = int(number_of_states / number_of_entities)
+                states_df, states_df_gradient = organize_df_per_entity(config, states_df, states_df_gradient,
+                                                                       1, number_of_states)
+
+            max_state = int(max(states_df["StateID"]))
+
+            # Get the number of state from state.csv file- for gradient
+            number_of_states = number_of_states * 2
+
+            # For transformation 1
+            min_property = int(min(states_df["TemporalPropertyID"]))
+
             # Run the three transformation on the Train and Test files
             create_transformations(config, path, gradient_dataset_path, output_path, file_type, number_of_entities,
-                                   time_serious_length, 1, classes, states_df,
-                                   states_df_gradient)
+                                   time_serious_length, 1, classes, max_state, number_of_states, min_property)
 
         print("")
 
@@ -64,6 +78,8 @@ def combining_two_methods_mts(config, prop_path, gradient_path):
         states_path = path + "train//states.csv"
         states_df = pd.read_csv(states_path, header=0)
 
+        number_of_states = states_df.shape[0]
+
         states_path_gradient = gradient_dataset_path + "train//states.csv"
         states_df_gradient = pd.read_csv(states_path_gradient, header=0)
 
@@ -71,6 +87,19 @@ def combining_two_methods_mts(config, prop_path, gradient_path):
         number_of_entities_test = mts_dict[dataset_name]["number_of_entities_test"]
         time_serious_length = mts_dict[dataset_name]["time_serious_length"]
         number_of_attributes = mts_dict[dataset_name]["number_of_attributes"]
+
+        if config.perEntity:
+            number_of_states = int(number_of_states / number_of_entities_train)
+            states_df, states_df_gradient = organize_df_per_entity(config, states_df, states_df_gradient,
+                                                                   number_of_attributes, number_of_states)
+
+        max_state = int(max(states_df["StateID"]))
+
+        # Get the number of state from state.csv file- for gradient
+        number_of_states = number_of_states * 2
+
+        # For transformation 1
+        min_property = int(min(states_df["TemporalPropertyID"]))
 
         y = np.load(config.mts_path + dataset_name + '//y_train.npy')
         classes = np.unique(y)
@@ -81,11 +110,11 @@ def combining_two_methods_mts(config, prop_path, gradient_path):
             if file_type == "train":
                 create_transformations(config, path, gradient_dataset_path, output_path, file_type,
                                        number_of_entities_train, time_serious_length, number_of_attributes, classes,
-                                       states_df, states_df_gradient)
+                                       max_state, number_of_states, min_property)
             else:
                 create_transformations(config, path, gradient_dataset_path, output_path, file_type,
                                        number_of_entities_test, time_serious_length, number_of_attributes, classes,
-                                       states_df, states_df_gradient)
+                                       max_state, number_of_states, min_property)
 
         print("")
 
@@ -95,8 +124,8 @@ def organize_df_per_entity(config, states_df, states_df_gradient, number_of_attr
         states_df["TemporalPropertyID"] = 0
         states_df_gradient["TemporalPropertyID"] = 0
     else:
-        states_df["TemporalPropertyID"].apply(lambda x: int(x[-1]) - 1 if x[-2] == "0" else int(x[-2:]) - 1)
-        states_df_gradient["TemporalPropertyID"].apply(lambda x: int(x[-1]) - 1 if x[-2] == "0" else int(x[-2:]) - 1)
+        states_df["TemporalPropertyID"] = states_df["TemporalPropertyID"].apply(lambda x: int(str(x)[-1]) - 1 if str(x)[-2] == "0" else int(str(x)[-2:]) - 1)
+        states_df_gradient["TemporalPropertyID"] = states_df_gradient["TemporalPropertyID"].apply(lambda x: int(str(x)[-1]) - 1 if str(x)[-2] == "0" else int(str(x)[-2:]) - 1)
 
     states_df["StateID"] = states_df["StateID"] % int(number_of_states / number_of_attributes)
     states_df.loc[states_df["StateID"] == 0, "StateID"] = int(number_of_states / number_of_attributes)
@@ -113,22 +142,7 @@ def organize_df_per_entity(config, states_df, states_df_gradient, number_of_attr
 
 
 def create_transformations(config, path, gradient_path, output_path, file_type, number_of_entities, time_serious_length,
-                           number_of_attributes, classes, states_df, states_df_gradient):
-    number_of_states = states_df.shape[0]
-
-    if config.perEntity:
-        number_of_states = int(number_of_states / number_of_entities)
-        states_df, states_df_gradient = organize_df_per_entity(config, states_df, states_df_gradient,
-                                                               number_of_attributes, number_of_states)
-
-    max_state = int(max(states_df["StateID"]))
-
-    # Get the number of state from state.csv file- for gradient
-    number_of_states = number_of_states * 2
-
-    # For transformation 1
-    min_property = int(min(states_df["TemporalPropertyID"]))
-
+                           number_of_attributes, classes, max_state, number_of_states, min_property):
     # For transformation 3
     rows_dict = {}
     index = 0
