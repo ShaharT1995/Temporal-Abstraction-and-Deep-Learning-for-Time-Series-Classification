@@ -78,7 +78,7 @@ def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, g
 
         # print("Hugobot is OFF")
         print("Step 3: run hugobot")
-        # run_cli(config, prop_path, max_gap)
+        run_cli(config, prop_path, max_gap)
 
         if config.combination and config.method != "gradient":
             print("Step 3.1: make the gkb.csv, ta.csv and ppa.csv for " + method + " method\n")

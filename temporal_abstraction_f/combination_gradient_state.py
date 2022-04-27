@@ -95,9 +95,8 @@ def organize_df_per_entity(config, states_df, states_df_gradient, number_of_attr
         states_df["TemporalPropertyID"] = 0
         states_df_gradient["TemporalPropertyID"] = 0
     else:
-        states_df["TemporalPropertyID"] = states_df["TemporalPropertyID"] - (states_df["TemporalPropertyID"] // 10) * 10
-        states_df_gradient["TemporalPropertyID"] = states_df_gradient["TemporalPropertyID"] - \
-                                                   (states_df_gradient["TemporalPropertyID"] // 10) * 10
+        states_df["TemporalPropertyID"].apply(lambda x: int(x[-1]) - 1 if x[-2] == "0" else int(x[-2:]) - 1)
+        states_df_gradient["TemporalPropertyID"].apply(lambda x: int(x[-1]) - 1 if x[-2] == "0" else int(x[-2:]) - 1)
 
     states_df["StateID"] = states_df["StateID"] % int(number_of_states / number_of_attributes)
     states_df.loc[states_df["StateID"] == 0, "StateID"] = int(number_of_states / number_of_attributes)
@@ -182,8 +181,11 @@ def fill_transformations(config, arr_1, arr_2, arr_3, path, file_type, classes, 
                     parse_data = data[info].split(',')
 
                     if config.perEntity:
-                        temporal_property_ID = 0 if config.archive == "UCR" else int(parse_data[3]) - \
-                                                                                 (int(parse_data[3]) // 10) * 10
+                        if config.archive == "UCR":
+                            temporal_property_ID = 0
+                        else:
+                            temporal_property_ID = int(parse_data[3][-1]) - 1 if parse_data[3][-2] == "0" else \
+                                int(parse_data[3][-2:]) - 1
 
                         modulo = int(parse_data[2]) % int(number_of_states / (number_of_attributes * 2))
                         if modulo == 0:
