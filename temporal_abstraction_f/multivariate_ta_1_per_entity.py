@@ -42,7 +42,8 @@ class MultivariateTA1:
         # Change the column order
         df = df.reindex(columns=["EntityID", "TemporalPropertyID", "TimeStamp", "TemporalPropertyValue"])
 
-        df["TemporalPropertyID"] = (df["EntityID"] + 1) * 10 + df["TemporalPropertyID"]
+        df["TemporalPropertyID"] = (((df["EntityID"] + 1).astype(int)).astype(str) + "00" +
+                                    (df["TemporalPropertyID"] + 1).astype(str)).astype(int)
 
         # Create classifier DF with numpy
         df_classifier = pd.DataFrame(y).reset_index().melt('index')

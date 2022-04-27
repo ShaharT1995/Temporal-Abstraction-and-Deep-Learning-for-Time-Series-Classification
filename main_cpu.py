@@ -18,7 +18,7 @@ def create_files():
 def run_cpu():
     prop_path = config.path_files_for_TA
     if config.perEntity:
-        prop_path += "PerProperty//"
+        prop_path += "PerEntity//"
     prop_path += config.archive + "//" + config.classifier + "//" + config.method + "//"
 
     create_directory(prop_path)
@@ -78,14 +78,14 @@ def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, g
 
         # print("Hugobot is OFF")
         print("Step 3: run hugobot")
-        run_cli(config, prop_path, max_gap)
+        # run_cli(config, prop_path, max_gap)
 
         if config.combination and config.method != "gradient":
             print("Step 3.1: make the gkb.csv, ta.csv and ppa.csv for " + method + " method\n")
 
             gradient_prop_path = config.path_files_for_TA
             if config.perEntity:
-                gradient_prop_path += "PerProperty//"
+                gradient_prop_path += "PerEntity//"
             gradient_prop_path += config.archive + "//" + config.classifier + "//gradient//number_bin_" + str(nb_bin) \
                                   + "//"
 

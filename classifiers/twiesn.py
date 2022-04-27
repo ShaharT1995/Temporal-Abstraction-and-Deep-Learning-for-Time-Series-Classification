@@ -28,10 +28,15 @@ class Classifier_TWIESN:
         # hypermarkets
         first_config = {'N_x': 250, 'connect': 0.5, 'scaleW_in': 1.0, 'lamda': 0.0}
         second_config = {'N_x': 250, 'connect': 0.5, 'scaleW_in': 2.0, 'lamda': 0.05}
-        third_config = {'N_x': 500, 'connect': 0.1, 'scaleW_in': 2.0, 'lamda': 0.05}
-        fourth_config = {'N_x': 800, 'connect': 0.1, 'scaleW_in': 2.0, 'lamda': 0.05}
-        self.configs = [first_config, second_config, third_config, fourth_config]
-        self.rho_s = [0.55, 0.9, 2.0, 5.0]
+
+        # We will try without this, because of memory problems
+        # third_config = {'N_x': 500, 'connect': 0.1, 'scaleW_in': 2.0, 'lamda': 0.05}
+        # fourth_config = {'N_x': 800, 'connect': 0.1, 'scaleW_in': 2.0, 'lamda': 0.05}
+        # self.configs = [first_config, second_config, third_config, fourth_config]
+        # self.rho_s = [0.55, 0.9, 2.0, 5.0]
+
+        self.configs = [first_config, second_config]
+        self.rho_s = [0.55, 0.9, 2.0]
         self.alpha = 0.1  # leaky rate
 
         self.W_in = None
@@ -107,10 +112,21 @@ class Classifier_TWIESN:
         return x_t
 
     def reshape_prediction(self, y_pred, num_instances, length_series):
-        # reshape so the first axis has the number of instances
+        # Reshape so the first axis has the number of instances
         new_y_pred = y_pred.reshape(num_instances, length_series, y_pred.shape[-1])
-        # average the predictions of instances
+
+        # Average the predictions of instances
         new_y_pred = np.average(new_y_pred, axis=1)
+        # TODO - Check if new_y_pred is the same struct like rocket-ucr
+
+        y_pred_lst = []
+        for v in new_y_pred:
+            y_pred_lst.append(np.exp(v) / np.sum(np.exp(v)))
+
+        y_pred_prob = np.array(y_pred_lst)
+
+        # TODO
+
         # get the label with maximum prediction over the last label axis
         new_y_pred = np.argmax(new_y_pred, axis=1)
         return new_y_pred
@@ -122,10 +138,11 @@ class Classifier_TWIESN:
         self.init_matrices(iter)
         # compute the state matrices which is the new feature space
         state_matrix = self.compute_state_matrix(self.x_train)
+
         # add the input to form the new feature space and transform to
         # the new feature space to be fed to the classifier
-        new_x_train = np.concatenate((self.x_train, state_matrix), axis=2).reshape(
-            self.N * self.T, self.num_dim + self.N_x)
+        new_x_train = np.concatenate((self.x_train, state_matrix), axis=2).reshape(self.N * self.T,
+                                                                                   self.num_dim + self.N_x)
         # memory free
         state_matrix = None
         gc.collect()

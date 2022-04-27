@@ -145,13 +145,17 @@ def create_transformations(config, path, output_path, file_type, number_of_entit
                     parse_data = data[info].split(',')
 
                     if config.perEntity:
-                        temporal_property_ID = 0 if univariate else int(parse_data[3]) - (int(parse_data[3]) // 10) * 10
+                        if univariate:
+                            temporal_property_ID = 0
+                        else:
+                            temporal_property_ID = int(parse_data[3][-1]) if parse_data[3][-2] == "0" else \
+                                int(parse_data[3][-2:])
 
                         modulo = int(parse_data[2]) % int(number_of_states / number_of_attributes)
                         if modulo == 0:
                             modulo = int(number_of_states / number_of_attributes)
 
-                        symbol = int(modulo + temporal_property_ID * (number_of_states / number_of_attributes))
+                        symbol = int(modulo + (temporal_property_ID - 1) * (number_of_states / number_of_attributes))
 
                     else:
                         temporal_property_ID = int(parse_data[3]) - min_property
