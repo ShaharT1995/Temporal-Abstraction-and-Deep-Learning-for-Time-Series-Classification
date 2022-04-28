@@ -45,6 +45,7 @@ def execute_running(config, running_dict, max_gap, method, nb_bin, paa, std, gra
         print("Step 6: Generate Results to CSV")
         generate_results_csv(config, params)
 
+        running_dict = open_pickle("running_dict" + config.archive)
         running_dict[key] = True
         write_pickle("running_dict" + config.archive, running_dict)
         return running_dict

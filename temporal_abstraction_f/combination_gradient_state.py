@@ -33,7 +33,7 @@ def combining_two_methods_ucr(config, prop_path, gradient_path):
             # Get from the read me file the number of rows, number of columns and number of
             classes = univariate_dict[(dataset_name, file_type.lower())]["classes"]
             number_of_entities = univariate_dict[(dataset_name, file_type.lower())]["rows"]
-            time_serious_length = univariate_dict[(dataset_name, file_type.lower())]["columns"] - 1
+            time_serious_length = univariate_dict[(dataset_name, file_type.lower())]["columns"]
 
             number_of_states = states_df.shape[0]
 
@@ -124,8 +124,10 @@ def organize_df_per_entity(config, states_df, states_df_gradient, number_of_attr
         states_df["TemporalPropertyID"] = 0
         states_df_gradient["TemporalPropertyID"] = 0
     else:
-        states_df["TemporalPropertyID"] = states_df["TemporalPropertyID"].apply(lambda x: int(str(x)[-1]) - 1 if str(x)[-2] == "0" else int(str(x)[-2:]) - 1)
-        states_df_gradient["TemporalPropertyID"] = states_df_gradient["TemporalPropertyID"].apply(lambda x: int(str(x)[-1]) - 1 if str(x)[-2] == "0" else int(str(x)[-2:]) - 1)
+        states_df["TemporalPropertyID"] = states_df["TemporalPropertyID"].apply(
+            lambda x: int(str(x)[-1]) - 1 if str(x)[-2] == "0" else int(str(x)[-2:]) - 1)
+        states_df_gradient["TemporalPropertyID"] = states_df_gradient["TemporalPropertyID"].apply(
+            lambda x: int(str(x)[-1]) - 1 if str(x)[-2] == "0" else int(str(x)[-2:]) - 1)
 
     states_df["StateID"] = states_df["StateID"] % int(number_of_states / number_of_attributes)
     states_df.loc[states_df["StateID"] == 0, "StateID"] = int(number_of_states / number_of_attributes)
@@ -134,7 +136,7 @@ def organize_df_per_entity(config, states_df, states_df_gradient, number_of_attr
     states_df_gradient.loc[states_df_gradient["StateID"] == 0, "StateID"] = int(number_of_states / number_of_attributes)
 
     states_df["StateID"] = states_df["StateID"] + states_df["TemporalPropertyID"] * (number_of_states /
-                                                                                         number_of_attributes)
+                                                                                     number_of_attributes)
     states_df_gradient["StateID"] = states_df_gradient["StateID"] + states_df_gradient["TemporalPropertyID"] * \
                                     (number_of_states / number_of_attributes)
 
@@ -224,7 +226,9 @@ def fill_transformations(config, arr_1, arr_2, arr_3, path, file_type, classes, 
                     dict_value_2 = rows_dict[(symbol + max_state, '-')]
 
                     arr_3[int(entity_id)][int(parse_data[0]) - 1][dict_value_1] = True
-                    arr_3[int(entity_id)][int(parse_data[1]) - 2][dict_value_2] = True
+                    try:
+                        arr_3[int(entity_id)][int(parse_data[1]) - 2][dict_value_2] = True
+                    except:
+                        print()
 
     return arr_1, arr_2, arr_3
-

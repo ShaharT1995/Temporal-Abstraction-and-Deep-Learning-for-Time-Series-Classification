@@ -1,11 +1,10 @@
 import itertools
+import json
 import os
 import pickle
 import random
 import subprocess
 import time
-
-from utils_folder.utils import write_pickle, open_pickle
 
 
 def get_number_of_jobs(user_name):
@@ -25,8 +24,8 @@ def create_combination_list():
     dict_name = {"archive": ['UCR', 'MTS'],
                  "classifier": ['fcn', 'mlp', 'resnet', 'twiesn', 'encoder', 'mcdcnn', 'cnn', 'inception',
                                 'lstm_fcn', 'mlstm_fcn', 'rocket'],
-                 "afterTA": ['True'],
-                 "method": ['sax', 'td4c-cosine', 'gradient'],
+                 "afterTA": ['True', 'False'],
+                 "method": ['RawData', 'sax', 'td4c-cosine', 'gradient'],
                  "combination": ['False', 'True'],
                  "transformation": ['1'],
                  "perEntity": ['False', 'True']}
@@ -35,7 +34,21 @@ def create_combination_list():
 
     combination_lst = []
     for combination in keys_list:
-        combination_lst.append(list(combination))
+        # combination[3] - Method, combination[2] - afterTA, combination[4] - Gradient combination,
+        # combination[5] - Transformation number, combination[6] - Per entity
+
+        # Raw data cannot be with afterTA
+        if not (combination[3] == "RawData" and combination[2] == "True"):
+            # Raw data cannot be with per entity
+            if not (combination[3] == "RawData" and combination[6] == "True"):
+                # Raw data cannot be with gradient combination
+                if not (combination[3] == "RawData" and combination[4] == "True"):
+                    # TA method cannot be without afterTA
+                    if not (combination[3] != "RawData" and combination[2] == "False"):
+                        # Raw data can be only with transformation 1 (without gradient combination, per entity, and TA)
+                        if not (combination[3] == "RawData" and combination[2] == "False" and combination[6] == "False"
+                                and combination[4] == "False" and (combination[5] == "2" or combination[5] == "3")):
+                            combination_lst.append(list(combination))
 
     # Save the pickle file
     save_combination_pickle(combination_lst)
@@ -70,7 +83,6 @@ def create_combination_gpu():
                         # Raw data can be only with transformation 1 (without gradient combination, per entity, and TA)
                         if not (combination[3] == "RawData" and combination[2] == "False" and combination[6] == "False"
                                 and combination[4] == "False" and (combination[5] == "2" or combination[5] == "3")):
-                            print(combination)
                             combination_lst.append(list(combination))
 
     # Save the pickle file
@@ -148,6 +160,12 @@ def check_lock():
     return True
 
 
+def write_pickle(name, data):
+    file = open("/sise/robertmo-group/TA-DL-TSC/Project/temporal_abstraction_f/pickle_files/" + name + ".pkl", "wb")
+    pickle.dump(data, file)
+    file.close()
+
+
 if __name__ == '__main__':
     current_user = "shaharap"
     user1 = "hadas5"
@@ -161,7 +179,16 @@ if __name__ == '__main__':
     temp_file = open("/sise/home/" + current_user + "/tmp.txt", 'w')
 
     # create_combination_gpu()
-    create_combination_cpu()
+    # create_combination_cpu()
+    create_combination_list()
+    # write_pickle("hugobot_dict", {})
+
+    # # For step one - CPU
+    # write_pickle("create_files_dict_UCR", {})
+    # write_pickle("create_files_dict_MTS", {})
+    # # For step two - GPU
+    # write_pickle("running_dictUCR", {})
+    # write_pickle("running_dictMTS", {})
 
     # while not check_lock():
     #     print("The file is lock by another user")

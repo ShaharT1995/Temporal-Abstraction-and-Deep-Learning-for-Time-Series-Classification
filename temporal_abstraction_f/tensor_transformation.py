@@ -36,7 +36,7 @@ def new_ucr_files(config, prop_path):
             # Run the three transformation on the Train and Test files
             create_transformations(config, path, output_path, file_type, number_of_rows, number_of_columns, 1, classes,
                                    states_df, univariate=True, classification_path=classification_path)
-        print("")
+    print("")
 
 
 def new_mts_files(config, prop_path):

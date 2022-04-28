@@ -75,7 +75,16 @@ def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, g
 
         # print("Hugobot is OFF")
         print("Step 3: run hugobot")
-        run_cli(config, prop_path, max_gap)
+        hugobot_key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window,
+                       config.perEntity)
+        hugobot_dict = open_pickle("hugobot_dict")
+
+        if hugobot_key not in hugobot_dict:
+            run_cli(config, prop_path, max_gap)
+            hugobot_dict[hugobot_key] = True
+            write_pickle("hugobot_dict", hugobot_dict)
+        else:
+            print("\tThe hugobot step already done for " + config.classifier + ", with " + method)
 
         if config.combination and config.method != "gradient":
             print("Step 3.1: make the gkb.csv, ta.csv and ppa.csv for " + method + " method\n")
@@ -103,7 +112,16 @@ def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, g
 
             # print("Hugobot is OFF")
             print("Step 3.2: run hugobot for Gradient method")
-            # run_cli(config, gradient_prop_path, max_gap)
+            hugobot_key = (config.archive, config.classifier, "gradient", nb_bin, paa, std, max_gap, gradient_window,
+                           config.perEntity)
+            hugobot_dict = open_pickle("hugobot_dict")
+
+            if hugobot_key not in hugobot_dict:
+                run_cli(config, gradient_prop_path, max_gap)
+                hugobot_dict[hugobot_key] = True
+                write_pickle("hugobot_dict", hugobot_dict)
+            else:
+                print("\tThe hugobot step already done for " + config.classifier + ", with gradient")
 
             config.set_method(method)
 
@@ -114,9 +132,9 @@ def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, g
         else:
             # Make the second temporal abstraction -> hugobot output files to original format
             print("Step 4: transformation 2")
-
             new_ucr_files(config, prop_path) if config.archive == "UCR" else new_mts_files(config, prop_path)
 
+        running_dict = open_pickle("create_files_dict_" + config.archive)
         running_dict[key] = True
         write_pickle("create_files_dict_" + config.archive, running_dict)
         return running_dict
