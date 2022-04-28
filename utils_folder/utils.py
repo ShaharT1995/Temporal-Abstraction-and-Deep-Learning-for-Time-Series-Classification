@@ -248,40 +248,41 @@ def transform_mts_to_ucr_format():
 
 def calculate_metrics(y_true, y_pred, learning_time, predicting_time, y_true_val=None, y_pred_val=None,
                       y_pred_prob=None):
-    res = pd.DataFrame(data=np.zeros((1, 11), dtype=np.float), index=[0],
-                       columns=['precision', 'accuracy', 'recall', 'mcc', 'cohen_kappa', 'learning_time',
-                                'predicting_time', 'f1_score_macro', 'f1_score_micro', 'f1_score_weighted', 'auc'])
+    # res = pd.DataFrame(data=np.zeros((1, 12), dtype=np.float), index=[0],
+    #                    columns=['Precision', 'Accuracy', 'Recall', 'MCC', 'Cohen Kappa', 'Learning Time',
+    #                             'Predicting Time', 'F1 Score Macro', 'F1 Score Micro', 'F1 Score Weighted', 'Balanced Accuracy', 'AUC'])
 
-    res['precision'] = precision_score(y_true, y_pred, average='macro')
-    res['recall'] = recall_score(y_true, y_pred, average='macro')
+    res = pd.DataFrame( dtype=np.float)
+    res['Precision'] = precision_score(y_true, y_pred, average='macro')
+    res['Recall'] = recall_score(y_true, y_pred, average='macro')
 
-    res['accuracy'] = balanced_accuracy_score(y_true, y_pred)
+    res['Accuracy'] = balanced_accuracy_score(y_true, y_pred)
 
-    res['f1_score_macro'] = f1_score(y_true, y_pred, average='macro')
-    res['f1_score_micro'] = f1_score(y_true, y_pred, average='micro')
-    res['f1_score_weighted'] = f1_score(y_true, y_pred, average='weighted')
+    res['F1 Score Macro'] = f1_score(y_true, y_pred, average='macro')
+    res['F1 Score Micro'] = f1_score(y_true, y_pred, average='micro')
+    res['F1 Score Weighted'] = f1_score(y_true, y_pred, average='weighted')
 
     # Matthews correlation coefficient
-    res['mcc'] = matthews_corrcoef(y_true, y_pred)
+    res['MCC'] = matthews_corrcoef(y_true, y_pred)
 
     # Cohen’s kappa #TODO - Why?
     if len(set(y_true + y_pred)) == 1:
-        res['cohen_kappa'] = 1
+        res['Cohen Kappa'] = 1
     else:
-        res['cohen_kappa'] = cohen_kappa_score(y_true, y_pred)
+        res['Cohen Kappa'] = cohen_kappa_score(y_true, y_pred)
 
     # This is useful when transfer learning is used with cross validation
     if y_true_val is not None:
-        res['accuracy_val'] = balanced_accuracy_score(y_true_val, y_pred_val)
+        res['Balanced Accuracy'] = balanced_accuracy_score(y_true_val, y_pred_val)
 
     # AUC
     if y_pred_prob is None:
-        res['auc'] = 0
+        res['AUC'] = 0
     else:
-        res['auc'] = roc_auc_score(y_true, y_pred_prob, multi_class='ovr')  # todo - think if ovo / ovr/ raise
+        res['AUC'] = roc_auc_score(y_true, y_pred_prob, multi_class='ovr')  # todo - think if ovo / ovr/ raise
 
-    res['learning_time'] = learning_time
-    res['predicting_time'] = predicting_time
+    res['Learning Time'] = learning_time
+    res['Predicting Time'] = predicting_time
 
     return res
 
@@ -302,6 +303,7 @@ def generate_results_csv(config, params):
 
     for it in range(config.ITERATIONS):
         for dataset_name in dataset_list:
+
             output_dir = config.path + "/ResultsProject//DNN//" + config.archive + "//" + config.classifier + '/' + \
                          config.method + "/" + params + "//itr" + str(it) + '//' + dataset_name + '/' + \
                          'df_metrics.csv'
