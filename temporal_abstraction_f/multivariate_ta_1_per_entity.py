@@ -66,13 +66,13 @@ class MultivariateTA1:
         :return: the function return the count of the time series
         """
         for dataset_name in self.config.MTS_DATASET_NAMES:
-            print("\t\t" + dataset_name + ":")
+            print("\t" + dataset_name + ":")
             output_path = self.config.path_transformation1 + dataset_name + "//"
             root_dir_dataset = self.cur_root_dir + dataset_name + '/'
 
-            print("\t\t\tTrain")
-            self.input_to_csv(root_dir_dataset, dataset_name, "train", output_path)
-            print("\t\t\tTest")
-            self.attributes_dict[dataset_name] = self.input_to_csv(root_dir_dataset, dataset_name, "test", output_path)
+            print("\t\tTrain")
+            self.attributes_dict[dataset_name] = self.input_to_csv(root_dir_dataset, dataset_name, "train", output_path)
+            print("\t\tTest")
+            self.input_to_csv(root_dir_dataset, dataset_name, "test", output_path)
 
         write_pickle("attributes_dict_mts_per_entity", self.attributes_dict)

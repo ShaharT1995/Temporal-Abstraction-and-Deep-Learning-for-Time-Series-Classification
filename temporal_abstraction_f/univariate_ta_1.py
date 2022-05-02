@@ -59,7 +59,7 @@ class UnivariateTA1:
 
         merged.to_csv(output_path + "/transformation1_" + file_type.lower() + '.csv', index=False)
 
-    def convert_all_UTS(self):
+    def convert_all_UCR(self):
         """
         :return: the function return the count of the time series
         """
@@ -68,13 +68,13 @@ class UnivariateTA1:
         attributes_dict = {}
 
         for dataset_name in self.config.UNIVARIATE_DATASET_NAMES_2018:
-            print("\t\t" + dataset_name + ":")
+            print("\t" + dataset_name + ":")
             for file_type in file_types:
                 output_path = self.config.path_transformation1 + dataset_name + "//"
                 root_dir_dataset = self.cur_root_dir + dataset_name + '/' + dataset_name
 
                 self.input_to_csv(root_dir_dataset, file_type, dataset_name, output_path)
-                print("\t\t\t" + file_type.lower())
+                print("\t\t" + file_type.lower())
 
             attributes_dict[dataset_name] = [self.next_attribute]
             self.next_attribute += 1
