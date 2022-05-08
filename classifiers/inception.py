@@ -142,10 +142,14 @@ class Classifier_INCEPTION:
         self.model.save(self.output_directory + 'last_model.hdf5')
 
         start_time = time.time()
-        y_pred = self.predict(x_test, y_true, x_train, y_train, y_val,
-                              return_df_metrics=False)
+        y_pred = self.predict(x_test, y_true, x_train, y_train, y_val, return_df_metrics=False)
         predicting_time = time.time() - start_time
         y_pred_prob = y_pred
+
+        # For binary classification
+        # https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html
+        if len(y_pred_prob.shape) == 2 and y_pred_prob.shape[1] == 2:
+            y_pred_prob = y_pred_prob[:, 1]
 
         # save predictions
         np.save(self.output_directory + 'y_pred.npy', y_pred)

@@ -31,13 +31,16 @@ class ConfigClass:
         self.paa_window_size = 1
         self.gradient_window_size = [10]
 
-        self.UNIVARIATE_DATASET_NAMES_2018 = ['Beef', 'ACSF1', 'Adiac', 'Coffee', 'Computers', 'CricketX', 'CricketY', 'CricketZ',
-                                              'Crop', 'Earthquakes', 'ECG200', 'ElectricDevices', 'EthanolLevel',
-                                              'FordA', 'FordB', 'HandOutlines', 'Herring', 'LargeKitchenAppliances',
-                                              'MiddlePhalanxOutlineCorrect', 'MiddlePhalanxTW',
-                                              'PhalangesOutlinesCorrect', 'PLAID', 'PowerCons', 'SemgHandMovementCh2',
-                                              'SemgHandSubjectCh2', 'ShapesAll', 'SmoothSubspace', 'Strawberry',
-                                              'SyntheticControl', 'Worms', 'WormsTwoClass']
+        self.UNIVARIATE_DATASET_NAMES_2018 = ['Beef', 'ACSF1', 'Adiac', 'Computers', 'CricketX', 'CricketY',
+                                              'CricketZ', 'Crop', 'Earthquakes', 'ECG200', 'ElectricDevices',
+                                              'EthanolLevel', 'FordA', 'FordB', 'HandOutlines', 'Herring',
+                                              'LargeKitchenAppliances', 'MiddlePhalanxOutlineCorrect',
+                                              'MiddlePhalanxTW', 'PhalangesOutlinesCorrect', 'PLAID', 'PowerCons',
+                                              'SemgHandMovementCh2', 'SemgHandSubjectCh2', 'ShapesAll',
+                                              'SmoothSubspace', 'Strawberry', 'SyntheticControl', 'Worms',
+                                              'WormsTwoClass']
+
+        # self.UNIVARIATE_DATASET_NAMES_2018 = ['FordB']
 
         self.MTS_DATASET_NAMES = ['Libras', 'ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
                                   'JapaneseVowels', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
@@ -99,7 +102,6 @@ class ConfigClass:
 
         # Setting the graph-level random seed.
         tf.random.set_seed(89)
-
 
         session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
         sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)

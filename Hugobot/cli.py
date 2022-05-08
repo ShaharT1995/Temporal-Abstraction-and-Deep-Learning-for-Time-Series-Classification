@@ -33,11 +33,12 @@ def run_cli(config, prop_path, max_gap):
             raw_data_path = config.path_transformation1 + dataset_name + "/transformation1_" + file_type + ".csv"
 
             output_folder = prop_path + dataset_name + "/" + file_type + "/"
-            if not os.path.exists(output_folder):
-                os.makedirs(output_folder)
-            else:
-                print("\t\tThe hugobot step already done for " + dataset_name + ": " + file_type)
-                continue
+
+            # if not os.path.exists(output_folder):
+            #     os.makedirs(output_folder)
+            # else:
+            #     print("\t\tThe hugobot step already done for " + dataset_name + ": " + file_type)
+            #     continue
 
             print("\t\t" + file_type)
 

@@ -156,6 +156,11 @@ class Classifier_RESNET:
         predicting_time = time.time() - start_time
         y_pred_prob = y_pred
 
+        # For binary classification
+        # https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html
+        if len(y_pred_prob.shape) == 2 and y_pred_prob.shape[1] == 2:
+            y_pred_prob = y_pred_prob[:, 1]
+
         # save predictions
         np.save(self.output_directory + 'y_pred.npy', y_pred)
 

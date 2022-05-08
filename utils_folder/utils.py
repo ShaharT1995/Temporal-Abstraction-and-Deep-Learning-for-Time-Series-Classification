@@ -25,6 +25,9 @@ matplotlib.rcParams['font.sans-serif'] = 'Arial'
 config = ConfigClass()
 config.set_seed()
 
+import warnings
+warnings.filterwarnings("ignore")
+
 
 def open_pickle(name):
     file = open(config.path + "/Project/temporal_abstraction_f/pickle_files//" + name + ".pkl", "rb")
@@ -122,6 +125,7 @@ def read_all_datasets(config):
                 x_test = wait_for_files(root_dir_dataset + 'x_test.npy')
                 y_test = wait_for_files(root_dir_dataset + 'y_test.npy')
 
+            # UCR
             else:
                 root_dir_dataset = config.ucr_path + '/' + dataset_name + '/'
 
@@ -248,11 +252,11 @@ def transform_mts_to_ucr_format():
 
 def calculate_metrics(y_true, y_pred, learning_time, predicting_time, y_true_val=None, y_pred_val=None,
                       y_pred_prob=None):
-    # res = pd.DataFrame(data=np.zeros((1, 12), dtype=np.float), index=[0],
-    #                    columns=['Precision', 'Accuracy', 'Recall', 'MCC', 'Cohen Kappa', 'Learning Time',
-    #                             'Predicting Time', 'F1 Score Macro', 'F1 Score Micro', 'F1 Score Weighted', 'Balanced Accuracy', 'AUC'])
+    res = pd.DataFrame(data=np.zeros((1, 12), dtype=np.float), index=[0],
+                       columns=['Precision', 'Accuracy', 'Recall', 'MCC', 'Cohen Kappa', 'Learning Time',
+                                'Predicting Time', 'F1 Score Macro', 'F1 Score Micro', 'F1 Score Weighted',
+                                'Balanced Accuracy', 'AUC'])
 
-    res = pd.DataFrame( dtype=np.float)
     res['Precision'] = precision_score(y_true, y_pred, average='macro')
     res['Recall'] = recall_score(y_true, y_pred, average='macro')
 

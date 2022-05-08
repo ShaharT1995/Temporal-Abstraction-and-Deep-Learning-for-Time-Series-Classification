@@ -168,11 +168,12 @@ class Classifier_TWIESN:
 
         # reconstruct the training prediction
         y_pred_val, y_pred_val_prob_new = self.reshape_prediction(y_pred_val_prob, self.x_val.shape[0], self.T)
+
         # get the metrics for the train
         df_val_metrics = calculate_metrics(np.argmax(self.y_val, axis=1), y_pred_val, learning_time, predicting_time,
-                                           y_pred_prob=y_pred_val_prob_new)
+                                           y_pred_prob=None)
         # get the train accuracy
-        train_acc = df_val_metrics['accuracy'][0]
+        train_acc = df_val_metrics['Accuracy'][0]
 
         # Testing
 
@@ -194,6 +195,11 @@ class Classifier_TWIESN:
 
         # reconstruct the test predictions
         y_pred, y_pred_prob = self.reshape_prediction(y_pred, self.x_test.shape[0], self.T)
+
+        # For binary classification
+        # https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html
+        if len(y_pred_prob.shape) == 2 and y_pred_prob.shape[1] == 2:
+            y_pred_prob = y_pred_prob[:, 1]
 
         # get the metrics for the test predictions
         df_metrics = calculate_metrics(self.y_true, y_pred, learning_time, predicting_time, y_pred_prob=y_pred_prob)
@@ -232,7 +238,7 @@ class Classifier_TWIESN:
         if self.x_train.shape[0] > 1000 or self.x_test.shape[0] > 1000:
             for config in self.configs:
                 config['N_x'] = 100
-            self.configs = [self.configs[0], self.configs[1], self.configs[2]]
+            self.configs = [self.configs[0], self.configs[1]]
 
         output_directory_root = self.output_directory
         # grid search

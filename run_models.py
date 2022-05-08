@@ -108,14 +108,14 @@ def run_all(config, params):
                                config.method + "/" + params + "//itr" + str(iter) + '//' + dataset_name + '/'
 
             if os.path.exists(output_directory + "/DONE"):
-                print("Already Done")
+                print("\t\t\tAlready Done")
                 continue
 
             create_directory(output_directory)
 
             fit_classifier(config, iter, datasets_dict, dataset_name, config.classifier, output_directory)
 
-            print('\t\tDONE')
+            print('\t\t\tDONE')
 
             # the creation of this directory means
             create_directory(output_directory + '/DONE')

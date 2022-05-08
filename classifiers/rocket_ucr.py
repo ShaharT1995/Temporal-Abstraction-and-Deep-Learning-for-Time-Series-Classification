@@ -263,6 +263,11 @@ class Classifier_Rocket:
         y_pred, y_pred_prob = rocket.predict(x_test)
         duration_predict = time.time() - start_time
 
+        # For binary classification
+        # https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html
+        if len(y_pred_prob.shape) == 2 and y_pred_prob.shape[1] == 2:
+            y_pred_prob = y_pred_prob[:, 1]
+
         # Save Metrics
         df_metrics = calculate_metrics(y_true, y_pred, duration, duration_predict, y_pred_prob=y_pred_prob)
         df_metrics.to_csv(self.output_dir + 'df_metrics.csv', index=False)

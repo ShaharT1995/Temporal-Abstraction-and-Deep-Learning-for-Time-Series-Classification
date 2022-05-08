@@ -75,18 +75,7 @@ def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, g
 
         # print("Hugobot is OFF")
         print("Step 3: run hugobot")
-        # hugobot_key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window,
-        #                config.perEntity)
-        # hugobot_dict = open_pickle("hugobot_dict")
-
-        # if hugobot_key not in hugobot_dict:
-        if True:
-            run_cli(config, prop_path, max_gap)
-            # hugobot_dict = open_pickle("hugobot_dict")
-            # hugobot_dict[hugobot_key] = True
-            # write_pickle("hugobot_dict", hugobot_dict)
-        else:
-            print("\tThe hugobot step already done for " + config.classifier + ", with " + method)
+        run_cli(config, prop_path, max_gap)
 
         if config.combination and config.method != "gradient":
             print("Step 3.1: make the gkb.csv, ta.csv and ppa.csv for " + method + " method\n")
@@ -114,18 +103,7 @@ def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, g
 
             # print("Hugobot is OFF")
             print("Step 3.2: run hugobot for Gradient method")
-            # hugobot_key = (config.archive, config.classifier, "gradient", nb_bin, paa, std, max_gap, gradient_window,
-            #                config.perEntity)
-            # hugobot_dict = open_pickle("hugobot_dict")
-
-            # if hugobot_key not in hugobot_dict:
-            if True:
-                run_cli(config, gradient_prop_path, max_gap)
-                # hugobot_dict = open_pickle("hugobot_dict")
-                # hugobot_dict[hugobot_key] = True
-                # write_pickle("hugobot_dict", hugobot_dict)
-            else:
-                print("\tThe hugobot step already done for " + config.classifier + ", with gradient")
+            run_cli(config, gradient_prop_path, max_gap)
 
             config.set_method(method)
 

@@ -204,6 +204,7 @@ class Classifier_TLENET:
 
         y_pred_prob = model.predict(x_test, batch_size=batch_size)
 
+
         # convert the predicted from binary to integer 
         y_pred = np.argmax(y_pred_prob, axis=1)
 
