@@ -94,7 +94,7 @@ def create_combination_gpu():
 # We run this function one time. The function create all the possible combination
 def create_combination_cpu():
     dict_name = {"archive": ['UCR', 'MTS'],
-                 "classifier": ['rocket'],
+                 "classifier": ['twiesn', 'rocket'],
                  "afterTA": ['False', 'True'],
                  "method": ['sax', 'td4c-cosine', 'gradient', 'RawData'],
                  "combination": ['False', 'True'],
