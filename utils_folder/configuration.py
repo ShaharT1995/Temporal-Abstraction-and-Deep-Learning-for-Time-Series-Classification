@@ -43,7 +43,7 @@ class ConfigClass:
         # self.UNIVARIATE_DATASET_NAMES_2018 = ['FordB']
 
         self.MTS_DATASET_NAMES = ['Libras', 'ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
-                                  'JapaneseVowels', 'NetFlow', 'UWave', 'Wafer', 'WalkvsRun']
+                                  'JapaneseVowels', 'NetFlow', 'UWave', 'Wafer']
 
     def set_path_transformations(self):
         if self.perEntity:

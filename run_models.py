@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import pandas as pd
 import sklearn
 from utils_folder.utils import read_all_datasets, create_directory
 
@@ -27,12 +28,13 @@ def fit_classifier(config, iter, datasets_dict, dataset_name, classifier_name, o
         x_test = x_test.reshape((x_test.shape[0], x_test.shape[1], 1))
 
     input_shape = x_train.shape[1:]
-    classifier = create_classifier(config, classifier_name, input_shape, nb_classes, output_directory)
+    classifier = create_classifier(config, classifier_name, input_shape, nb_classes, output_directory,
+                                   len(pd.unique(y_test_true)))
 
     classifier.fit(x_train, y_train, x_test, y_test, y_test_true, iter)
 
 
-def create_classifier(config, classifier_name, input_shape, nb_classes, output_directory, verbose=False):
+def create_classifier(config, classifier_name, input_shape, nb_classes, output_directory, cv=10, verbose=False):
     if classifier_name == 'fcn':
         from classifiers import fcn
         return fcn.Classifier_FCN(output_directory, input_shape, nb_classes, verbose)
@@ -74,12 +76,12 @@ def create_classifier(config, classifier_name, input_shape, nb_classes, output_d
         return inception.Classifier_INCEPTION(output_directory, input_shape, nb_classes, verbose)
 
     if classifier_name == 'rocket':
-        if config.archive == "UCR":
+        if config.archive == "UCR" and config.transformation_number == "1" and config.combination is False:
             from classifiers import rocket_ucr
             return rocket_ucr.Classifier_Rocket(output_directory, verbose)
         else:
             from classifiers import rocket_mts
-            return rocket_mts.RocketClassifier(output_directory)
+            return rocket_mts.RocketClassifier(output_directory, cv)
 
     if classifier_name == 'lstm_fcn':
         from classifiers import lstm_fcn

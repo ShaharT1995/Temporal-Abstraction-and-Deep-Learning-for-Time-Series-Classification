@@ -117,6 +117,7 @@ class RocketClassifier:
     # was n_kernels: int = 10000
     def __init__(self,
                  output_folder: str,
+                 cv: int,
                  build: bool = True,
                  n_kernels: int = 1000):
         config = ConfigClass()
@@ -128,7 +129,7 @@ class RocketClassifier:
         self.kernels = None
         self.classifier = None
         if build:
-            self.classifier = RidgeClassifierCV(alphas=np.logspace(-3, 3, 10), cv=10, normalize=True)
+            self.classifier = RidgeClassifierCV(alphas=np.logspace(-3, 3, 10), cv=min(10, cv), normalize=True)
 
         self.model_path = os.path.join(self.output_folder, 'model.pkl')
 
@@ -190,10 +191,19 @@ class RocketClassifier:
             y_pred_des_func = y_pred_des_func.reshape(y_pred_des_func.shape[0], 1)
 
         y_pred = []
-        for v in y_pred_des_func:
-            v[v < -10000] = -700
-            v[v >10000] = 700
-            y_pred.append(np.exp(v) / np.sum(np.exp(v)))
+
+        if len(y_pred_des_func.shape) == 1:
+            for v in y_pred_des_func:
+                if v <= -700:
+                    v = -700
+                if v >= 700:
+                    v = 700
+                y_pred.append(np.exp(v) / np.sum(np.exp(v)))
+        else:
+            for v in y_pred_des_func:
+                v[v <= -700] = -700
+                v[v >= 700] = 700
+                y_pred.append(np.exp(v) / np.sum(np.exp(v)))
 
         test_duration = time.perf_counter() - start_time
 
