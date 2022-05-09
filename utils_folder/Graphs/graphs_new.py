@@ -1,3 +1,5 @@
+import matplotlib
+
 from utils_folder.utils import open_pickle
 import pickle
 import re
@@ -11,12 +13,11 @@ import matplotlib.font_manager as fm
 
 config = ConfigClass()
 
-# font_path = "C:\Windows\Fonts\cambria.ttc"
-# my_font = fm.FontProperties(fname=font_path)
-
-font_path = "C:\Windows\Fonts\cambria.ttc"
+font_path = "/sise/robertmo-group/TA-DL-TSC/Cambria/CAMBRIA.TTC"
 my_font = fm.FontProperties(fname=font_path)
 
+font_path = "/sise/robertmo-group/TA-DL-TSC/Cambria/CAMBRIAB.TTF"
+my_font_bold = fm.FontProperties(fname=font_path)
 
 # Creates a unified file of all results for all combinations
 def concat_results(path_ta_dir, raw_data=False):
@@ -146,7 +147,6 @@ def create_fig_best_params_VS_raw_data(best_params, raw_data_df, metrics):
                x_label='Method',y_label="Value", hue="Data")
 
 
-
 def create_fig_best_params_VS_raw_data_classifier(best_params, raw_data_df,after_ta_df, metrics):
     df = concat_after_df_with_best_df(after_ta_df, best_params, metrics,
                                       ["nb bins", "method", "transformation_type", "classifier_name"])
@@ -179,7 +179,7 @@ def create_fig_dataset_characteristics(best_params, raw_data_df , after_ta_df, m
     raw_data_df = raw_data_df.groupby(['dataset_name_raw_data'],
                                       as_index=False).agg(dict_raw_data)
 
-    raw_data_df= raw_data_df.rename(columns={"dataset_name_raw_data": "dataset_name"})
+    raw_data_df = raw_data_df.rename(columns={"dataset_name_raw_data": "dataset_name"})
     df = pd.merge(raw_data_df, df, on=["dataset_name" ])
 
     df = pd.merge(df, characteristics_df, on="dataset_name")
@@ -243,21 +243,30 @@ def create_fig(x, y, col, data, name, x_label, y_label='' , legend='', hue=None)
                     sharey=False,
                     height=6, aspect=1.3, join=False)
     v = 0
+
+    matplotlib.font_manager._load_fontmanager(try_read_cache=False)
+
     for i in range(g.axes.shape[0]):
         for j in range(g.axes.shape[1]):
+            plt.rcParams["font.family"] = "Cambria"
+
             axis = g.axes[i, j]
-            axis.set_xlabel(x_label, fontdict={'weight': 'bold'})
+            axis.set_xlabel(x_label, fontdict={'weight': 'bold'}, fontproperties=my_font_bold)
             axis.tick_params(labelleft=True, labelbottom=True)
             if legend != "":
-                axis.legend(title=legend)
+                axis.legend(title=legend, prop={'family': 'Cambria'})
 
             axis.set_title(None)
             if y_label == '':
                 y_label_new = metrics[v]
             else:
                 y_label_new = y_label
-            axis.set_ylabel(y_label_new, fontdict={'weight': 'bold'})
-            plt.setp(axis.get_xticklabels(), rotation=30)
+
+            plt.setp(axis.get_yticklabels(), fontproperties=my_font)
+            plt.setp(axis.get_xticklabels(), rotation=30, fontproperties=my_font)
+
+            axis.set_ylabel(y_label_new, fontproperties=my_font_bold)
+
             # axis.set_ylim(0, 1)
             v += 1
 
@@ -337,5 +346,6 @@ def create_all_graphs(create_csv=False):
     create_fig_dataset_characteristics(df_top_ta, raw_data_df, df_after_ta, metrics, classes_df, "classes")
 
     # -------------------------------------------------------------------------------------------------
+
 
 create_all_graphs()
