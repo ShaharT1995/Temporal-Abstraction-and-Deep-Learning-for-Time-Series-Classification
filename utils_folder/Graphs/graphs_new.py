@@ -225,7 +225,7 @@ def add_characteristic(characteristic_name, df):
         df.loc[df.lengths > 1000, 'groups_lengths'] = " > 1000"
 
     else:
-        df.loc[df.classes < 3, 'classes'] = "< 3"
+        df.loc[df.classes < 3, 'groups_classes'] = "< 3"
         df.loc[(df.classes >= 3) & (df.classes <= 10), 'groups_classes'] = "3 - 10"
         df.loc[(df.classes > 10), 'groups_classes'] = "> 10"
 

@@ -186,6 +186,8 @@ class Base_Classifier_ROCKET(BaseEstimator, ClassifierMixin):
         y_pred_des_func = self.ridge_cv_.decision_function(self.x_test_)
         y_pred_lst = []
         for v in y_pred_des_func:
+            v[v < -10000] = -700
+            v[v >10000] = 700
             y_pred_lst.append(np.exp(v) / np.sum(np.exp(v)))
 
         y_pred_prob = np.array(y_pred_lst)
