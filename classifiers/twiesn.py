@@ -117,20 +117,19 @@ class Classifier_TWIESN:
 
         # Average the predictions of instances
         new_y_pred = np.average(new_y_pred, axis=1)
-
         y_pred_lst = []
         for v in new_y_pred:
+            v[v < -10000] = -700
+            v[v >10000] = 700
             y_pred_lst.append(np.exp(v) / np.sum(np.exp(v)))
 
         y_pred_prob = np.array(y_pred_lst)
-
         # get the label with maximum prediction over the last label axis
         new_y_pred = np.argmax(new_y_pred, axis=1)
         return new_y_pred, y_pred_prob
 
     def train(self, iter):
         # Training
-
         # init the matrices
         self.init_matrices(iter)
         # compute the state matrices which is the new feature space
