@@ -201,8 +201,8 @@ class RocketClassifier:
                 y_pred.append(np.exp(v) / np.sum(np.exp(v)))
         else:
             for v in y_pred_des_func:
-                v[v <= -700] = -700
-                v[v >= 700] = 700
+                v[v <= -50] = -50
+                v[v >= 50] = 50
                 y_pred.append(np.exp(v) / np.sum(np.exp(v)))
 
         test_duration = time.perf_counter() - start_time

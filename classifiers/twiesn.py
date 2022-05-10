@@ -119,8 +119,8 @@ class Classifier_TWIESN:
         new_y_pred = np.average(new_y_pred, axis=1)
         y_pred_lst = []
         for v in new_y_pred:
-            v[v < -10000] = -700
-            v[v >10000] = 700
+            v[v < -700] = -700
+            v[v > 700] = 700
             y_pred_lst.append(np.exp(v) / np.sum(np.exp(v)))
 
         y_pred_prob = np.array(y_pred_lst)
