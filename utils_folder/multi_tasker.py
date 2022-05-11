@@ -21,14 +21,23 @@ def run_job_using_sbatch(sbatch_path, arguments):
 
 # for step one running hugobot
 def create_combination_list():
+    # dict_name = {"archive": ['UCR', 'MTS'],
+    #              "classifier": ['fcn', 'mlp', 'resnet', 'twiesn', 'encoder', 'mcdcnn', 'cnn', 'inception',
+    #                             'lstm_fcn', 'mlstm_fcn', 'rocket'],
+    #              "afterTA": ['True', 'False'],
+    #              "method": ['RawData', 'sax', 'td4c-cosine', 'gradient'],
+    #              "combination": ['False', 'True'],
+    #              "transformation": ['1'],
+    #              "perEntity": ['True', 'False']}
+
     dict_name = {"archive": ['UCR', 'MTS'],
                  "classifier": ['fcn', 'mlp', 'resnet', 'twiesn', 'encoder', 'mcdcnn', 'cnn', 'inception',
                                 'lstm_fcn', 'mlstm_fcn', 'rocket'],
-                 "afterTA": ['True', 'False'],
-                 "method": ['RawData', 'sax', 'td4c-cosine', 'gradient'],
+                 "afterTA": ['True'],
+                 "method": ['sax', 'td4c-cosine', 'gradient'],
                  "combination": ['False', 'True'],
                  "transformation": ['1'],
-                 "perEntity": ['False']}
+                 "perEntity": ['True']}
 
     keys_list = list(itertools.product(*dict_name.values()))
 
@@ -48,7 +57,9 @@ def create_combination_list():
                         # Raw data can be only with transformation 1 (without gradient combination, per entity, and TA)
                         if not (combination[3] == "RawData" and combination[2] == "False" and combination[6] == "False"
                                 and combination[4] == "False" and (combination[5] == "2" or combination[5] == "3")):
-                            combination_lst.append(list(combination))
+                            # Gradient method cannot be with gradient combination
+                            if not (combination[3] == "gradient" and combination[4] == "True"):
+                                combination_lst.append(list(combination))
 
     # Save the pickle file
     save_combination_pickle(combination_lst)
@@ -199,10 +210,10 @@ if __name__ == '__main__':
     # while not check_lock():
     #     print("The file is lock by another user")
     #
-    # file = open(project_path + "/Run//combination_list_cpu.pkl", "rb")
+    # file = open(project_path + "/Run//combination_list.pkl", "rb")
     # data = pickle.load(file)
     # print(len(data))
-    #
+
     # file = open(project_path + "Project/temporal_abstraction_f/pickle_files//create_files_dict_UCR.pkl", "rb")
     # data1 = pickle.load(file)
     # print(len(data1))
@@ -223,7 +234,15 @@ if __name__ == '__main__':
     # data3 = pickle.load(file)
     # print(len(data3))
 
-    print()
+    # file = open(project_path + "Project/temporal_abstraction_f/pickle_files//run_to_do_MTS.pkl", "rb")
+    # data2 = pickle.load(file)
+    # print(len(data2))
+    #
+    # file = open(project_path + "Project/temporal_abstraction_f/pickle_files//run_to_do_UCR.pkl", "rb")
+    # data3 = pickle.load(file)
+    # print(len(data3))
+
+    # print()
     #
     # number_to_run = max(number_of_total_jobs - get_number_of_jobs(current_user), 0)
     #

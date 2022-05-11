@@ -34,11 +34,8 @@ def run_cli(config, prop_path, max_gap):
 
             output_folder = prop_path + dataset_name + "/" + file_type + "/"
 
-            # if not os.path.exists(output_folder):
-            #     os.makedirs(output_folder)
-            # else:
-            #     print("\t\tThe hugobot step already done for " + dataset_name + ": " + file_type)
-            #     continue
+            if not os.path.exists(output_folder):
+                os.makedirs(output_folder)
 
             print("\t\t" + file_type)
 
