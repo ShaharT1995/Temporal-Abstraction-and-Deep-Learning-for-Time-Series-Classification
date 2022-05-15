@@ -6,6 +6,7 @@ import pandas as pd
 
 from user_interface.results_union import results_union
 from user_interface.temporal_abstraction import temporal_abstraction
+from utils_folder.utils import wait_for_files
 
 TEMPORAL_ABSTRACTION_PROJECT_PATH = "/"
 sys.path.append(TEMPORAL_ABSTRACTION_PROJECT_PATH)
@@ -37,6 +38,10 @@ def run_cli(config, prop_path, max_gap):
             if not os.path.exists(output_folder):
                 os.makedirs(output_folder)
 
+            else:
+                print("\t\tHugobot step already done for " + dataset_name + ": " + file_type)
+                continue
+
             print("\t\t" + file_type)
 
             if config.method == "gradient":
@@ -65,7 +70,8 @@ def run_cli(config, prop_path, max_gap):
                 # Test
                 else:
                     train_gkb_path = prop_path + dataset_name + "//train//states.csv"
-                    df = pd.read_csv(train_gkb_path)
+                    # df = pd.read_csv(train_gkb_path)
+                    df = wait_for_files(train_gkb_path, cli=True)
                     df["Method"] = "knowledge-based"
 
                     test_gkb_path = prop_path + dataset_name + "//test//states.csv"

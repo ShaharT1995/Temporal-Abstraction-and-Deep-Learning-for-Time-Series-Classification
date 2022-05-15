@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pandas as pd
 from utils_folder.utils import open_pickle, create_directory
 
@@ -27,6 +29,13 @@ def create_three_files(config, path, method, nb_bins, paa_window_size, std_coeff
         dataset_list = config.MTS_DATASET_NAMES
 
     for ds in dataset_list:
+
+        ta_file = Path(path + ds + '//ta.csv')
+        if ta_file.is_file():
+            print(ds)
+            print("\tFiles already exists, continue to the next step")
+            continue
+
         # GKB
         index = 0
         df_gkb = pd.DataFrame(

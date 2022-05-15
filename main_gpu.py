@@ -26,6 +26,7 @@ def execute_running(config, running_dict, max_gap, method, nb_bin, paa, std, gra
 
     key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window,
            config.transformation_number, config.combination, config.perEntity)
+
     not_done = open_pickle("run_to_do_" + config.archive)
 
     # cpu_key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window,
