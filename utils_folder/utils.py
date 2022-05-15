@@ -403,16 +403,6 @@ def save_logs(output_directory, hist, y_pred, y_true, learning_time, predicting_
     return df_metrics
 
 
-def merge_two_columns(x):
-    return round(x[4] * 100, 1)
-
-
-def merge_accuracy(x):
-    merged = str(round(x.accuracy, 2)) + " / " + str(round(x.accuracy_before, 2)) + " (" + str(round(
-        x.accuracy - x.accuracy_before, 2)) + ")"
-    return merged
-
-
 def create_df_for_rank_graph(path):
     df = pd.read_csv(path, encoding="utf-8")
 
