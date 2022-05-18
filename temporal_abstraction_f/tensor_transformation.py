@@ -66,10 +66,10 @@ def new_mts_files(config, prop_path):
         y = np.load(config.mts_path + dataset_name + '//y_train.npy')
         classes = np.unique(y)
 
-        states_path = path + "train//states.csv"
-        states_df = pd.read_csv(states_path, header=0)
-
         for file_type in files_type:
+            states_path = path + file_type + "//states.csv"
+            states_df = pd.read_csv(states_path, header=0)
+
             # Run the three transformation on the Train and Test files
             if file_type == "train":
                 create_transformations(config, path, output_path, file_type, number_of_entities_train,
@@ -151,11 +151,17 @@ def create_transformations(config, path, output_path, file_type, number_of_entit
                             temporal_property_ID = int(parse_data[3][-1]) - 1 if parse_data[3][-2] == "0" else \
                                 int(parse_data[3][-2:]) - 1
 
-                        modulo = int(parse_data[2]) % int(number_of_states / number_of_attributes)
-                        if modulo == 0:
-                            modulo = int(number_of_states / number_of_attributes)
+                        try:
+                            modulo = int(parse_data[2]) % int(number_of_states / number_of_attributes)
+                            if modulo == 0:
+                                modulo = int(number_of_states / number_of_attributes)
+                        except:
+                            print()
 
-                        symbol = int(modulo + temporal_property_ID * (number_of_states / number_of_attributes))
+                        try:
+                            symbol = int(modulo + temporal_property_ID * (number_of_states / number_of_attributes))
+                        except:
+                            print()
 
                     else:
                         temporal_property_ID = int(parse_data[3]) - min_property

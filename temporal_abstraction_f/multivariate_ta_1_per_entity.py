@@ -71,8 +71,10 @@ class MultivariateTA1:
             root_dir_dataset = self.cur_root_dir + dataset_name + '/'
 
             print("\t\tTrain")
-            self.attributes_dict[dataset_name] = self.input_to_csv(root_dir_dataset, dataset_name, "train", output_path)
+            self.attributes_dict[(dataset_name, "train")] = self.input_to_csv(root_dir_dataset, dataset_name, "train",
+                                                                              output_path)
             print("\t\tTest")
-            self.input_to_csv(root_dir_dataset, dataset_name, "test", output_path)
+            self.attributes_dict[(dataset_name, "test")] = self.input_to_csv(root_dir_dataset, dataset_name, "test",
+                                                                              output_path)
 
         write_pickle("attributes_dict_mts_per_entity", self.attributes_dict)

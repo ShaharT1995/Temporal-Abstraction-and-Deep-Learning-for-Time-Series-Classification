@@ -44,27 +44,32 @@ def run_cli(config, prop_path, max_gap):
 
             print("\t\t" + file_type)
 
+            path_addition = ""
+            if config.perEntity:
+                path_addition = '_' + file_type
+
             if config.method == "gradient":
                 cli(['temporal-abstraction',
                      f'{raw_data_path}',  # 'Path to data set file'
                      output_folder,  # 'Path to output dir'
                      'per-property',  # per-property
                      '-s',  # -s (when using Gradient or KnowledgeBased)
-                     prop_path + dataset_name + "//gkb.csv",  # 'Path to states file' (when using Gradient or
-                                                              # KnowledgeBased)
-                     prop_path + dataset_name + "//pp.csv",  # 'Path to pre-processing file'
-                     prop_path + dataset_name + "//ta.csv"],  # 'Path to Temporal Abstraction file'
+                     prop_path + dataset_name + "//gkb" + path_addition + ".csv",  # 'Path to states file' (when using
+                     # Gradient or KnowledgeBased)
+                     prop_path + dataset_name + "//pp" + path_addition + ".csv",  # 'Path to pre-processing file'
+                     prop_path + dataset_name + "//ta" + path_addition + ".csv"],  # 'Path to Temporal Abstraction file'
                     standalone_mode=False)
 
             # Method is not gradient
             else:
-                if file_type == "train":
+                if (not config.perEntity and file_type == "train") or config.perEntity:
                     cli(['temporal-abstraction',
                          f'{raw_data_path}',  # 'Path to data set file'
                          output_folder,  # 'Path to output dir'
                          'per-property',  # per-property
-                         prop_path + dataset_name + "//pp.csv",  # 'Path to pre-processing file'
-                         prop_path + dataset_name + "//ta.csv"],  # 'Path to Temporal Abstraction file'
+                         prop_path + dataset_name + "//pp" + path_addition + ".csv",  # 'Path to pre-processing file'
+                         prop_path + dataset_name + "//ta" + path_addition + ".csv"],  # 'Path to Temporal Abstraction
+                                                                                       # file'
                         standalone_mode=False)
 
                 # Test

@@ -106,6 +106,10 @@ def run_all(config, params):
         for dataset_name in dataset_list:
             print('\t\tdataset_name: ', dataset_name)
 
+            if dataset_name == "CMUsubject16" and (config.classifier == "mlp" or config.classifier == "mcdcnn"):
+                print('\t\tMemory Error in : ', dataset_name)
+                continue
+
             output_directory = config.path + "/ResultsProject//DNN//" + config.archive + "//" + config.classifier + '/' + \
                                config.method + "/" + params + "//itr" + str(iter) + '//' + dataset_name + '/'
 

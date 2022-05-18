@@ -19,6 +19,38 @@ def run_job_using_sbatch(sbatch_path, arguments):
     subprocess.Popen(run_list, stdout=temp_file, stderr=temp_file)
 
 
+def create_combination_per_entity():
+    ucr_dict = {"archive": ['UCR'],
+                "dataset_name": ['Beef', 'ACSF1', 'Adiac', 'Computers', 'CricketX', 'CricketY', 'CricketZ', 'Crop',
+                                 'Earthquakes', 'ECG200', 'ElectricDevices', 'EthanolLevel', 'FordA', 'FordB',
+                                 'HandOutlines', 'Herring', 'LargeKitchenAppliances', 'MiddlePhalanxOutlineCorrect',
+                                 'MiddlePhalanxTW', 'PhalangesOutlinesCorrect', 'PLAID', 'PowerCons',
+                                 'SemgHandMovementCh2', 'SemgHandSubjectCh2', 'ShapesAll', 'SmoothSubspace',
+                                 'Strawberry', 'SyntheticControl', 'Worms', 'WormsTwoClass'],
+                 "nb_bins": ['3', '10'],
+                 "method": ['sax', 'td4c-cosine', 'gradient'],
+                 "combination": ['False']}
+
+    mts_dict = {"archive": ['MTS'],
+                "dataset_name": ['Libras', 'ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
+                                  'JapaneseVowels', 'NetFlow', 'UWave', 'Wafer'],
+                 "nb_bins": ['3', '10'],
+                 "method": ['sax', 'td4c-cosine', 'gradient'],
+                 "combination": ['False']}
+
+    keys_list = list(itertools.product(*ucr_dict.values())) + list(itertools.product(*mts_dict.values()))
+
+    combination_lst = []
+    for combination in keys_list:
+        # Gradient method cannot be with gradient combination
+        if not (combination[3] == "gradient" and combination[4] == "True"):
+            combination_lst.append(list(combination))
+
+    # Save the pickle file
+    save_combination_pickle(combination_lst)
+    print()
+
+
 # for step one running hugobot
 def create_combination_list():
     # dict_name = {"archive": ['UCR', 'MTS'],
@@ -31,8 +63,7 @@ def create_combination_list():
     #              "perEntity": ['True', 'False']}
 
     dict_name = {"archive": ['UCR', 'MTS'],
-                 "classifier": ['fcn', 'mlp', 'resnet', 'twiesn', 'encoder', 'mcdcnn', 'cnn', 'inception',
-                                'lstm_fcn', 'mlstm_fcn', 'rocket'],
+                 "classifier": ['fcn'],
                  "afterTA": ['True'],
                  "method": ['sax', 'td4c-cosine', 'gradient'],
                  "combination": ['False', 'True'],
@@ -104,8 +135,16 @@ def create_combination_gpu():
 
 # We run this function one time. The function create all the possible combination
 def create_combination_cpu():
-    dict_name = {"archive": ['UCR', 'MTS'],
-                 "classifier": ['twiesn', 'rocket'],
+    # dict_name = {"archive": ['UCR', 'MTS'],
+    #              "classifier": ['twiesn', 'rocket'],
+    #              "afterTA": ['False', 'True'],
+    #              "method": ['sax', 'td4c-cosine', 'gradient', 'RawData'],
+    #              "combination": ['False', 'True'],
+    #              "transformation": ['1', '2', '3'],
+    #              "perEntity": ['False']}
+
+    dict_name = {"archive": ['MTS'],
+                 "classifier": ['rocket'],
                  "afterTA": ['False', 'True'],
                  "method": ['sax', 'td4c-cosine', 'gradient', 'RawData'],
                  "combination": ['False', 'True'],
@@ -194,8 +233,9 @@ if __name__ == '__main__':
     temp_file = open("/sise/home/" + current_user + "/tmp.txt", 'w')
 
     # create_combination_gpu()
-    create_combination_cpu()
+    # create_combination_cpu()
     # create_combination_list()
+    create_combination_per_entity()
 
     # # For step one - CPU
     # write_pickle("create_files_dict_UCR", {})
@@ -232,7 +272,9 @@ if __name__ == '__main__':
     #
     # file = open(project_path + "Project/temporal_abstraction_f/pickle_files//running_dictMTS.pkl", "rb")
     # data3 = pickle.load(file)
-    # print(len(data3))
+
+    # del data3[('MTS', 'mcdcnn', 'td4c-cosine', 10, 1, -1, 1, None, '3', True, False)]
+    # write_pickle("running_dictMTS", data3)
 
     # file = open(project_path + "Project/temporal_abstraction_f/pickle_files//run_to_do_MTS.pkl", "rb")
     # data2 = pickle.load(file)

@@ -4,7 +4,7 @@ import pandas as pd
 from utils_folder.utils import open_pickle, create_directory
 
 
-def create_three_files(config, path, method, nb_bins, paa_window_size, std_coefficient, max_gap,
+def create_three_files(config, path, method, nb_bins, paa_window_size, std_coefficient, max_gap, type="train",
                        gradient_window_size=None):
     """
     :param path: the location of the database
@@ -29,13 +29,6 @@ def create_three_files(config, path, method, nb_bins, paa_window_size, std_coeff
         dataset_list = config.MTS_DATASET_NAMES
 
     for ds in dataset_list:
-
-        ta_file = Path(path + ds + '//ta.csv')
-        if ta_file.is_file():
-            print(ds)
-            print("\tFiles already exists, continue to the next step")
-            continue
-
         # GKB
         index = 0
         df_gkb = pd.DataFrame(
@@ -49,7 +42,9 @@ def create_three_files(config, path, method, nb_bins, paa_window_size, std_coeff
         # PP
         df_pp = pd.DataFrame(columns=["TemporalPropertyID", "PAAWindowSize", "StdCoefficient", "MaxGap"])
 
-        for property_id in attribute_dict[ds]:
+        property_list = attribute_dict[(ds, type)] if config.perEntity else attribute_dict[ds]
+
+        for property_id in property_list:
             # TA
             new_row = pd.Series(data={"TemporalPropertyID": property_id, "Method": method, "NbBins": nb_bins,
                                       "GradientWindowSize": gradient_window_size})
@@ -74,8 +69,17 @@ def create_three_files(config, path, method, nb_bins, paa_window_size, std_coeff
                     df_gkb = df_gkb.append(new_row, ignore_index=True)
 
         create_directory(path + ds)
+
+        path_addition = ""
+        if config.perEntity:
+            path_addition = '_' + type
+
         if method == "gradient":
-            df_gkb.to_csv(path + ds + '//gkb.csv', index=False)
+            df_gkb.to_csv(path + ds + '//gkb' + path_addition + '.csv', index=False)
         # Save all data frames to csv
-        df_ta.to_csv(path + ds + '//ta.csv', index=False)
-        df_pp.to_csv(path + ds + '//pp.csv', index=False)
+        df_ta.to_csv(path + ds + '//ta' + path_addition + '.csv', index=False)
+        df_pp.to_csv(path + ds + '//pp' + path_addition + '.csv', index=False)
+
+        if config.perEntity and type == "train":
+            create_three_files(config, path, method, nb_bins, paa_window_size, std_coefficient, max_gap, "test",
+                               gradient_window_size)

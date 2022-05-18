@@ -79,8 +79,9 @@ class UnivariateTA1:
                 root_dir_dataset = self.cur_root_dir + dataset_name + '/' + dataset_name
 
                 r = self.input_to_csv(root_dir_dataset, file_type, dataset_name, output_path)
-                if file_type == "TRAIN":
-                    attributes_dict[dataset_name] = [i for i in range(self.next_attribute, self.next_attribute + r)]
+
+                attributes_dict[(dataset_name, file_type.lower())] = [i for i in range(self.next_attribute,
+                                                                                       self.next_attribute + r)]
 
                 print("\t\t" + file_type.lower())
 

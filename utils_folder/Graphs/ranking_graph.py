@@ -5,9 +5,6 @@ import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
-matplotlib.rcParams['font.family'] = 'sans-serif'
-matplotlib.rcParams['font.sans-serif'] = 'Arial'
-
 import operator
 import math
 from scipy.stats import wilcoxon
@@ -182,7 +179,7 @@ def graph_ranks(avranks, names, p_values, cd=None, cdmethod=None, lowv=None, hig
 
     for a in range(lowv, highv + 1):
         text(rankpos(a), cline - tick / 2 - 0.05, str(a),
-             ha="center", va="bottom", size=16)
+             ha="center", va="bottom", size=14)
 
     k = len(ssums)
 
@@ -199,7 +196,7 @@ def graph_ranks(avranks, names, p_values, cd=None, cdmethod=None, lowv=None, hig
              linewidth=linewidth)
         if labels:
             text(textspace + 0.3, chei - 0.075, format(ssums[i], '.4f'), ha="right", va="center", size=10)
-        text(textspace - 0.2, chei, filter_names(nnames[i]), ha="right", va="center", size=16)
+        text(textspace - 0.2, chei, filter_names(nnames[i]), ha="right", va="center", size=14)
 
     for i in range(math.ceil(k / 2), k):
         chei = cline + minnotsignificant + (k - i - 1) * space_between_names
@@ -210,7 +207,7 @@ def graph_ranks(avranks, names, p_values, cd=None, cdmethod=None, lowv=None, hig
         if labels:
             text(textspace + scalewidth - 0.3, chei - 0.075, format(ssums[i], '.4f'), ha="left", va="center", size=10)
         text(textspace + scalewidth + 0.2, chei, filter_names(nnames[i]),
-             ha="left", va="center", size=16)
+             ha="left", va="center", size=14)
 
     # no-significance lines
     def draw_lines(lines, side=0.05, height=0.1):
@@ -268,32 +265,33 @@ def form_cliques(p_values, nnames):
     return networkx.find_cliques(g)
 
 
-def draw_cd_diagram(df_perf=None, alpha=0.05, title=None, labels=False):
+def draw_cd_diagram(file_name, metric, df_perf=None, alpha=0.01, title=None, labels=False):
     """
     Draws the critical difference diagram given the list of pairwise classifiers that are
     significant or not
     """
-    p_values, average_ranks, _ = wilcoxon_holm(df_perf=df_perf, alpha=alpha)
+    font = {'family': 'Cambria'}
+    font_bold = {'family': 'Cambria', 'weight': 'bold'}
 
-    print(average_ranks)
+    matplotlib.rc('font', **font)
 
-    for p in p_values:
-        print(p)
+    p_values, average_ranks, _ = wilcoxon_holm(metric, df_perf=df_perf, alpha=alpha)
 
+    # print(average_ranks)
+    # for p in p_values:
+    #     print(p)
 
     graph_ranks(average_ranks.values, average_ranks.keys(), p_values,
                 cd=None, reverse=True, width=9, textspace=1.5, labels=labels)
 
-    font = {'family': 'sans-serif',
-        'color':  'black',
-        'weight': 'normal',
-        'size': 22,
-        }
     if title:
-        plt.title(title,fontdict=font, y=0.9, x=0.5)
-    plt.savefig('ucr_cd-diagram_afterTA.png',bbox_inches='tight')
+        plt.title(title, fontdict=font_bold, y=0.9, x=0.5)
 
-def wilcoxon_holm(alpha=0.05, df_perf=None):
+    plt.savefig("/sise/robertmo-group/TA-DL-TSC/Project/utils_folder/Graphs/"
+                + file_name + '.png', bbox_inches='tight')
+
+
+def wilcoxon_holm(metric, alpha=0.05, df_perf=None):
     """
     Applies the wilcoxon signed rank test between each pair of algorithm and then use Holm
     to reject the null's hypothesis
@@ -309,7 +307,7 @@ def wilcoxon_holm(alpha=0.05, df_perf=None):
                        ['classifier_name'])
     # test the null hypothesis using friedman before doing a post-hoc analysis
     friedman_p_value = friedmanchisquare(*(
-        np.array(df_perf.loc[df_perf['classifier_name'] == c]['accuracy'])
+        np.array(df_perf.loc[df_perf['classifier_name'] == c][metric])
         for c in classifiers))[1]
     if friedman_p_value >= alpha:
         # then the null hypothesis over the entire classifiers cannot be rejected
@@ -324,14 +322,14 @@ def wilcoxon_holm(alpha=0.05, df_perf=None):
         # get the name of classifier one
         classifier_1 = classifiers[i]
         # get the performance of classifier one
-        perf_1 = np.array(df_perf.loc[df_perf['classifier_name'] == classifier_1]['accuracy']
+        perf_1 = np.array(df_perf.loc[df_perf['classifier_name'] == classifier_1][metric]
                           , dtype=np.float64)
         for j in range(i + 1, m):
             # get the name of the second classifier
             classifier_2 = classifiers[j]
             # get the performance of classifier one
             perf_2 = np.array(df_perf.loc[df_perf['classifier_name'] == classifier_2]
-                              ['accuracy'], dtype=np.float64)
+                              [metric], dtype=np.float64)
             # calculate the p_value
             p_value = wilcoxon(perf_1, perf_2, zero_method='pratt')[1]
             # appen to the list
@@ -356,7 +354,7 @@ def wilcoxon_holm(alpha=0.05, df_perf=None):
     sorted_df_perf = df_perf.loc[df_perf['classifier_name'].isin(classifiers)]. \
         sort_values(['classifier_name', 'dataset_name'])
     # get the rank data
-    rank_data = np.array(sorted_df_perf['accuracy']).reshape(m, max_nb_datasets)
+    rank_data = np.array(sorted_df_perf[metric]).reshape(m, max_nb_datasets)
 
     # create the data frame containg the accuracies
     df_ranks = pd.DataFrame(data=rank_data, index=np.sort(classifiers), columns=
@@ -364,14 +362,12 @@ def wilcoxon_holm(alpha=0.05, df_perf=None):
 
     # number of wins
     dfff = df_ranks.rank(ascending=False)
-    print(dfff[dfff == 1.0].sum(axis=1))
+    # print(dfff[dfff == 1.0].sum(axis=1))
 
     # average the ranks
     average_ranks = df_ranks.rank(ascending=False).mean(axis=1).sort_values(ascending=False)
     # return the p-values and the average ranks
     return p_values, average_ranks, max_nb_datasets
 
-
 # df_perf = pd.read_csv('DefaultvsTunedvsEnsembleCritDiffAcc.csv',index_col=False)
 # draw_cd_diagram(df_perf=df_perf, title='Accuracy', labels=True)
-

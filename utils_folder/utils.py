@@ -1,6 +1,5 @@
 import os
 import pickle
-import json
 import random
 import time
 from builtins import print
@@ -16,11 +15,8 @@ from sklearn.metrics import precision_score, recall_score, f1_score, balanced_ac
 from sklearn.metrics import roc_auc_score
 
 from utils_folder.configuration import ConfigClass
-from utils_folder.ranking_graph import draw_cd_diagram
 
 matplotlib.use('agg')
-matplotlib.rcParams['font.family'] = 'sans-serif'
-matplotlib.rcParams['font.sans-serif'] = 'Arial'
 
 config = ConfigClass()
 config.set_seed()
@@ -403,15 +399,4 @@ def save_logs(output_directory, hist, y_pred, y_true, learning_time, predicting_
     return df_metrics
 
 
-def create_df_for_rank_graph(path):
-    df = pd.read_csv(path, encoding="utf-8")
 
-    res_df = df.groupby(["classifier_name", "archive_name", "dataset_name"], as_index=False).agg({"accuracy": np.mean})
-
-    ucr_df = res_df.loc[res_df.archive_name == "UCRArchive_2018"]
-    mts_df = res_df.loc[res_df.archive_name == "mts_archive"]
-
-    mts_df.drop("archive_name", axis=1, inplace=True)
-    ucr_df.drop("archive_name", axis=1, inplace=True)
-
-    draw_cd_diagram(df_perf=mts_df, title='Accuracy', labels=True)
