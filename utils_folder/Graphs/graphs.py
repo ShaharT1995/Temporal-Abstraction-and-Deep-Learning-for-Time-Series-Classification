@@ -55,11 +55,11 @@ def concat_results(path_ta_dir, raw_data=False, type="UCR"):
                                 res_ta_data["gradient_window_size"] = arguments[6]
 
                                 if arguments[7] == "1":
-                                    transformation_name = "Categorical"
+                                    transformation_name = "Discrete"
                                 elif arguments[7] == "2":
-                                    transformation_name = "One-Hot"
+                                    transformation_name = " Symbol One-Hot"
                                 else:
-                                    transformation_name = "Endpoint"
+                                    transformation_name = "Endpoint One-Hot"
 
                                 res_ta_data["transformation_type"] = transformation_name
 
@@ -196,8 +196,37 @@ def create_fig_best_params_VS_raw_data_classifier(best_params, raw_data_df, afte
                x_label='Classifier', legend="TA vs Raw data", hue="Data", type=type)
 
 
+
+def create_fig_best_params_VS_raw_data_datasets(best_params, raw_data_df, after_ta_df, metrics, type="UCR"):
+
+    df = concat_after_df_with_best_df(after_ta_df, best_params, metrics,
+                                      ["nb bins", "method", "transformation_type", "dataset_name"], number_of_cols=3)
+
+    dict_raw_data = {k + "_raw_data": np.mean for k in metrics}
+    raw_data_df = raw_data_df.groupby(['dataset_name_raw_data'], as_index=False).agg(dict_raw_data)
+
+    raw_data_df = raw_data_df.rename(columns={"dataset_name_raw_data": "dataset_name"})
+    df = pd.merge(df, raw_data_df, on='dataset_name')
+
+    melt_df_after = pd.melt(df, id_vars=["nb bins", "method", "transformation_type", "dataset_name"],
+                            value_vars=metrics)
+
+    df.drop(metrics, inplace=True, axis=1)
+    df.columns = df.columns.str.replace('_raw_data', '')
+
+    melt_before = pd.melt(df, id_vars=["nb bins", "method", "transformation_type", "dataset_name"],
+                          value_vars=metrics)
+
+    # Merge the two df
+    data = pd.concat([melt_before.assign(Data='Raw Data'), melt_df_after.assign(Data='TA')])
+
+    data = data.rename(columns={"variable": "Evaluation Metric", "dataset_name": "Dataset"})
+
+    create_fig(x="Dataset", y="value", col="Evaluation Metric", data=data, name="TA vs Raw data - Dataset",
+               x_label='Dataset', legend="TA vs Raw data", hue="Data", type=type)
+
 def create_fig_dataset_characteristics(best_params, raw_data_df, after_ta_df, metrics, characteristics_df,
-                                       characteristic_name, type="UCR"):
+                                       characteristic_name, type="UCR", continuous=False):
     df = concat_after_df_with_best_df(after_ta_df, best_params, metrics,
                                       ["nb bins", "method", "transformation_type", "dataset_name"], number_of_cols=3)
 
@@ -208,53 +237,22 @@ def create_fig_dataset_characteristics(best_params, raw_data_df, after_ta_df, me
 
     raw_data_df = raw_data_df.rename(columns={"dataset_name_raw_data": "dataset_name"})
     df = pd.merge(raw_data_df, df, on=["dataset_name"])
-
     df = pd.merge(df, characteristics_df, on="dataset_name")
 
-    df = add_characteristic(characteristic_name, df)
-
-    melt_df_after = pd.melt(df, id_vars=["nb bins", "method", "transformation_type", "groups_" + characteristic_name],
-                            value_vars=metrics)
-
-    df.drop(metrics, inplace=True, axis=1)
-    df.columns = df.columns.str.replace('_raw_data', '')
-
-    melt_before = pd.melt(df, id_vars=["nb bins", "method", "transformation_type", "groups_" + characteristic_name],
-                          value_vars=metrics)
-
-    # Merge the two df
-    data = pd.concat([melt_before.assign(Data='Raw Data'), melt_df_after.assign(Data='TA')])
-
-    data = data.rename(
-        columns={"variable": "Evaluation Metric", "groups_" + characteristic_name: "Dataset " + characteristic_name})
-
-    if characteristic_name == "classes":
-        order = ["Binary", "3 - 10", "> 10"]
+    if continuous:
+        df = df.rename(columns={characteristic_name: "groups_" + characteristic_name})
+        fig_name= "TA vs Raw data - " + characteristic_name + " - Continuous"
+        order = None
+        join= True
     else:
-        order = ["< 81", "81 - 250", "251 - 450", "451 - 700", "701 - 1000", " > 1000"]
+        df = add_characteristic(characteristic_name, df)
+        fig_name= "TA vs Raw data - " + characteristic_name
+        join = None
+        if characteristic_name == "classes":
+            order = ["Binary", "3 - 10", "> 10"]
+        else:
+            order = ["< 81", "81 - 250", "251 - 450", "451 - 700", "701 - 1000", " > 1000"]
 
-    create_fig(x="Dataset " + characteristic_name, y="value", col="Evaluation Metric", data=data,
-               name="TA vs Raw data - " + characteristic_name,
-               x_label="Dataset " + characteristic_name, legend="TA vs Raw data", hue="Data", type=type,
-               order=order)
-
-
-def create_fig_dataset_characteristics_continuous(best_params, raw_data_df, after_ta_df, metrics, characteristics_df,
-                                                  characteristic_name, type="UCR"):
-    df = concat_after_df_with_best_df(after_ta_df, best_params, metrics,
-                                      ["nb bins", "method", "transformation_type", "dataset_name"], number_of_cols=3)
-
-    dict_raw_data = {k + "_raw_data": np.mean for k in metrics}
-
-    raw_data_df = raw_data_df.groupby(['dataset_name_raw_data'],
-                                      as_index=False).agg(dict_raw_data)
-
-    raw_data_df = raw_data_df.rename(columns={"dataset_name_raw_data": "dataset_name"})
-    df = pd.merge(raw_data_df, df, on=["dataset_name"])
-
-    df = pd.merge(df, characteristics_df, on="dataset_name")
-
-    df = df.rename(columns={characteristic_name: "groups_" + characteristic_name})
 
     melt_df_after = pd.melt(df, id_vars=["nb bins", "method", "transformation_type", "groups_" + characteristic_name],
                             value_vars=metrics)
@@ -271,9 +269,12 @@ def create_fig_dataset_characteristics_continuous(best_params, raw_data_df, afte
     data = data.rename(
         columns={"variable": "Evaluation Metric", "groups_" + characteristic_name: "Dataset " + characteristic_name})
 
+
     create_fig(x="Dataset " + characteristic_name, y="value", col="Evaluation Metric", data=data,
-               name="TA vs Raw data - " + characteristic_name + " - Continuous",
-               x_label="Dataset " + characteristic_name, legend="TA vs Raw data", hue="Data", type=type, join=True)
+               name=fig_name,
+               x_label="Dataset " + characteristic_name, legend="TA vs Raw data", hue="Data", type=type,
+               order=order, join=join )
+
 
 
 def concat_after_df_with_best_df(after_ta_df, best_params, metrics, group_by_lst, number_of_cols):
@@ -308,11 +309,13 @@ def create_fig(x, y, col, data, name, x_label, y_label='', legend='', hue=None, 
     # metrics = ['MCC', 'Cohen Kappa', 'F1 Score Macro', 'F1 Score Micro', 'F1 Score Weighted', 'Balanced Accuracy',
     #            'AUC - ROC']
 
-    metrics = ['Balanced Accuracy', 'AUC - ROC']
-    data = data.loc[(data['Evaluation Metric'] == "AUC - ROC") | (data['Evaluation Metric'] == "Balanced Accuracy")]
-
-    sns.set_palette(sns.color_palette(["#FF0B04", "#4374B3"]))
-
+    metrics = ['Balanced Accuracy']
+    #data = data.loc[(data['Evaluation Metric'] == "AUC - ROC") | (data['Evaluation Metric'] == "Balanced Accuracy")]
+    data = data.loc[ (data['Evaluation Metric'] == "Balanced Accuracy")]
+    #["#FF0B04", "#4374B3"]
+    sns.set_palette(sns.color_palette(["#CD37CB", "#26AA1B"]))
+    # CD37CB
+    # 26AA1B
     g = sns.catplot(x=x, y=y,
                     col=col,
                     hue=hue,
@@ -320,17 +323,19 @@ def create_fig(x, y, col, data, name, x_label, y_label='', legend='', hue=None, 
                     kind="point",
                     sharey=False,
                     height=6,
-                    aspect=1.3,
+                    aspect=1.7,
                     join=join,
                     order=order,
-                    legend=False)
+                    legend=False,
+                    scale= 1.3
+                    )
     v = 0
 
     # plt.rcParams["font.family"] = "Cambria"
     # plt.legend(title="Data", prop={'family': 'Cambria'})
 
     matplotlib.font_manager._load_fontmanager(try_read_cache=False)
-
+    plt.grid()
     for i in range(g.axes.shape[0]):
         for j in range(g.axes.shape[1]):
             plt.rcParams["font.family"] = "Cambria"
@@ -346,9 +351,8 @@ def create_fig(x, y, col, data, name, x_label, y_label='', legend='', hue=None, 
                 y_label_new = metrics[v]
             else:
                 y_label_new = y_label
-
             plt.setp(axis.get_yticklabels(), fontproperties=my_font)
-            plt.setp(axis.get_xticklabels(), rotation=30, fontproperties=my_font)
+            plt.setp(axis.get_xticklabels(), rotation=80, fontproperties=my_font)
 
             axis.set_ylabel(y_label_new, fontproperties=my_font_bold)
 
@@ -357,10 +361,11 @@ def create_fig(x, y, col, data, name, x_label, y_label='', legend='', hue=None, 
 
     plt.subplots_adjust(wspace=0.3, hspace=0.3)
     plt.show()
+
     plt.savefig(type + "/" + name, bbox_inches='tight')
 
 
-def create_all_graphs(create_csv=False, type="UCR"):
+def create_all_graphs(graph_num, create_csv=False, type="UCR"):
     config = ConfigClass()
     # Run this only once
     if create_csv:
@@ -377,71 +382,77 @@ def create_all_graphs(create_csv=False, type="UCR"):
 
     metrics = ['MCC', 'Cohen Kappa', 'F1 Score Macro', 'F1 Score Micro', 'F1 Score Weighted', 'Balanced Accuracy',
                'AUC - ROC']
+    # --------------------------------Graph 1----------------------------------------------------------
+    if graph_num == 1:
+        df_top_from_raw, df_top_ta = get_best_df_after_ta(raw_data_df, df_after_ta, metrics, ["nb bins", "method"])
+        melt_df_after = pd.melt(df_top_ta, id_vars=["nb bins", "method"], value_vars=metrics)
+        melt_df_after = melt_df_after.rename(columns={"variable": "Evaluation Metric", "method": "Method"})
 
-    # --------------------------------Graph 0----------------------------------------------------------
-    # df_top_from_raw, df_top_ta = get_best_df_after_ta(raw_data_df, df_after_ta, metrics, ["nb bins", "method"])
-    # melt_df_after = pd.melt(df_top_ta, id_vars=["nb bins", "method"], value_vars=metrics)
-    # melt_df_after = melt_df_after.rename(columns={"variable": "Evaluation Metric", "method": "Method"})
-    #
-    # create_fig(x="Method", y="value", col="Evaluation Metric", data=melt_df_after, name="Method",
-    #            x_label='Method', hue="nb bins", legend="Number of Symbols", type=type)
-    #
-    # # # --------------------------------Graph 1----------------------------------------------------------
-    # df_top_from_raw, df_top_ta = get_best_df_after_ta(raw_data_df, df_after_ta,metrics, ["nb bins", "method"], 5)
-    # melt_df_after = pd.melt(df_top_ta, id_vars=["nb bins", "method"], value_vars=metrics)
-    # melt_df_after = melt_df_after.rename(columns={"variable": "Evaluation Metric", "method": "Method"})
-    #
-    # create_fig(x="Method", y="value", col="Evaluation Metric", data=melt_df_after, name="Best_n_ta",
-    #            x_label='Method', hue="nb bins", legend="Number of Symbols", type=type)
-    #
-    # # --------------------------------Graph 2----------------------------------------------------------
-    # df_top_from_raw, df_top_ta = get_best_df_after_ta(raw_data_df, df_after_ta, metrics, ["transformation_type"], 5)
-    # melt_df_after = pd.melt(df_top_ta, id_vars=["transformation_type"], value_vars=metrics)
-    # melt_df_after = melt_df_after.rename(columns={"variable": "Evaluation Metric",
-    #                                               "transformation_type": "Transformation Type"})
-    #
-    # create_fig(x="Transformation Type", y="value", col="Evaluation Metric", data=melt_df_after,
-    #            name="Best_transformation_with_best_ta", x_label='Transformation Type', legend="", type=type,
-    #            order=["Categorical", "One-Hot", "Endpoint"])
-    #
-    # # --------------------------------Graph 3----------------------------------------------------------
-    # create_fig_best_transformation(None, df_after_ta, metrics, graph_best_transformation=True, type=type)
+        create_fig(x="Method", y="value", col="Evaluation Metric", data=melt_df_after, name="Method",
+                   x_label='Method', hue="nb bins", legend="Number of Symbols", type=type)
+    # --------------------------------Graph 2----------------------------------------------------------
+    elif graph_num == 2:
+        df_top_from_raw, df_top_ta = get_best_df_after_ta(raw_data_df, df_after_ta,metrics, ["nb bins", "method"], 5)
+        melt_df_after = pd.melt(df_top_ta, id_vars=["nb bins", "method"], value_vars=metrics)
+        melt_df_after = melt_df_after.rename(columns={"variable": "Evaluation Metric", "method": "Method"})
 
-    # --------------------------------Graph 4----------------------------------------------------------
-    # df_top_from_raw, df_top_ta = get_best_df_after_ta(raw_data_df, df_after_ta, metrics, ["nb bins", "method",
-    #                                                                                       "transformation_type"], 1)
-    # create_fig_best_params_VS_raw_data(df_top_ta, raw_data_df, metrics, type=type)
+        create_fig(x="Method", y="value", col="Evaluation Metric", data=melt_df_after, name="Best_n_ta",
+                   x_label='Method', hue="nb bins", legend="Number of Symbols", type=type)
+
+    # --------------------------------Graph 3----------------------------------------------------------
+    elif graph_num == 3:
+        df_top_from_raw, df_top_ta = get_best_df_after_ta(raw_data_df, df_after_ta, metrics, ["transformation_type"], 5)
+        melt_df_after = pd.melt(df_top_ta, id_vars=["transformation_type"], value_vars=metrics)
+        melt_df_after = melt_df_after.rename(columns={"variable": "Evaluation Metric",
+                                                      "transformation_type": "Transformation Type"})
+
+        create_fig(x="Transformation Type", y="value", col="Evaluation Metric", data=melt_df_after,
+                   name="Best_transformation_with_best_ta", x_label='Transformation Type', legend="", type=type,
+                   order=["Categorical", "One-Hot", "Endpoint"])
+
+    # # --------------------------------Graph 4----------------------------------------------------------
+    elif graph_num == 4:
+        create_fig_best_transformation(None, df_after_ta, metrics, graph_best_transformation=True, type=type)
 
     # --------------------------------Graph 5----------------------------------------------------------
-    df_top_from_raw, df_top_ta = get_best_df_after_ta(raw_data_df, df_after_ta, metrics, ["nb bins", "method",
-                                                                                          "transformation_type"], 1)
-    create_fig_best_params_VS_raw_data_classifier(df_top_ta, raw_data_df, df_after_ta, metrics, type=type)
-    #
+    elif graph_num == 5:
+        df_top_from_raw, df_top_ta = get_best_df_after_ta(raw_data_df, df_after_ta, metrics, ["nb bins", "method",
+                                                                                              "transformation_type"], 1)
+        create_fig_best_params_VS_raw_data(df_top_ta, raw_data_df, metrics, type=type)
+
+    # --------------------------------Graph 6----------------------------------------------------------
+    elif graph_num == 6:
+        df_top_from_raw, df_top_ta = get_best_df_after_ta(raw_data_df, df_after_ta, metrics, ["nb bins", "method",
+                                                                                              "transformation_type"], 1)
+        create_fig_best_params_VS_raw_data_classifier(df_top_ta, raw_data_df, df_after_ta, metrics, type=type)
+        create_fig_best_params_VS_raw_data_datasets(df_top_ta, raw_data_df, df_after_ta, metrics, type=type)
+
     # # --------------------------------Graph 6----------------------------------------------------------
-    # df_top_from_raw, df_top_ta = get_best_df_after_ta(raw_data_df, df_after_ta, metrics, ["nb bins", "method",
-    #                                                                                     "transformation_type"], 1)
-    # # for length
-    # length_dict = open_pickle(type + "_length")
-    # length_df = pd.DataFrame(list(length_dict.items()), columns=['dataset_name', 'lengths'])
-    # create_fig_dataset_characteristics(df_top_ta, raw_data_df, df_after_ta, metrics, length_df, "lengths", type=type)
-    #
-    # # for length - continuous
-    # length_dict = open_pickle(type + "_length")
-    # length_df = pd.DataFrame(list(length_dict.items()), columns=['dataset_name', 'lengths'])
-    # create_fig_dataset_characteristics_continuous(df_top_ta, raw_data_df, df_after_ta, metrics, length_df, "lengths",
-    #                                               type=type)
-    #
-    # # for classes
-    # classes_dict = open_pickle(type + "_classes")
-    # classes_df = pd.DataFrame(list(classes_dict.items()), columns=['dataset_name', 'classes'])
-    # create_fig_dataset_characteristics(df_top_ta, raw_data_df, df_after_ta, metrics, classes_df, "classes", type=type)
-    #
-    # # for classes - continuous
-    # classes_dict = open_pickle(type + "_classes")
-    # classes_df = pd.DataFrame(list(classes_dict.items()), columns=['dataset_name', 'classes'])
-    # create_fig_dataset_characteristics_continuous(df_top_ta, raw_data_df, df_after_ta, metrics, classes_df, "classes",
-    #                                                  type=type)
+    elif graph_num == 7:
+        df_top_from_raw, df_top_ta = get_best_df_after_ta(raw_data_df, df_after_ta, metrics, ["nb bins", "method",
+                                                                                            "transformation_type"], 1)
+        # for length
+        length_dict = open_pickle(type + "_length")
+        length_df = pd.DataFrame(list(length_dict.items()), columns=['dataset_name', 'lengths'])
+        create_fig_dataset_characteristics(df_top_ta, raw_data_df, df_after_ta, metrics, length_df, "lengths", type=type)
+
+        # for length - continuous
+        length_dict = open_pickle(type + "_length")
+        length_df = pd.DataFrame(list(length_dict.items()), columns=['dataset_name', 'lengths'])
+        create_fig_dataset_characteristics(df_top_ta, raw_data_df, df_after_ta, metrics, length_df, "lengths",
+                                                      type=type, continuous=True)
+
+        # for classes
+        classes_dict = open_pickle(type + "_classes")
+        classes_df = pd.DataFrame(list(classes_dict.items()), columns=['dataset_name', 'classes'])
+        create_fig_dataset_characteristics(df_top_ta, raw_data_df, df_after_ta, metrics, classes_df, "classes", type=type)
+
+        # for classes - continuous
+        classes_dict = open_pickle(type + "_classes")
+        classes_df = pd.DataFrame(list(classes_dict.items()), columns=['dataset_name', 'classes'])
+        create_fig_dataset_characteristics(df_top_ta, raw_data_df, df_after_ta, metrics, classes_df, "classes",
+                                                         type=type,  continuous=True)
 
 
 if __name__ == '__main__':
-    create_all_graphs(create_csv=True, type="MTS")
+    create_all_graphs(6, create_csv=False, type="MTS")
