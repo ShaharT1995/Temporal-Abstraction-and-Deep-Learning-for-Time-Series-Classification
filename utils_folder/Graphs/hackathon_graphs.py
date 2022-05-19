@@ -1,3 +1,6 @@
+import os
+import re
+
 import matplotlib
 import numpy as np
 import pandas as pd
@@ -5,9 +8,84 @@ import seaborn as sns
 import matplotlib.font_manager as fm
 from matplotlib import pyplot as plt
 
-from utils_folder.Graphs.graphs import concat_results, my_font_bold, my_font
 from utils_folder.configuration import ConfigClass
 from utils_folder.utils import open_pickle
+
+config = ConfigClass()
+
+font_path = "/sise/robertmo-group/TA-DL-TSC/Cambria/CAMBRIA.TTC"
+my_font = fm.FontProperties(fname=font_path)
+
+font_path = "/sise/robertmo-group/TA-DL-TSC/Cambria/CAMBRIAB.TTF"
+my_font_bold = fm.FontProperties(fname=font_path)
+
+
+# Creates a unified file of all results for all combinations
+def concat_results(path_ta_dir, raw_data=False, type="UCR"):
+    classifiers = ["cnn", "mlp", "mcdcnn", "fcn", "twiesn", "encoder", "inception", "lstm_fcn", "mlstm_fcn", "rocket"]
+
+    columns_df = ['classifier_name', 'archive_name', 'dataset_name', 'Precision', 'Accuracy', 'Recall', 'MCC',
+                  'Cohen Kappa', 'Learning Time', 'Predicting Time', 'F1 Score Macro', 'F1 Score Micro',
+                  'F1 Score Weighted', 'Balanced Accuracy', 'AUC', "iteration"]
+
+    output_file_name = "Raw_data_results_" + type + "_new.csv"
+    if not raw_data:
+        columns_df += ['method', "nb bins", "paa", "std", "max gap", "gradient_window_size"]
+        output_file_name = 'results_of_all_combinations_' + type + '_new.csv'
+
+    df = pd.DataFrame(columns=columns_df)
+    for classifier in classifiers:
+        path_ta_dir_tmp = path_ta_dir + classifier
+        for root, dirs, files in os.walk(path_ta_dir_tmp):
+            for method in dirs:
+                files_path = path_ta_dir_tmp + "/" + method
+                for root, dirs, files in os.walk(files_path):
+                    for file in files:
+                        if file.endswith(".csv"):
+                            arguments = re.split('[_.]', file)
+                            res_ta_data = pd.read_csv(root + "//" + file, sep=',', header=0, encoding="utf-8")
+                            if not raw_data:
+                                new_method = method + " with Gradient" if arguments[8] == "True" else method
+                                new_method = new_method + " with Per Entity" if arguments[9] == "True" else new_method
+                                res_ta_data["method"] = new_method
+                                res_ta_data["nb bins"] = arguments[2]
+                                res_ta_data["paa"] = arguments[3]
+                                res_ta_data["std"] = arguments[4]
+                                res_ta_data["max gap"] = arguments[5]
+                                res_ta_data["gradient_window_size"] = arguments[6]
+
+                                if arguments[7] == "1":
+                                    transformation_name = "Discrete"
+                                elif arguments[7] == "2":
+                                    transformation_name = "Symbol One-Hot"
+                                else:
+                                    transformation_name = "Endpoint One-Hot"
+
+                                res_ta_data["transformation_type"] = transformation_name
+
+                            df = pd.concat([df, res_ta_data])
+
+    df["Learning Time"] = df["Learning Time"] / 1000
+    df["Predicting Time"] = df["Predicting Time"] / 1000
+
+    df = df.drop(['precision', 'recall', 'accuracy', 'mcc', 'cohen_kappa', 'f1_score_macro',
+                  'f1_score_micro', 'f1_score_weighted', 'learning_time', 'predicting_time',
+                  'auc'], axis=1, errors='ignore')
+    df = df.rename(columns={"AUC": "AUC - ROC", 'Accuracy': 'Balanced Accuracy'})
+
+    df = df.replace({"classifier_name": dict(fcn="FCN", mlp="MLP", resnet="ResNet", twiesn="TWIESN", encoder="Encoder",
+                                             mcdcnn="MCDCNN", cnn="Time - CNN", inception="Inception",
+                                             lstm_fcn="LSTM - FCN", mlstm_fcn="MLSTM - FCN", rocket="Rocket")})
+
+    # Rename raw data columns
+    if raw_data:
+        df.rename(columns=lambda x: x + "_raw_data", inplace=True)
+    else:
+        df = df.replace({"method": {"sax": "SAX", "td4c-cosine": "TD4C - Cosine", "gradient": "Gradient",
+                                    "sax with Gradient": "SAX with Gradient", "td4c-cosine with Gradient":
+                                        "TD4C - Cosine with Gradient"}})
+
+    df.to_csv(output_file_name, index=False)
 
 
 def merge_two_df(raw_df, ta_df, metrics):
