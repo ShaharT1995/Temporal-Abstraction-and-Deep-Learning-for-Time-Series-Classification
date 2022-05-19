@@ -57,7 +57,7 @@ def concat_results(path_ta_dir, raw_data=False, type="UCR"):
                                 if arguments[7] == "1":
                                     transformation_name = "Discrete"
                                 elif arguments[7] == "2":
-                                    transformation_name = " Symbol One-Hot"
+                                    transformation_name = "Symbol One-Hot"
                                 else:
                                     transformation_name = "Endpoint One-Hot"
 
@@ -90,6 +90,7 @@ def concat_results(path_ta_dir, raw_data=False, type="UCR"):
 
 def get_best_df_after_ta(raw_data_df, df_after_ta, metrics, lst_group_by, max_val=None):
     # Mean val for group by
+    # dict_after_ta = {k: [np.mean, 'std'] for k in metrics}
     dict_after_ta = {k: np.mean for k in metrics}
     dict_raw_data = {k + "_raw_data": np.mean for k in metrics}
 
@@ -141,7 +142,8 @@ def create_fig_best_transformation(best_params, after_ta_df, metrics, graph_best
     data = melt_df_after.rename(columns={"variable": "Evaluation Metric", "transformation_type": "Transformation Type"})
 
     create_fig(x="Transformation Type", y="value", col="Evaluation Metric", data=data, name="best_transformation",
-               x_label="Transformation Type", legend="", type=type, order=["Categorical", "One-Hot", "Endpoint"])
+               x_label="Transformation Type", legend="", type=type, order=["Discrete", "Symbol One-Hot",
+                                                                           "Endpoint One-Hot"])
 
 
 def create_fig_best_params_VS_raw_data(best_params, raw_data_df, metrics, type="UCR"):
@@ -225,6 +227,7 @@ def create_fig_best_params_VS_raw_data_datasets(best_params, raw_data_df, after_
     create_fig(x="Dataset", y="value", col="Evaluation Metric", data=data, name="TA vs Raw data - Dataset",
                x_label='Dataset', legend="TA vs Raw data", hue="Data", type=type)
 
+
 def create_fig_dataset_characteristics(best_params, raw_data_df, after_ta_df, metrics, characteristics_df,
                                        characteristic_name, type="UCR", continuous=False):
     df = concat_after_df_with_best_df(after_ta_df, best_params, metrics,
@@ -252,7 +255,6 @@ def create_fig_dataset_characteristics(best_params, raw_data_df, after_ta_df, me
             order = ["Binary", "3 - 10", "> 10"]
         else:
             order = ["< 81", "81 - 250", "251 - 450", "451 - 700", "701 - 1000", " > 1000"]
-
 
     melt_df_after = pd.melt(df, id_vars=["nb bins", "method", "transformation_type", "groups_" + characteristic_name],
                             value_vars=metrics)
@@ -309,11 +311,12 @@ def create_fig(x, y, col, data, name, x_label, y_label='', legend='', hue=None, 
     # metrics = ['MCC', 'Cohen Kappa', 'F1 Score Macro', 'F1 Score Micro', 'F1 Score Weighted', 'Balanced Accuracy',
     #            'AUC - ROC']
 
-    metrics = ['Balanced Accuracy']
-    #data = data.loc[(data['Evaluation Metric'] == "AUC - ROC") | (data['Evaluation Metric'] == "Balanced Accuracy")]
-    data = data.loc[ (data['Evaluation Metric'] == "Balanced Accuracy")]
-    #["#FF0B04", "#4374B3"]
-    sns.set_palette(sns.color_palette(["#CD37CB", "#26AA1B"]))
+    metrics = ['Balanced Accuracy', "AUC - ROC"]
+    data = data.loc[(data['Evaluation Metric'] == "AUC - ROC") | (data['Evaluation Metric'] == "Balanced Accuracy")]
+    # data = data.loc[(data['Evaluation Metric'] == "Balanced Accuracy")]
+    # sns.set_palette(sns.color_palette(["#FF0B04", "#4374B3"]))
+    # sns.set_palette(sns.color_palette(["#CD37CB", "#26AA1B"]))
+    sns.set_palette(sns.color_palette(["#D422AE", "#D422AE"]))
     # CD37CB
     # 26AA1B
     g = sns.catplot(x=x, y=y,
@@ -323,11 +326,11 @@ def create_fig(x, y, col, data, name, x_label, y_label='', legend='', hue=None, 
                     kind="point",
                     sharey=False,
                     height=6,
-                    aspect=1.7,
+                    aspect=1.3,
                     join=join,
                     order=order,
                     legend=False,
-                    scale= 1.3
+                    scale=1.3
                     )
     v = 0
 
@@ -335,7 +338,6 @@ def create_fig(x, y, col, data, name, x_label, y_label='', legend='', hue=None, 
     # plt.legend(title="Data", prop={'family': 'Cambria'})
 
     matplotlib.font_manager._load_fontmanager(try_read_cache=False)
-    plt.grid()
     for i in range(g.axes.shape[0]):
         for j in range(g.axes.shape[1]):
             plt.rcParams["font.family"] = "Cambria"
@@ -455,4 +457,4 @@ def create_all_graphs(graph_num, create_csv=False, type="UCR"):
 
 
 if __name__ == '__main__':
-    create_all_graphs(6, create_csv=False, type="MTS")
+    create_all_graphs(6, create_csv=True, type="UCR")
