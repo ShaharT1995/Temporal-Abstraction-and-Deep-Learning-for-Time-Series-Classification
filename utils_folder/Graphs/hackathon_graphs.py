@@ -106,6 +106,7 @@ def get_best_df_after_ta(ta_df, metrics, lst_group_by, max_val=None):
 
     df["avg_ta"] = df[[i for i in metrics]].mean(axis=1)
 
+    # Get only the top X results
     if max_val is not None:
         df = df.nlargest(max_val, "avg_ta")
 
@@ -188,7 +189,7 @@ def melt_RawData_TA(df, lst, metrics):
 
 
 def metrics_best_combination_VS_raw_data(df, metrics, type="UCR"):
-    data = melt_RawData_TA(df, ["nb bins", "method", "transformation_type"], metrics)
+    data = melt_RawData_TA(df, ["nb bins", "method", "classifier_name", "transformation_type"], metrics)
 
     data = data.rename(columns={"variable": "Evaluation Metric", "method": "Method",
                                 "transformation_type": "Transformation Type"})
@@ -282,9 +283,9 @@ def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
     for num in graph_numbers:
         # Graphs of the methods
         if num == 1:
-            df = get_best_df_after_ta(df, metrics, ["nb bins", "method"], max_val=None)
-
-            melt_df = pd.melt(df, id_vars=["nb bins", "method"], value_vars=metrics)
+            df = get_best_df_after_ta(df, metrics, ["nb bins", "method"], max_val=5)
+            # todo ask shahar - i think we need to add "classifier_name", "transformation_type" to the id_vars..
+            melt_df = pd.melt(df, id_vars=["nb bins", "method","classifier_name", "transformation_type"], value_vars=metrics)
             melt_df = melt_df.rename(columns={"variable": "Evaluation Metric", "method": "Method"})
             create_fig(x="Method", y="value", col="Evaluation Metric", data=melt_df, name="Method",
                        x_label='Method', hue="nb bins", legend="Number of Symbols", type=type, colors=1)
@@ -292,8 +293,7 @@ def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
         # Graphs of the top N methods
         elif num == 2:
             df = get_best_df_after_ta(df, metrics, ["nb bins", "method"], max_val=5)
-
-            melt_df = pd.melt(df, id_vars=["nb bins", "method"], value_vars=metrics)
+            melt_df = pd.melt(df, id_vars=["nb bins", "method", "classifier_name", "transformation_type"], value_vars=metrics)
             melt_df = melt_df.rename(columns={"variable": "Evaluation Metric", "method": "Method"})
 
             create_fig(x="Method", y="value", col="Evaluation Metric", data=melt_df, name="Best 5 Methods",
@@ -303,7 +303,7 @@ def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
         elif num == 3:
             df = get_best_df_after_ta(df, metrics, ["nb bins", "method"], max_val=5)
 
-            melt_df = pd.melt(df, id_vars=["transformation_type"], value_vars=metrics)
+            melt_df = pd.melt(df, id_vars=["nb bins", "method", "classifier_name", "transformation_type"], value_vars=metrics)
             melt_df = melt_df.rename(columns={"variable": "Evaluation Metric",
                                               "transformation_type": "Transformation Type"})
 
@@ -313,7 +313,7 @@ def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
 
         # Rank the transformation
         elif num == 4:
-            melt_df = pd.melt(df, id_vars=["transformation_type"], value_vars=metrics)
+            melt_df = pd.melt(df, id_vars=["nb bins", "method", "classifier_name", "transformation_type"], value_vars=metrics)
             data = melt_df.rename(columns={"variable": "Evaluation Metric",
                                            "transformation_type": "Transformation Type"})
 
@@ -360,4 +360,5 @@ def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
 
 
 if __name__ == '__main__':
-    create_all_graphs([1, 2, 3, 4, 5, 6, 7, 8], create_csv=False, type="MTS")
+    create_all_graphs([1], create_csv=False, type="MTS")
+    # 2, 3, 4, 5, 6, 7, 8
