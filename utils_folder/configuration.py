@@ -45,6 +45,8 @@ class ConfigClass:
         self.MTS_DATASET_NAMES = ['Libras', 'ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
                                   'JapaneseVowels', 'NetFlow', 'UWave', 'Wafer']
 
+        # self.MTS_DATASET_NAMES = ['AUSLAN']
+
     def set_path_transformations(self):
         if self.perEntity:
             self.path_transformation1 = self.path_files_for_TA + "Transformation1 PerEntity//" + self.archive + "//"

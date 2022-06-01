@@ -22,10 +22,10 @@ def new_ucr_files(config, prop_path):
 
         print("\t" + dataset_name)
 
-        states_path = path + "train//states.csv"
-        states_df = pd.read_csv(states_path, header=0)
-
         for file_type in files_type:
+            states_path = path + file_type.lower() + "//states.csv"
+            states_df = pd.read_csv(states_path, header=0)
+
             # Get from the read me file the number of rows, number of columns and number of
             classes = univariate_dict[(dataset_name, file_type.lower())]["classes"]
             number_of_rows = univariate_dict[(dataset_name, file_type.lower())]["rows"]
@@ -39,7 +39,7 @@ def new_ucr_files(config, prop_path):
     print("")
 
 
-def new_mts_files(config, prop_path):
+def new_mts_files(config, prop_path, nb_bins):
     """
     :param cur_root_dir: the location in which all the databases are saved
     :return: the function create all the transformations
@@ -52,6 +52,8 @@ def new_mts_files(config, prop_path):
 
     for index, dataset_name in enumerate(config.MTS_DATASET_NAMES):
         print("\t" + dataset_name)
+
+        dataset_with_empty_columns = False
 
         path = prop_path + dataset_name + "/"
         output_path = config.path_transformation2 + dataset_name + "//"
@@ -70,18 +72,49 @@ def new_mts_files(config, prop_path):
             states_path = path + file_type + "//states.csv"
             states_df = pd.read_csv(states_path, header=0)
 
+            count_df = pd.DataFrame(states_df['TemporalPropertyID'].value_counts())
+            count_df = count_df.reset_index(level=0)
+            count_df = count_df.loc[count_df['TemporalPropertyID'] < nb_bins]
+
+            states_df['StateID'] = states_df['StateID'].astype(dtype='float')
+
+            if count_df.shape[0] > 0:
+                dataset_with_empty_columns = True
+
+                for index, row in count_df.iterrows():
+                    rows_to_add = nb_bins - row["TemporalPropertyID"]
+
+                    next_state = states_df.loc[states_df["TemporalPropertyID"] == row["index"]]["StateID"].iloc[0] +\
+                                 0.001
+
+                    for i in range(rows_to_add):
+                        states_df = states_df.append({"StateID": next_state,
+                                                      "TemporalPropertyID": row["index"],
+                                                      "BinID": i + 1,
+                                                      "BinLow": float('-inf'),
+                                                      "BinHigh": float('inf'),
+                                                      "Method": config.method.upper()}, ignore_index=True)
+                        next_state += 0.001
+
+                states_df = states_df.sort_values(by=['StateID', 'BinID'])
+                states_df.reset_index(drop=True, inplace=True)
+                states_df["index"] = states_df.index + 1
+
             # Run the three transformation on the Train and Test files
             if file_type == "train":
                 create_transformations(config, path, output_path, file_type, number_of_entities_train,
-                                       time_serious_length, number_of_attributes, classes, states_df)
+                                       time_serious_length, number_of_attributes, classes, states_df,
+                                       dataset_with_empty_columns=dataset_with_empty_columns)
             else:
                 create_transformations(config, path, output_path, file_type, number_of_entities_test,
-                                       time_serious_length, number_of_attributes, classes, states_df)
+                                       time_serious_length, number_of_attributes, classes, states_df,
+                                       dataset_with_empty_columns=dataset_with_empty_columns)
         print("")
 
 
 def create_transformations(config, path, output_path, file_type, number_of_entities, time_serious_length,
-                           number_of_attributes, classes, states_df, univariate=False, classification_path=""):
+                           number_of_attributes, classes, states_df, univariate=False, classification_path="",
+                           dataset_with_empty_columns=False):
     """
     :param path: the location of the hugobot output
     :param file_type: train/test
@@ -91,7 +124,6 @@ def create_transformations(config, path, output_path, file_type, number_of_entit
     :param classes: the classes in the database
     :return: the function do the transformation and save the data after it
     """
-
     # Get the number of state from state.csv file
     number_of_states = states_df.shape[0]
 
@@ -151,17 +183,15 @@ def create_transformations(config, path, output_path, file_type, number_of_entit
                             temporal_property_ID = int(parse_data[3][-1]) - 1 if parse_data[3][-2] == "0" else \
                                 int(parse_data[3][-2:]) - 1
 
-                        try:
-                            modulo = int(parse_data[2]) % int(number_of_states / number_of_attributes)
-                            if modulo == 0:
-                                modulo = int(number_of_states / number_of_attributes)
-                        except:
-                            print()
+                        state_id = int(parse_data[2])
+                        if dataset_with_empty_columns:
+                            state_id = states_df["index"].loc[states_df["StateID"] == state_id].iloc[0]
 
-                        try:
-                            symbol = int(modulo + temporal_property_ID * (number_of_states / number_of_attributes))
-                        except:
-                            print()
+                        modulo = state_id % int(number_of_states / number_of_attributes)
+                        if modulo == 0:
+                            modulo = int(number_of_states / number_of_attributes)
+
+                        symbol = int(modulo + temporal_property_ID * (number_of_states / number_of_attributes))
 
                     else:
                         temporal_property_ID = int(parse_data[3]) - min_property

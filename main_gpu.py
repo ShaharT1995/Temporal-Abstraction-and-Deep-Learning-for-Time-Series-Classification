@@ -27,25 +27,15 @@ def execute_running(config, running_dict, max_gap, method, nb_bin, paa, std, gra
     key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window,
            config.transformation_number, config.combination, config.perEntity)
 
-    not_done = open_pickle("run_to_do_" + config.archive)
-
-    # cpu_key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window,
-    #            config.combination, config.perEntity)
-
-    # cpu_dict = open_pickle("create_files_dict_" + config.archive)
-    # if cpu_key not in cpu_dict:
-    #     not_done = open_pickle("run_to_do_" + config.archive)
-    #     not_done[key] = True
-    #     write_pickle("run_to_do_" + config.archive, not_done)
-    #     print("\tThose parameters doesn't done in the cpu server")
-    #     return
-
     # set number of bins in the path
     config.set_path_transformations_2(nb_bin)
 
-    if key in running_dict and key not in not_done:
-        print("Already Done! \n")
-        return running_dict
+    # if key in running_dict:
+    #     print("Already Done! \n")
+    #     return running_dict
+
+    if False:
+        print()
 
     else:
         print("Step 5: Run all:")

@@ -12,6 +12,8 @@ def copytree(src, dst, symlinks=False, ignore=None):
             shutil.copy2(s, d)
 
 
-source_folder = r"/sise/robertmo-group/TA-DL-TSC/Data/FilesForTA/MTS/HugoBotOutput/gradient/number_bin_10/"
-destination_folder = r"/sise/robertmo-group/TA-DL-TSC/Data/FilesForTA/MTS/rocket/gradient/number_bin_10/"
-copytree(source_folder, destination_folder)
+source_folder = r"/sise/robertmo-group/TA-DL-TSC/Data/AfterTA/PerEntity/MTS/HugoBotFiles/sax"
+for classifier in ['fcn', 'mlp', 'resnet', 'twiesn', 'encoder', 'mcdcnn', 'cnn', 'inception', 'lstm_fcn', 'mlstm_fcn',
+                   'rocket']:
+    destination_folder = r"/sise/robertmo-group/TA-DL-TSC/Data/AfterTA/PerEntity/MTS/" + classifier + "/sax"
+    copytree(source_folder, destination_folder)

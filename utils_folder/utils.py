@@ -147,6 +147,15 @@ def read_all_datasets(config):
                 x_train = x_train.values
                 x_test = x_test.values
 
+                # znorm
+                std_ = x_train.std(axis=1, keepdims=True)
+                std_[std_ == 0] = 1.0
+                x_train = (x_train - x_train.mean(axis=1, keepdims=True)) / std_
+
+                std_ = x_test.std(axis=1, keepdims=True)
+                std_[std_ == 0] = 1.0
+                x_test = (x_test - x_test.mean(axis=1, keepdims=True)) / std_
+
         datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(), y_test.copy())
 
     return datasets_dict

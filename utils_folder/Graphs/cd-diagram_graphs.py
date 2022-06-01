@@ -101,11 +101,11 @@ def create_diagram_main(type, metric):
 
     # create_diagram_combination(raw_data_df, df_after_ta, type, metric)
     # create_diagram_combination_without_transformation(raw_data_df, df_after_ta, type, metric)
-    # create_diagram_method(df_after_ta, type, metric)
-    create_diagram_classifier(raw_data_df, df_after_ta, type, metric)
+    create_diagram_method(df_after_ta, type, metric)
+    # create_diagram_classifier(raw_data_df, df_after_ta, type, metric)
     # create_diagram_transformation(df_after_ta, type, metric)
 
 
 if __name__ == '__main__':
-    create_diagram_main(type="MTS", metric="AUC - ROC")
-    create_diagram_main(type="MTS", metric="Balanced Accuracy")
+    create_diagram_main(type="UCR", metric="AUC - ROC")
+    create_diagram_main(type="UCR", metric="Balanced Accuracy")

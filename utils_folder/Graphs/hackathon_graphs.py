@@ -83,7 +83,7 @@ def concat_results(path_ta_dir, raw_data=False, type="UCR"):
     else:
         df = df.replace({"method": {"sax": "SAX", "td4c-cosine": "TD4C - Cosine", "gradient": "Gradient",
                                     "sax with Gradient": "SAX with Gradient", "td4c-cosine with Gradient":
-                                        "TD4C - Cosine with Gradient"}})
+                                    "TD4C - Cosine with Gradient", "sax with Per Entity": "SAX with Per Entity"}})
 
     df.to_csv(output_file_name, index=False)
 
@@ -162,13 +162,13 @@ def create_fig(x, y, col, data, name, x_label, y_label='', legend='', hue=None, 
             y_label_new = metrics[v] if y_label == '' else y_label
 
             plt.setp(axis.get_yticklabels(), fontproperties=my_font)
-            plt.setp(axis.get_xticklabels(), rotation=80, fontproperties=my_font)
+            plt.setp(axis.get_xticklabels(), rotation=30, fontproperties=my_font)
 
             axis.set_ylabel(y_label_new, fontproperties=my_font_bold)
 
             v += 1
 
-    plt.subplots_adjust(wspace=0.3, hspace=0.3)
+    plt.subplots_adjust(wspace=0.15, hspace=0.3)
     plt.show()
 
     plt.savefig("test/" + type + "/" + name, bbox_inches='tight')
@@ -283,12 +283,18 @@ def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
     for num in graph_numbers:
         # Graphs of the methods
         if num == 1:
-            df = get_best_df_after_ta(df, metrics, ["nb bins", "method"], max_val=5)
+            df = get_best_df_after_ta(df, metrics, ["nb bins", "method"])
+
+            order = ["SAX", "SAX with Gradient", "SAX with Per Entity", "TD4C - Cosine",  "TD4C - Cosine with Gradient",
+                     "Gradient"]
+
             # todo ask shahar - i think we need to add "classifier_name", "transformation_type" to the id_vars..
-            melt_df = pd.melt(df, id_vars=["nb bins", "method","classifier_name", "transformation_type"], value_vars=metrics)
+            melt_df = pd.melt(df, id_vars=["nb bins", "method", "classifier_name", "transformation_type"],
+                              value_vars=metrics)
             melt_df = melt_df.rename(columns={"variable": "Evaluation Metric", "method": "Method"})
             create_fig(x="Method", y="value", col="Evaluation Metric", data=melt_df, name="Method",
-                       x_label='Method', hue="nb bins", legend="Number of Symbols", type=type, colors=1)
+                       x_label='Method', hue="nb bins", legend="Number of Symbols", type=type, colors=1,
+                       order=order)
 
         # Graphs of the top N methods
         elif num == 2:
@@ -360,5 +366,4 @@ def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
 
 
 if __name__ == '__main__':
-    create_all_graphs([1], create_csv=False, type="MTS")
-    # 2, 3, 4, 5, 6, 7, 8
+    create_all_graphs([1, 4, 5], create_csv=False, type="MTS")

@@ -37,9 +37,12 @@ def run_hugobot(config, dataset_name, path, running_dict, max_gap, method, nb_bi
     key = (config.archive, dataset_name, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window,
            config.combination, config.perEntity)
 
-    if key in running_dict:
-        print("Already Done! \n")
-        return running_dict
+    # if key in running_dict:
+    #     print("Already Done! \n")
+    #     return running_dict
+
+    if False:
+        print()
 
     else:
         prop_path = path + "number_bin_" + str(nb_bin) + "//"

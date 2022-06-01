@@ -29,14 +29,14 @@ def create_combination_per_entity():
                                  'Strawberry', 'SyntheticControl', 'Worms', 'WormsTwoClass'],
                  "nb_bins": ['3', '10'],
                  "method": ['sax', 'td4c-cosine', 'gradient'],
-                 "combination": ['False']}
+                 "combination": ['True']}
 
     mts_dict = {"archive": ['MTS'],
-                "dataset_name": ['Libras', 'ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
-                                  'JapaneseVowels', 'NetFlow', 'UWave', 'Wafer'],
+                "dataset_name": ['Libras', 'ArabicDigits', 'CharacterTrajectories', 'ECG',
+                                  'JapaneseVowels', 'NetFlow', 'Wafer'],
                  "nb_bins": ['3', '10'],
                  "method": ['sax', 'td4c-cosine', 'gradient'],
-                 "combination": ['False']}
+                 "combination": ['True']}
 
     keys_list = list(itertools.product(*ucr_dict.values())) + list(itertools.product(*mts_dict.values()))
 
@@ -99,14 +99,23 @@ def create_combination_list():
 
 # We run this function one time. The function create all the possible combination
 def create_combination_gpu():
-    dict_name = {"archive": ['UCR', 'MTS'],
+    # dict_name = {"archive": ['UCR', 'MTS'],
+    #              "classifier": ['fcn', 'mlp', 'resnet', 'encoder', 'mcdcnn', 'cnn', 'inception', 'lstm_fcn',
+    #                             'mlstm_fcn'],
+    #              "afterTA": ['False', 'True'],
+    #              "method": ['sax', 'td4c-cosine', 'gradient', 'RawData'],
+    #              "combination": ['False', 'True'],
+    #              "transformation": ['1', '2', '3'],
+    #              "perEntity": ['False']}
+
+    dict_name = {"archive": ['MTS'],
                  "classifier": ['fcn', 'mlp', 'resnet', 'encoder', 'mcdcnn', 'cnn', 'inception', 'lstm_fcn',
                                 'mlstm_fcn'],
-                 "afterTA": ['False', 'True'],
-                 "method": ['sax', 'td4c-cosine', 'gradient', 'RawData'],
-                 "combination": ['False', 'True'],
+                 "afterTA": ['True'],
+                 "method": ['sax'],
+                 "combination": ['False'],
                  "transformation": ['1', '2', '3'],
-                 "perEntity": ['False']}
+                 "perEntity": ['True']}
 
     keys_list = list(itertools.product(*dict_name.values()))
 
@@ -135,6 +144,14 @@ def create_combination_gpu():
 
 # We run this function one time. The function create all the possible combination
 def create_combination_cpu():
+    dict_name = {"archive": ['MTS'],
+                 "classifier": ['twiesn', 'rocket'],
+                 "afterTA": ['True'],
+                 "method": ['sax'],
+                 "combination": ['False'],
+                 "transformation": ['1', '2', '3'],
+                 "perEntity": ['True']}
+
     # dict_name = {"archive": ['UCR', 'MTS'],
     #              "classifier": ['twiesn', 'rocket'],
     #              "afterTA": ['False', 'True'],
@@ -142,14 +159,6 @@ def create_combination_cpu():
     #              "combination": ['False', 'True'],
     #              "transformation": ['1', '2', '3'],
     #              "perEntity": ['False']}
-
-    dict_name = {"archive": ['MTS'],
-                 "classifier": ['rocket'],
-                 "afterTA": ['False', 'True'],
-                 "method": ['sax', 'td4c-cosine', 'gradient', 'RawData'],
-                 "combination": ['False', 'True'],
-                 "transformation": ['1', '2', '3'],
-                 "perEntity": ['False']}
 
     keys_list = list(itertools.product(*dict_name.values()))
 
@@ -232,10 +241,10 @@ if __name__ == '__main__':
     current_file_path = "/sise/home/" + current_user + "/run_multi_tasker_gpu"
     temp_file = open("/sise/home/" + current_user + "/tmp.txt", 'w')
 
-    # create_combination_gpu()
+    create_combination_gpu()
     # create_combination_cpu()
     # create_combination_list()
-    create_combination_per_entity()
+    # create_combination_per_entity()
 
     # # For step one - CPU
     # write_pickle("create_files_dict_UCR", {})
