@@ -56,12 +56,9 @@ def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, g
     key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window, config.combination,
            config.perEntity)
 
-    # if key in running_dict:
-    #     print("Already Done! \n")
-    #     return running_dict
-
-    if False:
-        print()
+    if key in running_dict:
+        print("Already Done! \n")
+        return running_dict
 
     else:
         prop_path = path + "number_bin_" + str(nb_bin) + "//"
@@ -77,8 +74,8 @@ def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, g
         #                    gradient_window_size=gradient_window)
 
         print("Hugobot is OFF")
-        #print("Step 3: run hugobot")
-        #run_cli(config, prop_path, max_gap)
+        # print("Step 3: run hugobot")
+        # run_cli(config, prop_path, max_gap)
 
         if config.combination and config.method != "gradient":
             print("Step 3.1: make the gkb.csv, ta.csv and ppa.csv for " + method + " method\n")
@@ -91,22 +88,22 @@ def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, g
 
             create_directory(gradient_prop_path)
 
-            # TODO Change the gradient window size
-            create_three_files(config=config,
-                               path=gradient_prop_path,
-                               method="gradient",
-                               nb_bins=nb_bin,
-                               paa_window_size=paa,
-                               std_coefficient=std,
-                               max_gap=max_gap,
-                               gradient_window_size=config.gradient_window_size[0])
+            # # TODO Change the gradient window size
+            # create_three_files(config=config,
+            #                    path=gradient_prop_path,
+            #                    method="gradient",
+            #                    nb_bins=nb_bin,
+            #                    paa_window_size=paa,
+            #                    std_coefficient=std,
+            #                    max_gap=max_gap,
+            #                    gradient_window_size=config.gradient_window_size[0])
 
             method = config.method
             config.set_method("gradient")
 
             print("Hugobot is OFF")
             # print("Step 3.2: run hugobot for Gradient method")
-            #run_cli(config, gradient_prop_path, max_gap)
+            # run_cli(config, gradient_prop_path, max_gap)
 
             config.set_method(method)
 

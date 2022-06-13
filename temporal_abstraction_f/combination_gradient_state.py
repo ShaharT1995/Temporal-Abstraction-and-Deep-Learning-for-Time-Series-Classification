@@ -217,9 +217,11 @@ def fill_transformations(config, arr_1, arr_2, arr_3, path, file_type, classes, 
                     arr_1[int(entity_id)][int(parse_data[0]) - 1: int(parse_data[1]) - 1, temporal_property_ID +
                                                                                           start_from] = symbol + \
                                                                                                         max_state
-
-                    # Transformation 2
-                    arr_2[int(entity_id)][int(parse_data[0]) - 1: int(parse_data[1]) - 1, symbol + max_state - 1] = True
+                    try:
+                        # Transformation 2
+                        arr_2[int(entity_id)][int(parse_data[0]) - 1: int(parse_data[1]) - 1, symbol + max_state - 1] = True
+                    except Exception as e:
+                        print(e)
 
                     # Transformation 3
                     dict_value_1 = rows_dict[(symbol + max_state, '+')]
@@ -228,7 +230,7 @@ def fill_transformations(config, arr_1, arr_2, arr_3, path, file_type, classes, 
                     arr_3[int(entity_id)][int(parse_data[0]) - 1][dict_value_1] = True
                     try:
                         arr_3[int(entity_id)][int(parse_data[1]) - 2][dict_value_2] = True
-                    except:
-                        print()
+                    except Exception as e:
+                        print(e)
 
     return arr_1, arr_2, arr_3

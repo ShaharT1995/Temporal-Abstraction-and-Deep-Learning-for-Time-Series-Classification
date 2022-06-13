@@ -25,22 +25,59 @@ class ConfigClass:
         self.path_transformation1 = ""
         self.path_transformation2 = ""
 
-        self.nb_bin = [3, 10]
+        self.nb_bin = [3, 5, 10, 20]
         self.std_coefficient = [-1]
         self.max_gap = [1]
         self.paa_window_size = 1
         self.gradient_window_size = [10]
 
-        self.UNIVARIATE_DATASET_NAMES_2018 = ['Beef', 'ACSF1', 'Adiac', 'Computers', 'CricketX', 'CricketY',
-                                              'CricketZ', 'Crop', 'Earthquakes', 'ECG200', 'ElectricDevices',
-                                              'EthanolLevel', 'FordA', 'FordB', 'HandOutlines', 'Herring',
-                                              'LargeKitchenAppliances', 'MiddlePhalanxOutlineCorrect',
-                                              'MiddlePhalanxTW', 'PhalangesOutlinesCorrect', 'PLAID', 'PowerCons',
-                                              'SemgHandMovementCh2', 'SemgHandSubjectCh2', 'ShapesAll',
-                                              'SmoothSubspace', 'Strawberry', 'SyntheticControl', 'Worms',
-                                              'WormsTwoClass']
+        # self.UNIVARIATE_DATASET_NAMES_2018 = ['Beef', 'ACSF1', 'Adiac', 'Computers', 'CricketX', 'CricketY',
+        #                                       'CricketZ', 'Crop', 'Earthquakes', 'ECG200', 'ElectricDevices',
+        #                                       'EthanolLevel', 'FordA', 'FordB', 'HandOutlines', 'Herring',
+        #                                       'LargeKitchenAppliances', 'MiddlePhalanxOutlineCorrect',
+        #                                       'MiddlePhalanxTW', 'PhalangesOutlinesCorrect', 'PLAID', 'PowerCons',
+        #                                       'SemgHandMovementCh2', 'SemgHandSubjectCh2', 'ShapesAll',
+        #                                       'SmoothSubspace', 'Strawberry', 'SyntheticControl', 'Worms',
+        #                                       'WormsTwoClass']
 
-        # self.UNIVARIATE_DATASET_NAMES_2018 = ['FordB']
+        self.UNIVARIATE_DATASET_NAMES_2018 = ['ACSF1', 'Adiac', 'AllGestureWiimoteX', 'AllGestureWiimoteY',
+                                              'AllGestureWiimoteZ',
+                                              'ArrowHead', 'Beef', 'BeetleFly', 'BirdChicken', 'BME', 'Car', 'CBF',
+                                              'Chinatown',
+                                              'ChlorineConcentration', 'CinCECGTorso', 'Coffee', 'Computers',
+                                              'CricketX',
+                                              'CricketY', 'CricketZ', 'Crop', 'DiatomSizeReduction',
+                                              'DistalPhalanxOutlineAgeGroup', 'DistalPhalanxOutlineCorrect',
+                                              'DistalPhalanxTW',
+                                              'DodgerLoopDay', 'DodgerLoopGame', 'DodgerLoopWeekend', 'Earthquakes',
+                                              'ECG200',
+                                              'ECG5000', 'ECGFiveDays', 'ElectricDevices', 'EOGHorizontalSignal',
+                                              'EOGVerticalSignal', 'EthanolLevel', 'FaceAll', 'FaceFour', 'FacesUCR',
+                                              'FiftyWords', 'Fish', 'FordA', 'FordB', 'FreezerRegularTrain',
+                                              'FreezerSmallTrain', 'Fungi', 'GestureMidAirD1', 'GestureMidAirD2',
+                                              'GestureMidAirD3', 'GesturePebbleZ1', 'GesturePebbleZ2', 'GunPoint',
+                                              'GunPointAgeSpan', 'GunPointMaleVersusFemale', 'GunPointOldVersusYoung',
+                                              'Ham', 'HandOutlines', 'Haptics', 'Herring', 'HouseTwenty', 'InlineSkate',
+                                              'InsectEPGRegularTrain', 'InsectEPGSmallTrain', 'InsectWingbeatSound',
+                                              'ItalyPowerDemand', 'LargeKitchenAppliances', 'Lightning2', 'Lightning7',
+                                              'Mallat', 'Meat', 'MedicalImages', 'MelbournePedestrian',
+                                              'MiddlePhalanxOutlineAgeGroup', 'MiddlePhalanxOutlineCorrect',
+                                              'MiddlePhalanxTW', 'MixedShapesRegularTrain', 'MixedShapesSmallTrain',
+                                              'MoteStrain', 'NonInvasiveFetalECGThorax1', 'NonInvasiveFetalECGThorax2',
+                                              'OliveOil', 'OSULeaf', 'PhalangesOutlinesCorrect', 'Phoneme',
+                                              'PickupGestureWiimoteZ', 'PigAirwayPressure', 'PigArtPressure', 'PigCVP',
+                                              'PLAID', 'Plane', 'PowerCons', 'ProximalPhalanxOutlineAgeGroup',
+                                              'ProximalPhalanxOutlineCorrect', 'ProximalPhalanxTW',
+                                              'RefrigerationDevices',
+                                              'Rock', 'ScreenType', 'SemgHandGenderCh2', 'SemgHandMovementCh2',
+                                              'SemgHandSubjectCh2', 'ShakeGestureWiimoteZ', 'ShapeletSim', 'ShapesAll',
+                                              'SmallKitchenAppliances', 'SmoothSubspace', 'SonyAIBORobotSurface1',
+                                              'SonyAIBORobotSurface2', 'StarLightCurves', 'Strawberry', 'SwedishLeaf',
+                                              'Symbols', 'SyntheticControl', 'ToeSegmentation1', 'ToeSegmentation2',
+                                              'Trace',
+                                              'TwoLeadECG', 'TwoPatterns', 'UMD', 'UWaveGestureLibraryAll',
+                                              'UWaveGestureLibraryX', 'UWaveGestureLibraryY', 'UWaveGestureLibraryZ',
+                                              'Wafer', 'Wine', 'WordSynonyms', 'Worms', 'WormsTwoClass', 'Yoga']
 
         self.MTS_DATASET_NAMES = ['Libras', 'ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
                                   'JapaneseVowels', 'NetFlow', 'UWave', 'Wafer']
@@ -55,7 +92,7 @@ class ConfigClass:
 
     def set_path_transformations_2(self, nb_bin):
         if self.perEntity:
-            self.path_transformation2 = self.path_after_TA + "PerEntity" + "//" + self.archive + "//" + self.classifier\
+            self.path_transformation2 = self.path_after_TA + "PerEntity" + "//" + self.archive + "//" + self.classifier \
                                         + "//" + self.method + "//" + "number_bin_" + str(nb_bin) + "//"
         else:
             self.path_transformation2 = self.path_after_TA + self.archive + "//" + self.classifier + "//" + \
@@ -108,4 +145,3 @@ class ConfigClass:
         session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
         sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
         K.set_session(sess)
-

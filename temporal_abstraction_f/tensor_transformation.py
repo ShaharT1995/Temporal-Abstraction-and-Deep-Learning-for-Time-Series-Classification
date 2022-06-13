@@ -71,34 +71,37 @@ def new_mts_files(config, prop_path, nb_bins):
         for file_type in files_type:
             states_path = path + file_type + "//states.csv"
             states_df = pd.read_csv(states_path, header=0)
+            # ------------------------------------------------------------
+            # TODO - Alise (For our problem)
+            if config.perEntity:
+                count_df = pd.DataFrame(states_df['TemporalPropertyID'].value_counts())
+                count_df = count_df.reset_index(level=0)
+                count_df = count_df.loc[count_df['TemporalPropertyID'] < nb_bins]
 
-            count_df = pd.DataFrame(states_df['TemporalPropertyID'].value_counts())
-            count_df = count_df.reset_index(level=0)
-            count_df = count_df.loc[count_df['TemporalPropertyID'] < nb_bins]
+                states_df['StateID'] = states_df['StateID'].astype(dtype='float')
 
-            states_df['StateID'] = states_df['StateID'].astype(dtype='float')
+                if count_df.shape[0] > 0:
+                    dataset_with_empty_columns = True
 
-            if count_df.shape[0] > 0:
-                dataset_with_empty_columns = True
+                    for index, row in count_df.iterrows():
+                        rows_to_add = nb_bins - row["TemporalPropertyID"]
 
-                for index, row in count_df.iterrows():
-                    rows_to_add = nb_bins - row["TemporalPropertyID"]
+                        next_state = states_df.loc[states_df["TemporalPropertyID"] == row["index"]]["StateID"].iloc[0] +\
+                                     0.001
 
-                    next_state = states_df.loc[states_df["TemporalPropertyID"] == row["index"]]["StateID"].iloc[0] +\
-                                 0.001
+                        for i in range(rows_to_add):
+                            states_df = states_df.append({"StateID": next_state,
+                                                          "TemporalPropertyID": row["index"],
+                                                          "BinID": i + 1,
+                                                          "BinLow": float('-inf'),
+                                                          "BinHigh": float('inf'),
+                                                          "Method": config.method.upper()}, ignore_index=True)
+                            next_state += 0.001
 
-                    for i in range(rows_to_add):
-                        states_df = states_df.append({"StateID": next_state,
-                                                      "TemporalPropertyID": row["index"],
-                                                      "BinID": i + 1,
-                                                      "BinLow": float('-inf'),
-                                                      "BinHigh": float('inf'),
-                                                      "Method": config.method.upper()}, ignore_index=True)
-                        next_state += 0.001
-
-                states_df = states_df.sort_values(by=['StateID', 'BinID'])
-                states_df.reset_index(drop=True, inplace=True)
-                states_df["index"] = states_df.index + 1
+                    states_df = states_df.sort_values(by=['StateID', 'BinID'])
+                    states_df.reset_index(drop=True, inplace=True)
+                    states_df["index"] = states_df.index + 1
+            # ------------------------------------------------------------
 
             # Run the three transformation on the Train and Test files
             if file_type == "train":
@@ -176,6 +179,8 @@ def create_transformations(config, path, output_path, file_type, number_of_entit
                     # Extract the start time, end time and state id
                     parse_data = data[info].split(',')
 
+                    # ------------------------------------------------------------
+                    # TODO - Alisa
                     if config.perEntity:
                         if univariate:
                             temporal_property_ID = 0
@@ -192,6 +197,7 @@ def create_transformations(config, path, output_path, file_type, number_of_entit
                             modulo = int(number_of_states / number_of_attributes)
 
                         symbol = int(modulo + temporal_property_ID * (number_of_states / number_of_attributes))
+                    # ------------------------------------------------------------
 
                     else:
                         temporal_property_ID = int(parse_data[3]) - min_property

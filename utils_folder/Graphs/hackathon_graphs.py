@@ -19,7 +19,6 @@ my_font = fm.FontProperties(fname=font_path)
 font_path = "/sise/robertmo-group/TA-DL-TSC/Cambria/CAMBRIAB.TTF"
 my_font_bold = fm.FontProperties(fname=font_path)
 
-
 # Creates a unified file of all results for all combinations
 def concat_results(path_ta_dir, raw_data=False, type="UCR"):
     classifiers = ["cnn", "mlp", "mcdcnn", "fcn", "twiesn", "encoder", "inception", "lstm_fcn", "mlstm_fcn", "rocket"]
@@ -126,7 +125,7 @@ def create_fig(x, y, col, data, name, x_label, y_label='', legend='', hue=None, 
     if graph_num == 5:
         metrics = ['MCC', 'Cohen Kappa', 'F1 Score Macro', 'F1 Score Micro', 'F1 Score Weighted', 'Balanced Accuracy',
                    'AUC - ROC']
-    elif graph_num == 7:
+    elif graph_num == 7 or graph_num == 6:
         metrics = ['Balanced Accuracy']
         data = data.loc[data['Evaluation Metric'] == "Balanced Accuracy"]
         graph_aspect = 3 if type == "UCR" else 2
@@ -153,26 +152,28 @@ def create_fig(x, y, col, data, name, x_label, y_label='', legend='', hue=None, 
             plt.rcParams["font.family"] = "Cambria"
 
             axis = g.axes[i, j]
-            axis.set_xlabel(x_label, fontdict={'weight': 'bold'}, fontproperties=my_font_bold)
+            axis.set_xlabel(x_label, fontdict={'weight': 'bold'}, fontproperties=my_font_bold, size="15")
             axis.tick_params(labelleft=True, labelbottom=True)
+
             if legend != "":
-                axis.legend(title=legend, prop={'family': 'Cambria'})
+                axis.legend(title=legend, prop={'family': 'Cambria', 'size': 15}, title_fontsize='15')
 
             axis.set_title(None)
             y_label_new = metrics[v] if y_label == '' else y_label
 
-            plt.setp(axis.get_yticklabels(), fontproperties=my_font)
-            plt.setp(axis.get_xticklabels(), rotation=30, fontproperties=my_font)
+            plt.setp(axis.get_yticklabels(), fontproperties=my_font, fontsize="15")
+            plt.setp(axis.get_xticklabels(), rotation=30, fontproperties=my_font, fontsize="15")
 
-            axis.set_ylabel(y_label_new, fontproperties=my_font_bold)
+            axis.set_ylabel(y_label_new, fontproperties=my_font_bold, size="15")
 
             v += 1
 
-    plt.subplots_adjust(wspace=0.15, hspace=0.3)
+    plt.subplots_adjust(wspace=0.3, hspace=0.3)
+    plt.grid()
     plt.show()
 
-    plt.savefig("test/" + type + "/" + name, bbox_inches='tight')
-
+    #plt.savefig("test/" + type + "/" + name, bbox_inches='tight')
+    plt.savefig("/sise/home/shaharap/test/" + type + "/" + name, bbox_inches='tight')
 
 def melt_RawData_TA(df, lst, metrics):
     melt_ta = pd.melt(df, id_vars=lst, value_vars=metrics)
@@ -204,7 +205,7 @@ def classifiers_best_combination_VS_raw_data(df, metrics, type="UCR"):
     data = data.rename(columns={"variable": "Evaluation Metric", "classifier_name": "Classifier"})
 
     create_fig(x="Classifier", y="value", col="Evaluation Metric", data=data, name="TA vs Raw data - Classifier",
-               x_label='Classifier', legend="TA vs Raw data", hue="Data", type=type, colors=3)
+               x_label='Classifier', legend="TA vs Raw data", hue="Data", type=type, colors=3, graph_num=6)
 
 
 def datasets_best_combination_VS_raw_data(df, metrics, type="UCR"):
@@ -285,8 +286,8 @@ def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
         if num == 1:
             df = get_best_df_after_ta(df, metrics, ["nb bins", "method"])
 
-            order = ["SAX", "SAX with Gradient", "SAX with Per Entity", "TD4C - Cosine",  "TD4C - Cosine with Gradient",
-                     "Gradient"]
+            order = ["SAX", "SAX with Gradient", "SAX with Per Entity", "Gradient", "TD4C - Cosine",
+                     "TD4C - Cosine with Gradient"]
 
             # todo ask shahar - i think we need to add "classifier_name", "transformation_type" to the id_vars..
             melt_df = pd.melt(df, id_vars=["nb bins", "method", "classifier_name", "transformation_type"],
@@ -366,4 +367,4 @@ def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
 
 
 if __name__ == '__main__':
-    create_all_graphs([1, 4, 5], create_csv=False, type="MTS")
+    create_all_graphs([6], create_csv=False, type="MTS")

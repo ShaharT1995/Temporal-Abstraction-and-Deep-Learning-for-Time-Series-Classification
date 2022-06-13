@@ -94,7 +94,7 @@ def get_best_df_after_ta(raw_data_df, df_after_ta, metrics, lst_group_by, max_va
     dict_after_ta = {k: np.mean for k in metrics}
     dict_raw_data = {k + "_raw_data": np.mean for k in metrics}
 
-    raw_data_df = raw_data_df.groupby(['classifier_name_raw_data', 'archive_name_raw_data'],
+    raw_data_df = raw_data_df.c(['classifier_name_raw_data', 'archive_name_raw_data'],
                                       as_index=False).agg(dict_raw_data)
 
     df_after_ta = df_after_ta.groupby(lst_group_by, as_index=False).agg(dict_after_ta)

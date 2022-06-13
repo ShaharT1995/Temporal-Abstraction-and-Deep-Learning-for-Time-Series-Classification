@@ -24,7 +24,7 @@ class MultivariateTA1:
         x = np.load(path + 'x_' + file_type + '.npy')
         y = np.load(path + 'y_' + file_type + '.npy')
 
-        # Reshape the data frame
+        # Reshape the data frame: m - entities, n - timestamps, r - time series
         m, n, r = x.shape
         out_arr = np.column_stack((np.repeat(np.arange(m), n), x.reshape(m * n, -1)))
 
@@ -42,8 +42,12 @@ class MultivariateTA1:
         # Change the column order
         df = df.reindex(columns=["EntityID", "TemporalPropertyID", "TimeStamp", "TemporalPropertyValue"])
 
+        # ------------------------------------------------------------
+        # TODO - Alisa
+        # For the per entity
         df["TemporalPropertyID"] = (((df["EntityID"] + 1).astype(int)).astype(str) + "00" +
                                     (df["TemporalPropertyID"] + 1).astype(str)).astype(int)
+        # ------------------------------------------------------------
 
         # Create classifier DF with numpy
         df_classifier = pd.DataFrame(y).reset_index().melt('index')

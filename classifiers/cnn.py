@@ -53,12 +53,11 @@ class Classifier_CNN:
 
         file_path = self.output_directory + 'best_model.hdf5'
 
-        # es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=30, min_delta=0)
+        es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=30, min_delta=0)
         model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='val_loss',
                                                            save_best_only=True)
 
-        # self.callbacks = [es, model_checkpoint]
-        self.callbacks = [model_checkpoint]
+        self.callbacks = [es, model_checkpoint]
         return model
 
     def fit(self, x_train, y_train, x_test, y_test, y_true,  iteration):

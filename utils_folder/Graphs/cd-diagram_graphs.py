@@ -107,5 +107,5 @@ def create_diagram_main(type, metric):
 
 
 if __name__ == '__main__':
-    create_diagram_main(type="UCR", metric="AUC - ROC")
-    create_diagram_main(type="UCR", metric="Balanced Accuracy")
+    create_diagram_main(type="MTS", metric="AUC - ROC")
+    create_diagram_main(type="MTS", metric="Balanced Accuracy")

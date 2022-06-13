@@ -39,6 +39,7 @@ class UnivariateTA1:
         # Adding the TemporalPropertyID with fix value
         df["TemporalPropertyID"] = self.next_attribute
 
+        # For the per entity
         df["TemporalPropertyID"] = df["TemporalPropertyID"] + df["EntityID"]
 
         # Drop all columns except classifier column
