@@ -26,6 +26,7 @@ class ConfigClass:
         self.path_transformation2 = ""
 
         self.nb_bin = [3, 5, 10, 20]
+        # self.nb_bin = [3, 10]
         self.std_coefficient = [-1]
         self.max_gap = [1]
         self.paa_window_size = 1
@@ -40,22 +41,19 @@ class ConfigClass:
         #                                       'SmoothSubspace', 'Strawberry', 'SyntheticControl', 'Worms',
         #                                       'WormsTwoClass']
 
-        self.UNIVARIATE_DATASET_NAMES_2018 = ['ACSF1', 'Adiac', 'AllGestureWiimoteX', 'AllGestureWiimoteY',
-                                              'AllGestureWiimoteZ',
-                                              'ArrowHead', 'Beef', 'BeetleFly', 'BirdChicken', 'BME', 'Car', 'CBF',
-                                              'Chinatown',
-                                              'ChlorineConcentration', 'CinCECGTorso', 'Coffee', 'Computers',
-                                              'CricketX',
-                                              'CricketY', 'CricketZ', 'Crop', 'DiatomSizeReduction',
-                                              'DistalPhalanxOutlineAgeGroup', 'DistalPhalanxOutlineCorrect',
-                                              'DistalPhalanxTW',
-                                              'DodgerLoopDay', 'DodgerLoopGame', 'DodgerLoopWeekend', 'Earthquakes',
-                                              'ECG200',
-                                              'ECG5000', 'ECGFiveDays', 'ElectricDevices', 'EOGHorizontalSignal',
-                                              'EOGVerticalSignal', 'EthanolLevel', 'FaceAll', 'FaceFour', 'FacesUCR',
-                                              'FiftyWords', 'Fish', 'FordA', 'FordB', 'FreezerRegularTrain',
-                                              'FreezerSmallTrain', 'Fungi', 'GestureMidAirD1', 'GestureMidAirD2',
-                                              'GestureMidAirD3', 'GesturePebbleZ1', 'GesturePebbleZ2', 'GunPoint',
+        # Datasets down because EFD
+        # 'AllGestureWiimoteX', 'AllGestureWiimoteY', 'AllGestureWiimoteZ', 'GestureMidAirD1', 'GestureMidAirD2',
+        # 'GestureMidAirD3', 'GesturePebbleZ1', 'GesturePebbleZ2', 'PLAID', 'ShakeGestureWiimoteZ'
+        self.UNIVARIATE_DATASET_NAMES_2018 = ['ACSF1', 'Adiac', 'ArrowHead', 'Beef', 'BeetleFly', 'BirdChicken', 'BME',
+                                              'Car', 'CBF', 'Chinatown', 'ChlorineConcentration', 'CinCECGTorso',
+                                              'Coffee', 'Computers', 'CricketX', 'CricketY', 'CricketZ', 'Crop',
+                                              'DiatomSizeReduction', 'DistalPhalanxOutlineAgeGroup',
+                                              'DistalPhalanxOutlineCorrect', 'DistalPhalanxTW', 'DodgerLoopDay',
+                                              'DodgerLoopGame', 'DodgerLoopWeekend', 'Earthquakes',
+                                              'ECG200', 'ECG5000', 'ECGFiveDays', 'ElectricDevices',
+                                              'EOGHorizontalSignal', 'EOGVerticalSignal', 'EthanolLevel', 'FaceAll',
+                                              'FaceFour', 'FacesUCR', 'FiftyWords', 'Fish', 'FordA', 'FordB',
+                                              'FreezerRegularTrain', 'FreezerSmallTrain', 'Fungi',  'GunPoint',
                                               'GunPointAgeSpan', 'GunPointMaleVersusFemale', 'GunPointOldVersusYoung',
                                               'Ham', 'HandOutlines', 'Haptics', 'Herring', 'HouseTwenty', 'InlineSkate',
                                               'InsectEPGRegularTrain', 'InsectEPGSmallTrain', 'InsectWingbeatSound',
@@ -66,16 +64,14 @@ class ConfigClass:
                                               'MoteStrain', 'NonInvasiveFetalECGThorax1', 'NonInvasiveFetalECGThorax2',
                                               'OliveOil', 'OSULeaf', 'PhalangesOutlinesCorrect', 'Phoneme',
                                               'PickupGestureWiimoteZ', 'PigAirwayPressure', 'PigArtPressure', 'PigCVP',
-                                              'PLAID', 'Plane', 'PowerCons', 'ProximalPhalanxOutlineAgeGroup',
+                                              'Plane', 'PowerCons', 'ProximalPhalanxOutlineAgeGroup',
                                               'ProximalPhalanxOutlineCorrect', 'ProximalPhalanxTW',
-                                              'RefrigerationDevices',
-                                              'Rock', 'ScreenType', 'SemgHandGenderCh2', 'SemgHandMovementCh2',
-                                              'SemgHandSubjectCh2', 'ShakeGestureWiimoteZ', 'ShapeletSim', 'ShapesAll',
+                                              'RefrigerationDevices', 'Rock', 'ScreenType', 'SemgHandGenderCh2',
+                                              'SemgHandMovementCh2', 'SemgHandSubjectCh2', 'ShapeletSim', 'ShapesAll',
                                               'SmallKitchenAppliances', 'SmoothSubspace', 'SonyAIBORobotSurface1',
                                               'SonyAIBORobotSurface2', 'StarLightCurves', 'Strawberry', 'SwedishLeaf',
                                               'Symbols', 'SyntheticControl', 'ToeSegmentation1', 'ToeSegmentation2',
-                                              'Trace',
-                                              'TwoLeadECG', 'TwoPatterns', 'UMD', 'UWaveGestureLibraryAll',
+                                              'Trace', 'TwoLeadECG', 'TwoPatterns', 'UMD', 'UWaveGestureLibraryAll',
                                               'UWaveGestureLibraryX', 'UWaveGestureLibraryY', 'UWaveGestureLibraryZ',
                                               'Wafer', 'Wine', 'WordSynonyms', 'Worms', 'WormsTwoClass', 'Yoga']
 

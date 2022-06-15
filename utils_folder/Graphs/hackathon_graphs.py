@@ -172,8 +172,8 @@ def create_fig(x, y, col, data, name, x_label, y_label='', legend='', hue=None, 
     plt.grid()
     plt.show()
 
-    #plt.savefig("test/" + type + "/" + name, bbox_inches='tight')
-    plt.savefig("/sise/home/shaharap/test/" + type + "/" + name, bbox_inches='tight')
+    plt.savefig("test/" + type + "/" + name, bbox_inches='tight')
+
 
 def melt_RawData_TA(df, lst, metrics):
     melt_ta = pd.melt(df, id_vars=lst, value_vars=metrics)
@@ -367,4 +367,4 @@ def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
 
 
 if __name__ == '__main__':
-    create_all_graphs([6], create_csv=False, type="MTS")
+    create_all_graphs([6], create_csv=True, type="UCR")

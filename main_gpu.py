@@ -30,13 +30,11 @@ def execute_running(config, running_dict, max_gap, method, nb_bin, paa, std, gra
     # set number of bins in the path
     config.set_path_transformations_2(nb_bin)
 
-    # if key in running_dict:
-    #     print("Already Done! \n")
-    #     return running_dict
-
-    if False:
-        print()
-
+    if key in running_dict:
+        print("Already Done! \n")
+        return running_dict
+    # if False:
+    #     print()
     else:
         print("Step 5: Run all:")
         params = "res_" + str(method) + "_" + str(nb_bin) + "_" + str(paa) + "_" + str(std) \
@@ -46,8 +44,14 @@ def execute_running(config, running_dict, max_gap, method, nb_bin, paa, std, gra
         run_models.run_all(config, params)
         print("")
 
-        print("Step 6: Generate Results to CSV")
+        print("Step 6: Generate Results to CSV\n")
         generate_results_csv(config, params)
+
+        print("Step 7: Delete the model folder")
+        model_dir_path = config.path + "/ResultsProject//DNN//" + config.archive + "//" + config.classifier + '/' + \
+                         config.method + "/" + params
+        if os.path.exists(model_dir_path) and os.path.isdir(model_dir_path):
+            shutil.rmtree(model_dir_path)
 
         running_dict = open_pickle("running_dict" + config.archive)
         running_dict[key] = True
@@ -58,6 +62,8 @@ def execute_running(config, running_dict, max_gap, method, nb_bin, paa, std, gra
 if __name__ == '__main__':
     import sys
     import run_models
+    import os
+    import shutil
 
     sys.path.insert(0, '/sise/robertmo-group/TA-DL-TSC/Project/')
 
