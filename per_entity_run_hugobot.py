@@ -108,7 +108,7 @@ def run_hugobot(config, dataset_name, path, running_dict, max_gap, method, nb_bi
         else:
             # Make the second temporal abstraction -> hugobot output files to original format
             print("Step 4: transformation 2")
-            new_ucr_files(config, prop_path) if config.archive == "UCR" else new_mts_files(config, prop_path)
+            new_ucr_files(config, prop_path) if config.archive == "UCR" else new_mts_files(config, prop_path, nb_bin)
 
         running_dict = open_pickle("PerEntity_Dict_" + config.archive)
         running_dict[key] = True
