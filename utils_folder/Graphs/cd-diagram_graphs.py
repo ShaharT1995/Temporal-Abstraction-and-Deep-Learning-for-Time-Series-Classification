@@ -1,8 +1,19 @@
 import numpy as np
 import pandas as pd
 
-from utils_folder.Graphs.graphs import get_best_df_after_ta, concat_after_df_with_best_df
 from utils_folder.Graphs.ranking_graph import draw_cd_diagram
+from utils_folder.Graphs.graphs import get_best_df_after_ta, concat_after_df_with_best_df
+
+
+def concat_after_df_with_best_df(after_ta_df, best_params, metrics, group_by_lst, number_of_cols):
+    dict_after_ta = {k: np.mean for k in metrics}
+    best_params = best_params.iloc[:, 0:number_of_cols]
+    after_ta_df = after_ta_df.groupby(group_by_lst, as_index=False).agg(dict_after_ta)
+    keys = list(best_params.columns.values)
+    i1 = after_ta_df.set_index(keys).index
+    i2 = best_params.set_index(keys).index
+    df = after_ta_df[i1.isin(i2)]
+    return df
 
 
 def create_diagram_classifier(raw_data_df, df_after_ta, type, metric):
@@ -101,11 +112,14 @@ def create_diagram_main(type, metric):
 
     # create_diagram_combination(raw_data_df, df_after_ta, type, metric)
     # create_diagram_combination_without_transformation(raw_data_df, df_after_ta, type, metric)
-    create_diagram_method(df_after_ta, type, metric)
+    # create_diagram_method(df_after_ta, type, metric)
     # create_diagram_classifier(raw_data_df, df_after_ta, type, metric)
-    # create_diagram_transformation(df_after_ta, type, metric)
+    create_diagram_transformation(df_after_ta, type, metric)
 
 
 if __name__ == '__main__':
     create_diagram_main(type="MTS", metric="AUC - ROC")
     create_diagram_main(type="MTS", metric="Balanced Accuracy")
+
+    create_diagram_main(type="UCR", metric="AUC - ROC")
+    create_diagram_main(type="UCR", metric="Balanced Accuracy")

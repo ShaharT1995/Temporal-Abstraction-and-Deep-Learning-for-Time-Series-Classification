@@ -38,9 +38,9 @@ def run_cli(config, prop_path, max_gap):
             if not os.path.exists(output_folder):
                 os.makedirs(output_folder)
 
-            else:
-                print("\t\tHugobot step already done for " + dataset_name + ": " + file_type)
-                continue
+            # else:
+            #     print("\t\tHugobot step already done for " + dataset_name + ": " + file_type)
+            #     continue
 
             print("\t\t" + file_type)
 

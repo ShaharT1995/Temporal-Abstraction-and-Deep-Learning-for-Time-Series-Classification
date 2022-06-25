@@ -19,9 +19,13 @@ my_font = fm.FontProperties(fname=font_path)
 font_path = "/sise/robertmo-group/TA-DL-TSC/Cambria/CAMBRIAB.TTF"
 my_font_bold = fm.FontProperties(fname=font_path)
 
+
 # Creates a unified file of all results for all combinations
 def concat_results(path_ta_dir, raw_data=False, type="UCR"):
-    classifiers = ["cnn", "mlp", "mcdcnn", "fcn", "twiesn", "encoder", "inception", "lstm_fcn", "mlstm_fcn", "rocket"]
+    # classifiers = ["cnn", "mlp", "mcdcnn", "fcn", "twiesn", "encoder", "inception", "lstm_fcn", "mlstm_fcn", "rocket"]
+    classifiers = ['fcn', 'resnet', 'inception', 'mcdcnn', 'mlstm_fcn', 'cnn', 'mlp']
+    methods = ['sax', 'gradient', 'equal-frequency', 'equal-width', 'RawData']
+    bins = ["3", "5", "10", "20"]
 
     columns_df = ['classifier_name', 'archive_name', 'dataset_name', 'Precision', 'Accuracy', 'Recall', 'MCC',
                   'Cohen Kappa', 'Learning Time', 'Predicting Time', 'F1 Score Macro', 'F1 Score Micro',
@@ -37,12 +41,21 @@ def concat_results(path_ta_dir, raw_data=False, type="UCR"):
         path_ta_dir_tmp = path_ta_dir + classifier
         for root, dirs, files in os.walk(path_ta_dir_tmp):
             for method in dirs:
+                if method not in methods:
+                    continue
+
                 files_path = path_ta_dir_tmp + "/" + method
                 for root, dirs, files in os.walk(files_path):
                     for file in files:
                         if file.endswith(".csv"):
                             arguments = re.split('[_.]', file)
+
+                            if not raw_data and (arguments[8] == "True" or arguments[9] == "True" or \
+                                                 arguments[2] not in bins or arguments[7] == "3"):
+                                continue
+
                             res_ta_data = pd.read_csv(root + "//" + file, sep=',', header=0, encoding="utf-8")
+
                             if not raw_data:
                                 new_method = method + " with Gradient" if arguments[8] == "True" else method
                                 new_method = new_method + " with Per Entity" if arguments[9] == "True" else new_method
@@ -126,9 +139,10 @@ def create_fig(x, y, col, data, name, x_label, y_label='', legend='', hue=None, 
         metrics = ['MCC', 'Cohen Kappa', 'F1 Score Macro', 'F1 Score Micro', 'F1 Score Weighted', 'Balanced Accuracy',
                    'AUC - ROC']
     elif graph_num == 7 or graph_num == 6:
-        metrics = ['Balanced Accuracy']
-        data = data.loc[data['Evaluation Metric'] == "Balanced Accuracy"]
-        graph_aspect = 3 if type == "UCR" else 2
+        metrics = ['Balanced Accuracy', "AUC - ROC"]
+        # metrics = ['Balanced Accuracy']
+        data = data.loc[(data['Evaluation Metric'] == "Balanced Accuracy") | (data['Evaluation Metric'] == "AUC - ROC")]
+        graph_aspect = 2 if type == "UCR" else 2
 
     else:
         metrics = ['Balanced Accuracy', "AUC - ROC"]
@@ -169,7 +183,6 @@ def create_fig(x, y, col, data, name, x_label, y_label='', legend='', hue=None, 
             v += 1
 
     plt.subplots_adjust(wspace=0.3, hspace=0.3)
-    plt.grid()
     plt.show()
 
     plt.savefig("test/" + type + "/" + name, bbox_inches='tight')
@@ -367,4 +380,5 @@ def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
 
 
 if __name__ == '__main__':
-    create_all_graphs([6], create_csv=True, type="UCR")
+    create_all_graphs([1, 2, 3, 4, 5, 6, 7, 8], create_csv=True, type="MTS")
+    # create_all_graphs([6], create_csv=False, type="UCR")

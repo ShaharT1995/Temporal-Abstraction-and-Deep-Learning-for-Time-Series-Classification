@@ -26,7 +26,6 @@ class ConfigClass:
         self.path_transformation2 = ""
 
         self.nb_bin = [3, 5, 10, 20]
-        # self.nb_bin = [3, 10]
         self.std_coefficient = [-1]
         self.max_gap = [1]
         self.paa_window_size = 1
