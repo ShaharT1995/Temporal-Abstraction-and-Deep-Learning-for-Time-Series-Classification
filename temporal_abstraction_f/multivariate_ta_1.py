@@ -15,7 +15,7 @@ class MultivariateTA1:
         self.next_attribute = next_attribute
         self.attributes_dict = {}
 
-    def input_to_csv(self, path, dataset_name, file_type, output_path):
+    def input_to_csv(self, path, dataset_name, file_type, output_path, normalization=True):
         """
         :param path: the location of the original files
         :param file_type: the type of the file - train/test
@@ -24,6 +24,12 @@ class MultivariateTA1:
         # Reading the npy files
         x = np.load(path + 'x_' + file_type + '.npy')
         y = np.load(path + 'y_' + file_type + '.npy')
+
+        # Z-Normalization
+        if normalization:
+            std_ = x.std(axis=(0, 1), keepdims=True)
+            std_ = np.where(std_ == 0, 1.0, std_)
+            x = (x - x.mean(axis=(0, 1), keepdims=True)) / std_
 
         # Reshape the data frame
         m, n, r = x.shape

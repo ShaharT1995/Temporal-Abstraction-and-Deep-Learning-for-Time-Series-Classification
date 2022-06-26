@@ -18,7 +18,7 @@ class UnivariateTA1:
 
         self.univariate_dict = {}
 
-    def input_to_csv(self, path, file_type, dataset_name, output_path):
+    def input_to_csv(self, path, file_type, dataset_name, output_path, normalization=True):
         """
         :param path: the location of the original files
         :param file_type: the type of the file - train/test
@@ -31,6 +31,15 @@ class UnivariateTA1:
 
         # Drop the classifier column
         df = tsv_data.drop([0], axis=1)
+
+        # Z-Normalization
+        if normalization:
+            df.columns = range(df.shape[1])
+            df = df.values
+
+            std_ = df.std(axis=1, keepdims=True)
+            std_[std_ == 0] = 1.0
+            df = (df - df.mean(axis=1, keepdims=True)) / std_
 
         # Create the new DF with numpy
         df = pd.DataFrame(df).reset_index().melt('index')

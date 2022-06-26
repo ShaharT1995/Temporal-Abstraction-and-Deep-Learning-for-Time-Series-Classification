@@ -85,7 +85,7 @@ def create_directory(directory_path):
         return directory_path
 
 
-def read_all_datasets(config):
+def read_all_datasets(config, normalization=True):
     datasets_dict = {}
 
     if config.archive == 'MTS':
@@ -121,6 +121,16 @@ def read_all_datasets(config):
                 x_test = wait_for_files(root_dir_dataset + 'x_test.npy')
                 y_test = wait_for_files(root_dir_dataset + 'y_test.npy')
 
+                # Z-Normalization
+                if normalization:
+                    std_ = x_train.std(axis=(0, 1), keepdims=True)
+                    std_ = np.where(std_ == 0, 1.0, std_)
+                    x_train = (x_train - x_train.mean(axis=(0, 1), keepdims=True)) / std_
+
+                    std_ = x_test.std(axis=(0, 1), keepdims=True)
+                    std_ = np.where(std_ == 0, 1.0, std_)
+                    x_test = (x_test - x_test.mean(axis=(0, 1), keepdims=True)) / std_
+
             # UCR
             else:
                 root_dir_dataset = config.ucr_path + '/' + dataset_name + '/'
@@ -147,14 +157,15 @@ def read_all_datasets(config):
                 x_train = x_train.values
                 x_test = x_test.values
 
-                # znorm
-                # std_ = x_train.std(axis=1, keepdims=True)
-                # std_[std_ == 0] = 1.0
-                # x_train = (x_train - x_train.mean(axis=1, keepdims=True)) / std_
-                #
-                # std_ = x_test.std(axis=1, keepdims=True)
-                # std_[std_ == 0] = 1.0
-                # x_test = (x_test - x_test.mean(axis=1, keepdims=True)) / std_
+                # Z-Normalization
+                if normalization:
+                    std_ = x_train.std(axis=1, keepdims=True)
+                    std_[std_ == 0] = 1.0
+                    x_train = (x_train - x_train.mean(axis=1, keepdims=True)) / std_
+
+                    std_ = x_test.std(axis=1, keepdims=True)
+                    std_[std_ == 0] = 1.0
+                    x_test = (x_test - x_test.mean(axis=1, keepdims=True)) / std_
 
         datasets_dict[dataset_name] = (x_train.copy(), y_train.copy(), x_test.copy(), y_test.copy())
 

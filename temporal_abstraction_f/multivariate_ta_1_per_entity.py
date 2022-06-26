@@ -14,8 +14,11 @@ class MultivariateTA1:
         self.cur_root_dir = self.config.mts_path
         self.attributes_dict = {}
 
-    def input_to_csv(self, path, dataset_name, file_type, output_path):
+    def input_to_csv(self, path, dataset_name, file_type, output_path, normalization=True):
         """
+        :param dataset_name:
+        :param output_path:
+        :param normalization:
         :param path: the location of the original files
         :param file_type: the type of the file - train/test
         :return: the function create the csv file of the hugobot input format
@@ -23,6 +26,12 @@ class MultivariateTA1:
         # Reading the npy files
         x = np.load(path + 'x_' + file_type + '.npy')
         y = np.load(path + 'y_' + file_type + '.npy')
+
+        # Z-Normalization
+        if normalization:
+            std_ = x.std(axis=(0, 1), keepdims=True)
+            std_ = np.where(std_ == 0, 1.0, std_)
+            x = (x - x.mean(axis=(0, 1), keepdims=True)) / std_
 
         # Reshape the data frame: m - entities, n - timestamps, r - time series
         m, n, r = x.shape
@@ -42,12 +51,9 @@ class MultivariateTA1:
         # Change the column order
         df = df.reindex(columns=["EntityID", "TemporalPropertyID", "TimeStamp", "TemporalPropertyValue"])
 
-        # ------------------------------------------------------------
-        # TODO - Alisa
         # For the per entity
         df["TemporalPropertyID"] = (((df["EntityID"] + 1).astype(int)).astype(str) + "00" +
                                     (df["TemporalPropertyID"] + 1).astype(str)).astype(int)
-        # ------------------------------------------------------------
 
         # Create classifier DF with numpy
         df_classifier = pd.DataFrame(y).reset_index().melt('index')

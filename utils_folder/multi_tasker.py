@@ -82,11 +82,11 @@ def create_combination_list():
     #              "transformation": ['1'],
     #              "perEntity": ['True', 'False']}
 
-    dict_name = {"archive": ['UCR', 'MTS'],
+    dict_name = {"archive": ['MTS'],
                  "classifier": ['HugoBotFiles'],
                  "afterTA": ['True'],
-                 "method": ['sax', 'td4c-cosine', 'gradient', 'equal-frequency', 'equal-width'],
-                 "combination": ['True'],
+                 "method": ['sax', 'gradient', 'equal-frequency', 'equal-width'],
+                 "combination": ['False'],
                  "transformation": ['1'],
                  "perEntity": ['False']}
 
@@ -251,9 +251,9 @@ if __name__ == '__main__':
     current_file_path = "/sise/home/" + current_user + "/run_multi_tasker_gpu"
     temp_file = open("/sise/home/" + current_user + "/tmp.txt", 'w')
 
-    create_combination_gpu()
+    # create_combination_gpu()
     # create_combination_cpu()
-    # create_combination_list()
+    create_combination_list()
     # create_combination_per_entity()
 
     # # For step one - CPU
