@@ -16,10 +16,12 @@ def create_files():
 
 
 def run_cpu():
+    norm = "With ZNorm//" if config.normalization else "Without ZNorm//"
+
     prop_path = config.path_files_for_TA
     if config.perEntity:
         prop_path += "PerEntity//"
-    prop_path += config.archive + "//" + config.classifier + "//" + config.method + "//"
+    prop_path += norm + config.archive + "//" + config.classifier + "//" + config.method + "//"
 
     create_directory(prop_path)
 
@@ -32,25 +34,26 @@ def run_cpu():
     running_dict = open_pickle("create_files_dict_" + config.archive)
 
     for nb_bin in config.nb_bin:
-        config.set_path_transformations_2(nb_bin)
+        for paa in config.paa_window_size:
+            for std in config.std_coefficient:
+                for max_gap in config.max_gap:
+                    config.set_path_transformations_2(nb_bin, paa, max_gap)
 
-        for std in config.std_coefficient:
-            for max_gap in config.max_gap:
-                if config.method == "gradient":
-                    for gradient_window in config.gradient_window_size:
+                    if config.method == "gradient":
+                        for gradient_window in config.gradient_window_size:
+                            running_dict = run_hugobot(config, prop_path, running_dict, max_gap, config.method, nb_bin,
+                                                       paa, std, gradient_window)
+                    else:
                         running_dict = run_hugobot(config, prop_path, running_dict, max_gap, config.method, nb_bin,
-                                                   config.paa_window_size, std, gradient_window)
-                else:
-                    running_dict = run_hugobot(config, prop_path, running_dict, max_gap, config.method, nb_bin,
-                                               config.paa_window_size, std)
+                                                   paa, std)
     print("Done")
 
 
 def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, gradient_window=None):
     print("--------------------------------------------------------------------------------------------------------")
-    print("Classifier: " + config.classifier + ", Method: " + method + ", Bins: " + str(nb_bin) + " Combination: " +
-          str(config.combination) + ", PerEntity: " + str(config.perEntity) +
-          ", Transformation Number: " + str(config.transformation_number))
+    print("Classifier: " + config.classifier + ", Method: " + method + ", Bins: " + str(nb_bin) + ", PAA: " + str(paa)
+          + " , MaxGap: " + str(max_gap) + ", Combination: " + str(config.combination) + ", PerEntity: " +
+          str(config.perEntity) + ", Transformation Number: " + str(config.transformation_number))
     print("-------------------------------------------------------------------------------------------------------- \n")
 
     key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window, config.combination,
@@ -64,7 +67,8 @@ def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, g
         print()
 
     else:
-        prop_path = path + "number_bin_" + str(nb_bin) + "//"
+        params = "number_bin-" + str(nb_bin) + "_paa-" + str(paa) + "_max_gap-" + str(max_gap)
+        prop_path = path + params + "//"
         create_directory(prop_path)
 
         create_three_files(config=config,
@@ -83,11 +87,12 @@ def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, g
         if config.combination and config.method != "gradient":
             print("Step 3.1: make the gkb.csv, ta.csv and ppa.csv for " + method + " method\n")
 
+            norm = "With ZNorm//" if config.normalization else "Without ZNorm//"
+
             gradient_prop_path = config.path_files_for_TA
             if config.perEntity:
                 gradient_prop_path += "PerEntity//"
-            gradient_prop_path += config.archive + "//" + config.classifier + "//gradient//number_bin_"\
-                                  + str(nb_bin) + "//"
+            gradient_prop_path += norm + config.archive + "//" + config.classifier + "//gradient//" + params + "//"
 
             create_directory(gradient_prop_path)
 
@@ -110,6 +115,7 @@ def run_hugobot(config, path, running_dict, max_gap, method, nb_bin, paa, std, g
 
             config.set_method(method)
 
+            # todo - Need to fix the path of normalization
             print("Step 4: transformation 2")
             combining_two_methods_ucr(config, prop_path, gradient_prop_path) if config.archive == "UCR" else \
                 combining_two_methods_mts(config, prop_path, gradient_prop_path)

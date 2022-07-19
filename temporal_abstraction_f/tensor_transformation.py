@@ -15,27 +15,30 @@ def new_ucr_files(config, prop_path):
     univariate_dict = open_pickle("univariate_dict")
 
     for index, dataset_name in enumerate(config.UNIVARIATE_DATASET_NAMES_2018):
-        path = prop_path + dataset_name + "//"
-        output_path = config.path_transformation2 + dataset_name + "//"
+        try:
+            path = prop_path + dataset_name + "//"
+            output_path = config.path_transformation2 + dataset_name + "//"
 
-        create_directory(output_path)
+            create_directory(output_path)
 
-        print("\t" + dataset_name)
+            print("\t" + dataset_name)
 
-        for file_type in files_type:
-            states_path = path + file_type.lower() + "//states.csv"
-            states_df = pd.read_csv(states_path, header=0)
+            for file_type in files_type:
+                states_path = path + file_type.lower() + "//states.csv"
+                states_df = pd.read_csv(states_path, header=0)
 
-            # Get from the read me file the number of rows, number of columns and number of
-            classes = univariate_dict[(dataset_name, file_type.lower())]["classes"]
-            number_of_rows = univariate_dict[(dataset_name, file_type.lower())]["rows"]
-            number_of_columns = univariate_dict[(dataset_name, file_type.lower())]["columns"]
+                # Get from the read me file the number of rows, number of columns and number of
+                classes = univariate_dict[(dataset_name, file_type.lower())]["classes"]
+                number_of_rows = univariate_dict[(dataset_name, file_type.lower())]["rows"]
+                number_of_columns = univariate_dict[(dataset_name, file_type.lower())]["columns"]
 
-            classification_path = config.ucr_path + '/' + dataset_name + '/y_' + file_type.lower() + '.npy'
+                classification_path = config.ucr_path + '/' + dataset_name + '/y_' + file_type.lower() + '.npy'
 
-            # Run the three transformation on the Train and Test files
-            create_transformations(config, path, output_path, file_type, number_of_rows, number_of_columns, 1, classes,
-                                   states_df, univariate=True, classification_path=classification_path)
+                # Run the three transformation on the Train and Test files
+                create_transformations(config, path, output_path, file_type, number_of_rows, number_of_columns, 1, classes,
+                                       states_df, univariate=True, classification_path=classification_path)
+        except:
+            print("\t\tFAILED!!!")
     print("")
 
 
@@ -53,8 +56,6 @@ def new_mts_files(config, prop_path, nb_bins):
     for index, dataset_name in enumerate(config.MTS_DATASET_NAMES):
         print("\t" + dataset_name)
 
-        dataset_with_empty_columns = False
-
         path = prop_path + dataset_name + "/"
         output_path = config.path_transformation2 + dataset_name + "//"
 
@@ -71,8 +72,9 @@ def new_mts_files(config, prop_path, nb_bins):
         for file_type in files_type:
             states_path = path + file_type + "//states.csv"
             states_df = pd.read_csv(states_path, header=0)
-            # ------------------------------------------------------------
-            # TODO - Alise (For our problem)
+
+            dataset_with_empty_columns = False
+
             if config.perEntity:
                 count_df = pd.DataFrame(states_df['TemporalPropertyID'].value_counts())
                 count_df = count_df.reset_index(level=0)
@@ -101,7 +103,6 @@ def new_mts_files(config, prop_path, nb_bins):
                     states_df = states_df.sort_values(by=['StateID', 'BinID'])
                     states_df.reset_index(drop=True, inplace=True)
                     states_df["index"] = states_df.index + 1
-            # ------------------------------------------------------------
 
             # Run the three transformation on the Train and Test files
             if file_type == "train":
@@ -179,8 +180,6 @@ def create_transformations(config, path, output_path, file_type, number_of_entit
                     # Extract the start time, end time and state id
                     parse_data = data[info].split(',')
 
-                    # ------------------------------------------------------------
-                    # TODO - Alisa
                     if config.perEntity:
                         if univariate:
                             temporal_property_ID = 0
@@ -197,7 +196,6 @@ def create_transformations(config, path, output_path, file_type, number_of_entit
                             modulo = int(number_of_states / number_of_attributes)
 
                         symbol = int(modulo + temporal_property_ID * (number_of_states / number_of_attributes))
-                    # ------------------------------------------------------------
 
                     else:
                         temporal_property_ID = int(parse_data[3]) - min_property

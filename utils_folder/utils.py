@@ -85,7 +85,8 @@ def create_directory(directory_path):
         return directory_path
 
 
-def read_all_datasets(config, normalization=True):
+def read_all_datasets(config):
+    normalization = config.normalization
     datasets_dict = {}
 
     if config.archive == 'MTS':
@@ -314,10 +315,11 @@ def save_test_duration(file_name, test_duration):
 
 
 def generate_results_csv(config, params):
+    normalization = config.normalization
     res = pd.DataFrame(data=np.zeros((0, 14), dtype=np.float), index=[],
                        columns=['classifier_name', 'archive_name', 'dataset_name', 'precision', 'recall', 'accuracy',
                                 'mcc', "cohen_kappa", "f1_score_macro", "f1_score_micro",
-                                "f1_score_weighted", 'learning_time', 'predicting_time','auc'])
+                                "f1_score_weighted", 'learning_time', 'predicting_time', 'auc'])
 
     dataset_list = config.UNIVARIATE_DATASET_NAMES_2018 if config.archive == "UCR" else config.MTS_DATASET_NAMES
 
@@ -338,8 +340,15 @@ def generate_results_csv(config, params):
             df_metrics['iteration'] = it
             res = pd.concat((res, df_metrics), axis=0, sort=False)
 
-    path = config.path + "ResultsProject//AfterTA//" if config.afterTA else config.path + "ResultsProject//RawData//"
-    path += config.archive + "//" + config.classifier + "//" + config.method + "//"
+    if config.afterTA:
+        path = config.path + "ResultsProject//AfterTA//"
+        path += config.archive
+        path += " - With ZNorm//" if normalization else " - Without ZNorm//"
+    else:
+        path = config.path + "ResultsProject//RawData"
+        path += " - With ZNorm//" if normalization else " - Without ZNorm//"
+
+    path += config.classifier + "//" + config.method + "//"
 
     create_directory(path)
     res.to_csv(path + params + ".csv", index=False)

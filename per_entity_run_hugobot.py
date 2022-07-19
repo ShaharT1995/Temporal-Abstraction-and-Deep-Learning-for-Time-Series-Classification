@@ -1,5 +1,7 @@
 def run_per_entity(nb_bin, dataset_name):
-    prop_path = config.path_files_for_TA + "PerEntity//" + config.archive + "//" + config.classifier + "//" +\
+    norm = "With ZNorm//" if config.normalization else "Without ZNorm//"
+
+    prop_path = config.path_files_for_TA + "PerEntity//" + norm + config.archive + "//" + config.classifier + "//" +\
                 config.method + "//"
 
     create_directory(prop_path)
@@ -15,23 +17,25 @@ def run_per_entity(nb_bin, dataset_name):
 
     running_dict = open_pickle("PerEntity_Dict_" + config.archive)
 
-    config.set_path_transformations_2(nb_bin)
+    for paa in config.paa_window_size:
+        for std in config.std_coefficient:
+            for max_gap in config.max_gap:
+                config.set_path_transformations_2(nb_bin, paa, max_gap)
 
-    for std in config.std_coefficient:
-        for max_gap in config.max_gap:
-            if config.method == "gradient":
-                for gradient_window in config.gradient_window_size:
-                    running_dict = run_hugobot(config, dataset_name, prop_path, running_dict, max_gap, config.method, nb_bin,
-                                               config.paa_window_size, std, gradient_window)
-            else:
-                running_dict = run_hugobot(config, dataset_name, prop_path, running_dict, max_gap, config.method, nb_bin,
-                                           config.paa_window_size, std)
+                if config.method == "gradient":
+                    for gradient_window in config.gradient_window_size:
+                        running_dict = run_hugobot(config, dataset_name, prop_path, running_dict, max_gap,
+                                                   config.method, nb_bin, paa, std, gradient_window)
+                else:
+                    running_dict = run_hugobot(config, dataset_name, prop_path, running_dict, max_gap, config.method,
+                                               nb_bin, paa, std)
     print("Done")
 
 
 def run_hugobot(config, dataset_name, path, running_dict, max_gap, method, nb_bin, paa, std, gradient_window=None):
     print("--------------------------------------------------------------------------------------------------------")
-    print(dataset_name + " - Method: " + method + ", Bins: " + str(nb_bin) + " Combination: " + str(config.combination))
+    print(dataset_name + " - Method: " + method + ", Bins: " + str(nb_bin) + ", PAA: " + str(paa) + " , MaxGap: "
+          + str(max_gap) + ", Combination: " + str(config.combination))
     print("--------------------------------------------------------------------------------------------------------\n")
 
     key = (config.archive, dataset_name, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window,
@@ -45,7 +49,8 @@ def run_hugobot(config, dataset_name, path, running_dict, max_gap, method, nb_bi
         print()
 
     else:
-        prop_path = path + "number_bin_" + str(nb_bin) + "//"
+        params = "number_bin-" + str(nb_bin) + "_paa-" + str(paa) + "_max_gap-" + str(max_gap)
+        prop_path = path + params + "//"
         create_directory(prop_path)
 
         create_three_files(config=config,
@@ -64,11 +69,12 @@ def run_hugobot(config, dataset_name, path, running_dict, max_gap, method, nb_bi
         if config.combination and config.method != "gradient":
             print("Step 3.1: make the gkb.csv, ta.csv and ppa.csv for " + method + " method\n")
 
+            norm = "With ZNorm//" if config.normalization else "Without ZNorm//"
+
             gradient_prop_path = config.path_files_for_TA
             if config.perEntity:
                 gradient_prop_path += "PerEntity//"
-            gradient_prop_path += config.archive + "//" + config.classifier + "//gradient//number_bin_"\
-                                  + str(nb_bin) + "//"
+            gradient_prop_path += norm + config.archive + "//" + config.classifier + "//gradient//" + params + "//"
 
             create_directory(gradient_prop_path)
 

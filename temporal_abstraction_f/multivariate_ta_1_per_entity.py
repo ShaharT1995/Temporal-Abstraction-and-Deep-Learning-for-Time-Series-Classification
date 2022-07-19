@@ -14,7 +14,7 @@ class MultivariateTA1:
         self.cur_root_dir = self.config.mts_path
         self.attributes_dict = {}
 
-    def input_to_csv(self, path, dataset_name, file_type, output_path, normalization=True):
+    def input_to_csv(self, path, dataset_name, file_type, output_path):
         """
         :param dataset_name:
         :param output_path:
@@ -23,6 +23,8 @@ class MultivariateTA1:
         :param file_type: the type of the file - train/test
         :return: the function create the csv file of the hugobot input format
         """
+        normalization = self.config.normalization
+
         # Reading the npy files
         x = np.load(path + 'x_' + file_type + '.npy')
         y = np.load(path + 'y_' + file_type + '.npy')

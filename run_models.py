@@ -99,6 +99,11 @@ def run_all(config, params):
 
     print("Classifier: " + config.classifier)
 
+    UNIVARIATE_DATASET_NAMES_2018_FailedEFD = ['AllGestureWiimoteX', 'AllGestureWiimoteY', 'AllGestureWiimoteZ',
+                                                    'GestureMidAirD1', 'GestureMidAirD2',
+                                                    'GestureMidAirD3', 'GesturePebbleZ1', 'GesturePebbleZ2', 'PLAID',
+                                                    'ShakeGestureWiimoteZ']
+
     for iter in range(config.ITERATIONS):
         print('\titer', iter)
 
@@ -109,6 +114,10 @@ def run_all(config, params):
             if dataset_name == "CMUsubject16" and (config.classifier == "mlp" or config.classifier == "mcdcnn"):
                 print('\t\tMemory Error in : ', dataset_name)
                 continue
+
+            # if dataset_name in UNIVARIATE_DATASET_NAMES_2018_FailedEFD and config.method == 'equal-frequency':
+            #     print('\t\tFAILED!')
+            #     continue
 
             output_directory = config.path + "/ResultsProject//DNN//" + config.archive + "//" + config.classifier + '/' + \
                                config.method + "/" + params + "//itr" + str(iter) + '//' + dataset_name + '/'

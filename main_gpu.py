@@ -5,30 +5,30 @@ def run():
     running_dict = open_pickle("running_dict" + config.archive)
 
     for nb_bin in config.nb_bin:
-        for std in config.std_coefficient:
-            for max_gap in config.max_gap:
-                if config.method == "gradient":
-                    for gradient_window in config.gradient_window_size:
-                        running_dict = execute_running(config, running_dict, max_gap, config.method, nb_bin,
-                                                       config.paa_window_size, std, gradient_window)
-                else:
-                    running_dict = execute_running(config, running_dict, max_gap, config.method, nb_bin,
-                                                   config.paa_window_size, std)
+        for paa in config.paa_window_size:
+            for std in config.std_coefficient:
+                for max_gap in config.max_gap:
+                    if config.method == "gradient":
+                        for gradient_window in config.gradient_window_size:
+                            running_dict = execute_running(config, running_dict, max_gap, config.method, nb_bin, paa,
+                                                           std, gradient_window)
+                    else:
+                        running_dict = execute_running(config, running_dict, max_gap, config.method, nb_bin, paa, std)
     print("Done")
 
 
 def execute_running(config, running_dict, max_gap, method, nb_bin, paa, std, gradient_window=None):
     print("--------------------------------------------------------------------------------------------------------")
-    print("Classifier: " + config.classifier + ", Method: " + method + ", Bins: " + str(nb_bin) + " Combination: " +
-          str(config.combination) + ", PerEntity: " + str(config.perEntity) +
-          ", Transformation Number: " + str(config.transformation_number))
+    print("Classifier: " + config.classifier + ", Method: " + method + ", Bins: " + str(nb_bin) + ", PAA: " + str(paa)
+          + " , MaxGap: " + str(max_gap) + ", Combination: " + str(config.combination) + ", PerEntity: " +
+          str(config.perEntity) + ", Transformation Number: " + str(config.transformation_number))
     print("--------------------------------------------------------------------------------------------------------")
 
     key = (config.archive, config.classifier, method, nb_bin, paa, std, max_gap, gradient_window,
            config.transformation_number, config.combination, config.perEntity)
 
     # set number of bins in the path
-    config.set_path_transformations_2(nb_bin)
+    config.set_path_transformations_2(nb_bin, paa, max_gap)
 
     # if key in running_dict:
     #     print("Already Done! \n")

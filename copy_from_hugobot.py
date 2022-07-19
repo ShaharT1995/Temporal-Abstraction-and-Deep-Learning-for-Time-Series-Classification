@@ -12,10 +12,11 @@ def copytree(src, dst, symlinks=False, ignore=None):
             shutil.copy2(s, d)
 
 
-source_folder = r"/sise/robertmo-group/TA-DL-TSC/Data/AfterTA/MTS/HugoBotFiles/"
-for classifier in ['fcn', 'mlp', 'resnet', 'twiesn', 'encoder', 'mcdcnn', 'cnn', 'inception', 'lstm_fcn', 'mlstm_fcn',
-                   'rocket']:
-    destination_folder = r"/sise/robertmo-group/TA-DL-TSC/Data/AfterTA/MTS/" + classifier + "/"
+source_folder = r"/sise/robertmo-group/TA-DL-TSC/Data/AfterTA/UCR - Without Normalization/HugoBotFiles - Without ZNorm/equal-frequency"
+for classifier in ['resnet']:
+    print("Start: " + classifier)
+    destination_folder = r"/sise/robertmo-group/TA-DL-TSC/Data/AfterTA/Without ZNorm//UCR//" + classifier + \
+                         "//equal-frequency"
     copytree(source_folder, destination_folder)
-    print(classifier + " Done")
+    print("Done: " + classifier)
 

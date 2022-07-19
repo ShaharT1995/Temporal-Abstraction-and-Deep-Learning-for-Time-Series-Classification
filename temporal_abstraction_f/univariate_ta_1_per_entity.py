@@ -18,7 +18,7 @@ class UnivariateTA1:
 
         self.univariate_dict = {}
 
-    def input_to_csv(self, path, file_type, dataset_name, output_path, normalization=True):
+    def input_to_csv(self, path, file_type, dataset_name, output_path):
         """
         :param path: the location of the original files
         :param file_type: the type of the file - train/test
@@ -26,6 +26,8 @@ class UnivariateTA1:
         :param dataset_name: the name of the dataset
         :return: the function create the csv file of the hugobot input format
         """
+        normalization = self.config.normalization
+
         # Reading the tsv file
         tsv_data = pd.read_csv(path + "_" + file_type + ".tsv", sep='\t', header=None)
 

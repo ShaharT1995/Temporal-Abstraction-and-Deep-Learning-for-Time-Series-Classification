@@ -16,6 +16,7 @@ class ConfigClass:
     transformation_number = ""
 
     def __init__(self):
+        self.normalization = True
         self.path = "/sise/robertmo-group/TA-DL-TSC/"
         self.mts_path = self.path + "mtsdata/archives/mts_archive/"
         self.ucr_path = self.path + "UCRArchive_2018/archives/UCRArchive_2018/"
@@ -27,8 +28,8 @@ class ConfigClass:
 
         self.nb_bin = [3, 5, 10, 20]
         self.std_coefficient = [-1]
-        self.max_gap = [1]
-        self.paa_window_size = 1
+        self.max_gap = [1, 2, 3]
+        self.paa_window_size = [1, 2, 5]
         self.gradient_window_size = [10]
 
         # self.UNIVARIATE_DATASET_NAMES_2018 = ['Beef', 'ACSF1', 'Adiac', 'Computers', 'CricketX', 'CricketY',
@@ -43,6 +44,12 @@ class ConfigClass:
         # Datasets down because EFD
         # 'AllGestureWiimoteX', 'AllGestureWiimoteY', 'AllGestureWiimoteZ', 'GestureMidAirD1', 'GestureMidAirD2',
         # 'GestureMidAirD3', 'GesturePebbleZ1', 'GesturePebbleZ2', 'PLAID', 'ShakeGestureWiimoteZ'
+
+        self.UNIVARIATE_DATASET_NAMES_2018_FailedEFD = ['AllGestureWiimoteX', 'AllGestureWiimoteY', 'AllGestureWiimoteZ',
+                                              'GestureMidAirD1', 'GestureMidAirD2',
+                                              'GestureMidAirD3', 'GesturePebbleZ1', 'GesturePebbleZ2', 'PLAID',
+                                              'ShakeGestureWiimoteZ']
+
         self.UNIVARIATE_DATASET_NAMES_2018 = ['ACSF1', 'Adiac', 'ArrowHead', 'Beef', 'BeetleFly', 'BirdChicken', 'BME',
                                               'Car', 'CBF', 'Chinatown', 'ChlorineConcentration', 'CinCECGTorso',
                                               'Coffee', 'Computers', 'CricketX', 'CricketY', 'CricketZ', 'Crop',
@@ -74,24 +81,33 @@ class ConfigClass:
                                               'UWaveGestureLibraryX', 'UWaveGestureLibraryY', 'UWaveGestureLibraryZ',
                                               'Wafer', 'Wine', 'WordSynonyms', 'Worms', 'WormsTwoClass', 'Yoga']
 
+        self.UNIVARIATE_DATASET_NAMES_2018 = self.UNIVARIATE_DATASET_NAMES_2018 + self.UNIVARIATE_DATASET_NAMES_2018_FailedEFD
+
+        # self.UNIVARIATE_DATASET_NAMES_2018 = ['ACSF1']
+
         self.MTS_DATASET_NAMES = ['Libras', 'ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
                                   'JapaneseVowels', 'NetFlow', 'UWave', 'Wafer']
 
-        # self.MTS_DATASET_NAMES = ['AUSLAN']
-
     def set_path_transformations(self):
-        if self.perEntity:
-            self.path_transformation1 = self.path_files_for_TA + "Transformation1 PerEntity//" + self.archive + "//"
-        else:
-            self.path_transformation1 = self.path_files_for_TA + "Transformation1//" + self.archive + "//"
+        norm = "With ZNorm//" if self.normalization else "Without ZNorm//"
 
-    def set_path_transformations_2(self, nb_bin):
         if self.perEntity:
-            self.path_transformation2 = self.path_after_TA + "PerEntity" + "//" + self.archive + "//" + self.classifier \
-                                        + "//" + self.method + "//" + "number_bin_" + str(nb_bin) + "//"
+            self.path_transformation1 = self.path_files_for_TA + "Transformation1 PerEntity//" + norm + \
+                                        self.archive + "//"
         else:
-            self.path_transformation2 = self.path_after_TA + self.archive + "//" + self.classifier + "//" + \
-                                        self.method + "//" + "number_bin_" + str(nb_bin) + "//"
+            self.path_transformation1 = self.path_files_for_TA + "Transformation1//" + norm + self.archive + "//"
+
+    def set_path_transformations_2(self, nb_bin, paa, max_gap):
+        norm = "With ZNorm//" if self.normalization else "Without ZNorm//"
+
+        params = "number_bin-" + str(nb_bin) + "_paa-" + str(paa) + "_max_gap-" + str(max_gap)
+
+        if self.perEntity:
+            self.path_transformation2 = self.path_after_TA + "PerEntity" + "//" + norm + self.archive + "//" + \
+                                        self.classifier + "//" + self.method + "//" + params + "//"
+        else:
+            self.path_transformation2 = self.path_after_TA + norm + self.archive + "//" + self.classifier + "//" + \
+                                        self.method + "//" + params + "//"
 
     @staticmethod
     def set_method(method):
