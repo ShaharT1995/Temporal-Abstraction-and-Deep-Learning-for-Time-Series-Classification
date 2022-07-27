@@ -33,6 +33,8 @@ class UnivariateTA1:
 
         # Drop the classifier column
         df = tsv_data.drop([0], axis=1)
+        if not normalization:
+            df = df.values
 
         # Z-Normalization
         if normalization:

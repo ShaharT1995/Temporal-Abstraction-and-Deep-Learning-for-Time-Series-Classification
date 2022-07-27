@@ -122,7 +122,7 @@ def read_all_datasets(config):
                 x_test = wait_for_files(root_dir_dataset + 'x_test.npy')
                 y_test = wait_for_files(root_dir_dataset + 'y_test.npy')
 
-                # Z-Normalization
+                # Z-Normalization (The UCR archive is already normalize) - don't need to do those raws
                 if normalization:
                     std_ = x_train.std(axis=(0, 1), keepdims=True)
                     std_ = np.where(std_ == 0, 1.0, std_)

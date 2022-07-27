@@ -16,7 +16,7 @@ class ConfigClass:
     transformation_number = ""
 
     def __init__(self):
-        self.normalization = True
+        self.normalization = False
         self.path = "/sise/robertmo-group/TA-DL-TSC/"
         self.mts_path = self.path + "mtsdata/archives/mts_archive/"
         self.ucr_path = self.path + "UCRArchive_2018/archives/UCRArchive_2018/"
@@ -26,10 +26,13 @@ class ConfigClass:
         self.path_transformation1 = ""
         self.path_transformation2 = ""
 
+        # self.nb_bin = [20]
         self.nb_bin = [3, 5, 10, 20]
         self.std_coefficient = [-1]
         self.max_gap = [1, 2, 3]
-        self.paa_window_size = [1, 2, 5]
+        self.max_gap = [1]
+        # self.paa_window_size = [2, 5]
+        self.paa_window_size = [1]
         self.gradient_window_size = [10]
 
         # self.UNIVARIATE_DATASET_NAMES_2018 = ['Beef', 'ACSF1', 'Adiac', 'Computers', 'CricketX', 'CricketY',
@@ -83,10 +86,11 @@ class ConfigClass:
 
         self.UNIVARIATE_DATASET_NAMES_2018 = self.UNIVARIATE_DATASET_NAMES_2018 + self.UNIVARIATE_DATASET_NAMES_2018_FailedEFD
 
-        # self.UNIVARIATE_DATASET_NAMES_2018 = ['ACSF1']
+        # self.UNIVARIATE_DATASET_NAMES_2018 = ['ArrowHead']
 
         self.MTS_DATASET_NAMES = ['Libras', 'ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
                                   'JapaneseVowels', 'NetFlow', 'UWave', 'Wafer']
+        # self.MTS_DATASET_NAMES = ['Libras', 'ECG']
 
     def set_path_transformations(self):
         norm = "With ZNorm//" if self.normalization else "Without ZNorm//"

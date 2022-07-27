@@ -55,7 +55,8 @@ def concat_results(path_ta_dir, normalization, raw_data=False, type="UCR"):
                             arguments = re.split('[_.]', file)
 
                             if not raw_data and (arguments[8] == "True" or arguments[9] == "True" or
-                                                 arguments[2] not in bins or arguments[7] == "3"):
+                                                 arguments[2] not in bins or arguments[7] == "3" or arguments[3] != "1"
+                                                 or arguments[5] != "1"):
                                 continue
 
                             res_ta_data = pd.read_csv(root + "//" + file, sep=',', header=0, encoding="utf-8")
@@ -99,34 +100,22 @@ def concat_results(path_ta_dir, normalization, raw_data=False, type="UCR"):
     else:
         df = df.replace({"method": {"sax": "SAX", "td4c-cosine": "TD4C - Cosine", "gradient": "Gradient",
                                     "sax with Gradient": "SAX with Gradient", "td4c-cosine with Gradient":
-                                        "TD4C - Cosine with Gradient", "sax with Per Entity": "SAX with Per Entity",
+                                    "TD4C - Cosine with Gradient", "sax with Per Entity": "SAX with Per Entity",
                                     "equal-frequency": "Equal-Frequency", "equal-width": "Equal-Width"}})
 
     df.to_csv(output_file_name, index=False)
 
 
-def merge_two_df(raw_df, ta_df, metrics, standardization=False):
-    if standardization:
-        ta_df = ta_df.groupby(["classifier_name", "dataset_name", "method", "nb bins", "transformation_type",
-                               "standardization"], as_index=False).agg({k: np.mean for k in metrics})
-        raw_df = raw_df.groupby(["classifier_name_raw_data", "dataset_name_raw_data", "standardization_raw_data"],
-                                as_index=False).agg({k + "_raw_data": np.mean for k in metrics})
+def merge_two_df(raw_df, ta_df, metrics):
+    ta_df = ta_df.groupby(["classifier_name", "dataset_name", "method", "nb bins", "transformation_type"]
+                          , as_index=False).agg({k: np.mean for k in metrics})
+    raw_df = raw_df.groupby(["classifier_name_raw_data", "dataset_name_raw_data"],
+                            as_index=False).agg({k + "_raw_data": np.mean for k in metrics})
 
-        raw_df = raw_df.rename(columns={"classifier_name_raw_data": "classifier_name",
-                                        "dataset_name_raw_data": "dataset_name",
-                                        "standardization_raw_data": "standardization"})
+    raw_df = raw_df.rename(columns={"classifier_name_raw_data": "classifier_name",
+                                    "dataset_name_raw_data": "dataset_name"})
 
-        merged = pd.merge(raw_df, ta_df, on=["classifier_name", "dataset_name", "standardization"])
-    else:
-        ta_df = ta_df.groupby(["classifier_name", "dataset_name", "method", "nb bins", "transformation_type"],
-                              as_index=False).agg({k: np.mean for k in metrics})
-        raw_df = raw_df.groupby(["classifier_name_raw_data", "dataset_name_raw_data"],
-                                as_index=False).agg({k + "_raw_data": np.mean for k in metrics})
-
-        raw_df = raw_df.rename(columns={"classifier_name_raw_data": "classifier_name",
-                                        "dataset_name_raw_data": "dataset_name"})
-
-        merged = pd.merge(raw_df, ta_df, on=["classifier_name", "dataset_name"])
+    merged = pd.merge(raw_df, ta_df, on=["classifier_name", "dataset_name"])
     return merged
 
 
@@ -136,7 +125,7 @@ def get_best_df_after_ta(ta_df, metrics, lst_group_by, max_val=None):
 
     df["avg_ta"] = df[[i for i in metrics]].mean(axis=1)
 
-    #df = df.loc[(df["nb bins"] == 10) & (df["method"] == "EFD")]
+    # df = df.loc[(df["nb bins"] == 3) & (df["method"] == "GRAD")]
 
     # Get only the top X results
     if max_val is not None:
@@ -152,13 +141,21 @@ def get_best_df_after_ta(ta_df, metrics, lst_group_by, max_val=None):
 
 
 def create_fig(x, y, col, data, name, normalization, x_label, y_label='', legend='', hue=None, type="UCR", order=None,
-               join=False,
-               graph_num=1, colors=1):
-    graph_aspect = 1.3
+               join=False, graph_num=1, colors=1):
+    graph_aspect = 1.5
+
+    rotation = 30
 
     if graph_num == 5:
+        rotation = 70
         metrics = ['MCC', 'Cohen Kappa', 'F1 Score Macro', 'F1 Score Micro', 'F1 Score Weighted', 'Balanced Accuracy',
                    'AUC - ROC']
+
+    elif graph_num == 1 or graph_num == 4:
+        rotation = 0
+        metrics = ['Balanced Accuracy', "AUC - ROC"]
+        data = data.loc[(data['Evaluation Metric'] == "AUC - ROC") | (data['Evaluation Metric'] == "Balanced Accuracy")]
+
     elif graph_num == 7 or graph_num == 6:
         metrics = ['Balanced Accuracy', "AUC - ROC"]
         # metrics = ['Balanced Accuracy']
@@ -197,20 +194,19 @@ def create_fig(x, y, col, data, name, normalization, x_label, y_label='', legend
             y_label_new = metrics[v] if y_label == '' else y_label
 
             plt.setp(axis.get_yticklabels(), fontproperties=my_font, fontsize="20")
-            plt.setp(axis.get_xticklabels(), rotation=30, fontproperties=my_font, fontsize="20")
+            plt.setp(axis.get_xticklabels(), rotation=rotation, fontproperties=my_font, fontsize="20")
 
             axis.set_ylabel(y_label_new, fontproperties=my_font_bold, size="20")
 
             v += 1
 
-    plt.subplots_adjust(wspace=0.3, hspace=0.3)
+    plt.subplots_adjust(wspace=0.1, hspace=0.3)
     plt.show()
 
-    # if normalization:
-    #     output_path = "ArticleGraphs/" + type + "/With ZNorm/" + name
-    # else:
-    #     output_path = "ArticleGraphs/" + type + "/Without ZNorm/" + name
-    output_path = "ArticleGraphsNew/" + type + "/" + name
+    if normalization:
+        output_path = "ArticleGraphs/" + type + "/With ZNorm/" + name
+    else:
+        output_path = "ArticleGraphs/" + type + "/Without ZNorm/" + name
     plt.savefig(output_path, bbox_inches='tight')
 
 
@@ -234,9 +230,12 @@ def metrics_best_combination_VS_raw_data(df, metrics, normalization, type="UCR")
     data = data.rename(columns={"variable": "Evaluation Metric", "method": "Method",
                                 "transformation_type": "Transformation Type"})
 
+    order = ['Balanced Accuracy', 'AUC - ROC', 'F1 Score Micro', 'F1 Score Macro','MCC', 'F1 Score Weighted',
+             'Cohen Kappa']
+
     create_fig(x="Evaluation Metric", y="value", col=None, data=data, name="TA vs Raw data", legend="TA vs Raw data",
-               x_label='Method', y_label="Value", hue="Data", type=type, graph_num=5, colors=3,
-               normalization=normalization)
+               x_label='Evaluation Metric', y_label="Evaluation Value", hue="Data", type=type, graph_num=5, colors=3,
+               normalization=normalization, order=order)
 
 
 def classifiers_best_combination_VS_raw_data(df, metrics, normalization, type="UCR"):
@@ -247,7 +246,7 @@ def classifiers_best_combination_VS_raw_data(df, metrics, normalization, type="U
     order = ["MLP", "MC-DCNN", "Time - CNN", "FCN", "ResNets", "InceptionTime", "MLSTM - FCN"]
 
     create_fig(x="Classifier", y="value", col="Evaluation Metric", data=data, name="TA vs Raw data - Classifier",
-               x_label='Classifier', legend="TA vs Raw data", hue="Data", type=type, colors=3, graph_num=6,
+               x_label='Deep Neural Network', legend="TA vs Raw data", hue="Data", type=type, colors=3, graph_num=6,
                normalization=normalization, order=order)
 
 
@@ -341,14 +340,17 @@ def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
     # Run this only once
     if create_csv:
         path_for_ta_dir = config.path + "ResultsProject/"
-        path_for_ta_dir += "RawData - With ZNorm/" + type + "/"
+        path_for_ta_dir += "RawData - With ZNorm/" + type + "/" if normalization else \
+            "RawData - Without ZNorm/" + type + "/"
 
         concat_results(path_for_ta_dir, raw_data=True, normalization=normalization, type=type)
 
         path_for_ta_dir = config.path + "ResultsProject/AfterTA/" + type
-        path_for_ta_dir += " - Without ZNorm/"
+        path_for_ta_dir += " - With ZNorm/" if normalization else " - Without ZNorm/"
 
         concat_results(path_for_ta_dir, normalization=normalization, type=type)
+
+    raw_data_df_standardization, df_after_ta_standardization = merge_csv_with_and_without_normalization(type)
 
     path_after_ta = "Reports/Without ZNorm/" + type + "/"
     path_raw_data = "Reports/With ZNorm/" + type + "/"
@@ -359,33 +361,39 @@ def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
     # Open raw data
     raw_data_df = pd.read_csv(path_raw_data + "RawData.csv", encoding="utf-8")
 
+    df_after_ta = df_after_ta.replace({"method": {"sax": "SAX",  "Gradient": "GRAD", "Equal-Frequency": "EFD",
+                                                  "Equal-Width": "EWD"},
+                                       "classifier_name": {"MCDCNN": "MC-DCNN", "ResNet": "ResNets",
+                                                            "Inception": "InceptionTime"}})
+
     raw_data_df = raw_data_df.replace({"classifier_name_raw_data": {"MCDCNN": "MC-DCNN", "ResNet": "ResNets",
-                                                                    "Inception": "InceptionTime"}})
-    df_after_ta = df_after_ta.replace({"classifier_name": {"MCDCNN": "MC-DCNN", "ResNet": "ResNets",
-                                                           "Inception": "InceptionTime"}})
+                                                            "Inception": "InceptionTime"}})
+
+    df_after_ta_standardization = df_after_ta_standardization.replace({"method": {"sax": "SAX",  "Gradient": "GRAD",
+                                                                                  "Equal-Frequency": "EFD",
+                                                                                  "Equal-Width": "EWD"}})
 
     metrics = ['MCC', 'Cohen Kappa', 'F1 Score Macro', 'F1 Score Micro', 'F1 Score Weighted', 'Balanced Accuracy',
                'AUC - ROC']
 
     df = merge_two_df(raw_data_df, df_after_ta, metrics)
 
-    raw_data_df_standardization, df_after_ta_standardization = merge_csv_with_and_without_normalization(type)
-
     for num in graph_numbers:
         # Graphs of the methods
         if num == 1:
-            df_standardization = merge_two_df(raw_data_df_standardization, df_after_ta_standardization, metrics)
-            df = get_best_df_after_ta(df_standardization, metrics, ["nb bins", "method"])
+            df_graph_1 = merge_two_df(raw_data_df_standardization, df_after_ta_standardization, metrics)
 
-            order = ["Equal-Width", "Equal-Frequency", "SAX", "Gradient"]
+            df_graph_1 = get_best_df_after_ta(df_graph_1, metrics, ["nb bins", "method"])
 
-            melt_df = pd.melt(df, id_vars=["nb bins", "method", "classifier_name", "transformation_type"],
+            order = ["EWD", "EFD", "SAX", "GRAD"]
+
+            melt_df = pd.melt(df_graph_1, id_vars=["nb bins", "method", "classifier_name", "transformation_type"],
                               value_vars=metrics)
 
             melt_df = melt_df.rename(columns={"variable": "Evaluation Metric", "method": "Method"})
             create_fig(x="Method", y="value", col="Evaluation Metric", data=melt_df, name="Method",
-                       x_label='Method', hue="nb bins", legend="Number of Symbols", type=type, colors=1,
-                       order=order, normalization=normalization)
+                       x_label="Temporal Abstraction Method", hue="nb bins", legend="Number of Symbols", type=type,
+                       colors=1, order=order, normalization=normalization)
 
         # Graphs of the top N methods
         elif num == 2:
@@ -416,22 +424,22 @@ def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
 
         # Rank the transformation
         elif num == 4:
-            df_standardization = merge_two_df(raw_data_df_standardization, df_after_ta_standardization, metrics,
-                                              standardization=True)
-            melt_df = pd.melt(df_standardization, id_vars=["nb bins", "method", "classifier_name",
-                                                           "transformation_type", "standardization"],
+            melt_df = pd.melt(df_after_ta_standardization, id_vars=["nb bins", "method", "classifier_name",
+                                                                    "transformation_type", "standardization"],
                               value_vars=metrics)
             data = melt_df.rename(columns={"variable": "Evaluation Metric",
                                            "transformation_type": "Transformation Type"})
 
             create_fig(x="Transformation Type", y="value", col="Evaluation Metric", data=data,
-                       name="Transformations", x_label="Transformation Type", legend="Standardization", type=type,
+                       name="Transformations", x_label="Tensor Representation", legend="Standardization", type=type,
                        hue="standardization", order=["Discrete", "Symbol One-Hot"], colors=1,
                        normalization=normalization)
 
         # All the metric - Raw Data VS. best combination
         elif num == 5:
-            df = get_best_df_after_ta(df, metrics, ["nb bins", "method", "transformation_type"], max_val=1)
+            metrics_graph_5 = ['Balanced Accuracy', 'AUC - ROC']
+            df = get_best_df_after_ta(df, metrics_graph_5, ["nb bins", "method", "transformation_type"],
+                                      max_val=1)
             metrics_best_combination_VS_raw_data(df, metrics, type=type, normalization=normalization)
 
         # Classifiers - Raw Data VS. best combination
@@ -473,4 +481,4 @@ def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
 
 if __name__ == '__main__':
     # create_all_graphs([1, 2, 3, 4, 5, 6, 7, 8], create_csv=False, normalization=True, type="UCR")
-    create_all_graphs([1, 4], create_csv=False, type="MTS")
+    create_all_graphs([6], create_csv=False, type="MTS")

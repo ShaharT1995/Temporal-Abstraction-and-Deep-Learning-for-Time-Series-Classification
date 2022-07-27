@@ -122,9 +122,9 @@ def run_all(config, params):
             output_directory = config.path + "/ResultsProject//DNN//" + config.archive + "//" + config.classifier + '/' + \
                                config.method + "/" + params + "//itr" + str(iter) + '//' + dataset_name + '/'
 
-            if os.path.exists(output_directory + "/DONE"):
-                print("\t\t\tAlready Done")
-                continue
+            # if os.path.exists(output_directory + "/DONE"):
+            #     print("\t\t\tAlready Done")
+            #     continue
 
             create_directory(output_directory)
 
