@@ -23,12 +23,26 @@ config.set_seed()
 
 import warnings
 warnings.filterwarnings("ignore")
+def wait_for_files(filepath, cli=False, sep=',', file=False):
+    flag, data = is_locked(filepath, cli, sep, file)
+    while flag:
+        flag, data = is_locked(filepath, cli, sep, file)
+        time.sleep(random.randint(0, 20))
+
+    return data
 
 
 def open_pickle(name):
-    file = open(config.path + "/Project/temporal_abstraction_f/pickle_files//" + name + ".pkl", "rb")
-    data = pickle.load(file)
+    target = config.path + "/Project/temporal_abstraction_f/pickle_files//" + name + ".pkl"
+    data = wait_for_files(target, file=True)
     return data
+
+
+#todo - old
+# def open_pickle(name):
+#     file = open(config.path + "/Project/temporal_abstraction_f/pickle_files//" + name + ".pkl", "rb")
+#     data = pickle.load(file)
+#     return data
 
 
 def write_pickle(name, data):
@@ -40,14 +54,41 @@ def write_pickle(name, data):
 def check_pickle_exists(name):
     return os.path.exists(config.path + "/Project/temporal_abstraction_f/pickle_files//" + name + ".pkl")
 
+#todo - old function
+# def is_locked(filepath, cli, sep):
+#     locked = None
+#     file_object = None
+#     if os.path.exists(filepath):
+#         try:
+#             if cli:
+#                 file_object = pd.read_csv(filepath)
+#
+#             # Read all datasets
+#             else:
+#                 # For the raw data in the UCR archive only
+#                 if config.archive == "UCR" and not config.afterTA:
+#                     file_object = pd.read_csv(filepath, sep=sep, header=None)
+#                 else:
+#                     file_object = np.load(filepath)
+#
+#             if file_object is not None:
+#                 locked = False
+#         except IOError as message:
+#             locked = True
+#
+#     return locked, file_object
 
-def is_locked(filepath, cli, sep):
+def is_locked(filepath, cli, sep, file):
     locked = None
     file_object = None
     if os.path.exists(filepath):
         try:
             if cli:
                 file_object = pd.read_csv(filepath)
+
+            elif file:
+                file_data = open(filepath, "rb")
+                file_object = pickle.load(file_data)
 
             # Read all datasets
             else:
@@ -64,14 +105,14 @@ def is_locked(filepath, cli, sep):
 
     return locked, file_object
 
-
-def wait_for_files(filepath, cli=False, sep=','):
-    flag, data = is_locked(filepath, cli, sep)
-    while flag:
-        flag, data = is_locked(filepath, cli, sep)
-        time.sleep(random.randint(0, 20))
-
-    return data
+#todo - old function
+# def wait_for_files(filepath, cli=False, sep=','):
+#     flag, data = is_locked(filepath, cli, sep)
+#     while flag:
+#         flag, data = is_locked(filepath, cli, sep)
+#         time.sleep(random.randint(0, 20))
+#
+#     return data
 
 
 def create_directory(directory_path):
