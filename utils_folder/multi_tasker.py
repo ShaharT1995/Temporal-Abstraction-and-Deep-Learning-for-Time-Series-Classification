@@ -20,45 +20,58 @@ def run_job_using_sbatch(sbatch_path, arguments):
 
 
 def create_combination_per_entity():
-    # ucr_dict = {"archive": ['UCR'],
-    #             "dataset_name": ['ACSF1', 'Adiac', 'ArrowHead', 'Beef', 'BeetleFly', 'BirdChicken', 'BME', 'Car', 'CBF',
-    #                              'Chinatown', 'ChlorineConcentration', 'CinCECGTorso', 'Coffee', 'Computers',
-    #                              'CricketX', 'CricketY', 'CricketZ', 'Crop', 'DiatomSizeReduction',
-    #                              'DistalPhalanxOutlineAgeGroup', 'DistalPhalanxOutlineCorrect', 'DistalPhalanxTW',
-    #                              'DodgerLoopDay', 'DodgerLoopGame', 'DodgerLoopWeekend', 'Earthquakes', 'ECG200',
-    #                              'ECG5000', 'ECGFiveDays', 'ElectricDevices', 'EOGHorizontalSignal',
-    #                              'EOGVerticalSignal', 'EthanolLevel', 'FaceAll', 'FaceFour', 'FacesUCR', 'FiftyWords',
-    #                              'Fish', 'FordA', 'FordB', 'FreezerRegularTrain', 'FreezerSmallTrain', 'Fungi',
-    #                              'GunPoint', 'GunPointAgeSpan', 'GunPointMaleVersusFemale', 'GunPointOldVersusYoung',
-    #                              'Ham', 'HandOutlines', 'Haptics', 'Herring', 'HouseTwenty', 'InlineSkate',
-    #                              'InsectEPGRegularTrain', 'InsectEPGSmallTrain', 'InsectWingbeatSound',
-    #                              'ItalyPowerDemand', 'LargeKitchenAppliances', 'Lightning2', 'Lightning7', 'Mallat',
-    #                              'Meat', 'MedicalImages', 'MelbournePedestrian', 'MiddlePhalanxOutlineAgeGroup',
-    #                              'MiddlePhalanxOutlineCorrect', 'MiddlePhalanxTW', 'MixedShapesRegularTrain',
-    #                              'MixedShapesSmallTrain', 'MoteStrain', 'NonInvasiveFetalECGThorax1',
-    #                              'NonInvasiveFetalECGThorax2', 'OliveOil', 'OSULeaf', 'PhalangesOutlinesCorrect',
-    #                              'Phoneme', 'PickupGestureWiimoteZ', 'PigAirwayPressure', 'PigArtPressure', 'PigCVP',
-    #                              'Plane', 'PowerCons', 'ProximalPhalanxOutlineAgeGroup',
-    #                              'ProximalPhalanxOutlineCorrect', 'ProximalPhalanxTW', 'RefrigerationDevices', 'Rock',
-    #                              'ScreenType', 'SemgHandGenderCh2', 'SemgHandMovementCh2', 'SemgHandSubjectCh2',
-    #                              'ShapeletSim', 'ShapesAll', 'SmallKitchenAppliances', 'SmoothSubspace',
-    #                              'SonyAIBORobotSurface1', 'SonyAIBORobotSurface2', 'StarLightCurves', 'Strawberry',
-    #                              'SwedishLeaf', 'Symbols', 'SyntheticControl', 'ToeSegmentation1', 'ToeSegmentation2',
-    #                              'Trace', 'TwoLeadECG', 'TwoPatterns', 'UMD', 'UWaveGestureLibraryAll',
-    #                              'UWaveGestureLibraryX', 'UWaveGestureLibraryY', 'UWaveGestureLibraryZ', 'Wafer',
-    #                              'Wine', 'WordSynonyms', 'Worms', 'WormsTwoClass', 'Yoga'],
-    #              "nb_bins": ['3', '5', '10', '20'],
-    #              "method": ['sax', 'td4c-cosine', 'gradient', 'equal-frequency', 'equal-width'],
-    #              "combination": ['False']}
+    UNIVARIATE_DATASET_NAMES_2018_FailedEFD = ['AllGestureWiimoteX', 'AllGestureWiimoteY', 'AllGestureWiimoteZ',
+                                                    'GestureMidAirD1', 'GestureMidAirD2',
+                                                    'GestureMidAirD3', 'GesturePebbleZ1', 'GesturePebbleZ2', 'PLAID',
+                                                    'ShakeGestureWiimoteZ']
 
-    mts_dict = {"archive": ['MTS'],
-                "dataset_name": ['Libras', 'ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
-                                  'JapaneseVowels', 'NetFlow', 'UWave', 'Wafer'],
+    UNIVARIATE_DATASET_NAMES_2018 = ['ACSF1', 'Adiac', 'ArrowHead', 'Beef', 'BeetleFly', 'BirdChicken', 'BME',
+                                          'Car', 'CBF', 'Chinatown', 'ChlorineConcentration', 'CinCECGTorso',
+                                          'Coffee', 'Computers', 'CricketX', 'CricketY', 'CricketZ', 'Crop',
+                                          'DiatomSizeReduction', 'DistalPhalanxOutlineAgeGroup',
+                                          'DistalPhalanxOutlineCorrect', 'DistalPhalanxTW', 'DodgerLoopDay',
+                                          'DodgerLoopGame', 'DodgerLoopWeekend', 'Earthquakes',
+                                          'ECG200', 'ECG5000', 'ECGFiveDays', 'ElectricDevices',
+                                          'EOGHorizontalSignal', 'EOGVerticalSignal', 'EthanolLevel', 'FaceAll',
+                                          'FaceFour', 'FacesUCR', 'FiftyWords', 'Fish', 'FordA', 'FordB',
+                                          'FreezerRegularTrain', 'FreezerSmallTrain', 'Fungi', 'GunPoint',
+                                          'GunPointAgeSpan', 'GunPointMaleVersusFemale', 'GunPointOldVersusYoung',
+                                          'Ham', 'HandOutlines', 'Haptics', 'Herring', 'HouseTwenty', 'InlineSkate',
+                                          'InsectEPGRegularTrain', 'InsectEPGSmallTrain', 'InsectWingbeatSound',
+                                          'ItalyPowerDemand', 'LargeKitchenAppliances', 'Lightning2', 'Lightning7',
+                                          'Mallat', 'Meat', 'MedicalImages', 'MelbournePedestrian',
+                                          'MiddlePhalanxOutlineAgeGroup', 'MiddlePhalanxOutlineCorrect',
+                                          'MiddlePhalanxTW', 'MixedShapesRegularTrain', 'MixedShapesSmallTrain',
+                                          'MoteStrain', 'NonInvasiveFetalECGThorax1', 'NonInvasiveFetalECGThorax2',
+                                          'OliveOil', 'OSULeaf', 'PhalangesOutlinesCorrect', 'Phoneme',
+                                          'PickupGestureWiimoteZ', 'PigAirwayPressure', 'PigArtPressure', 'PigCVP',
+                                          'Plane', 'PowerCons', 'ProximalPhalanxOutlineAgeGroup',
+                                          'ProximalPhalanxOutlineCorrect', 'ProximalPhalanxTW',
+                                          'RefrigerationDevices', 'Rock', 'ScreenType', 'SemgHandGenderCh2',
+                                          'SemgHandMovementCh2', 'SemgHandSubjectCh2', 'ShapeletSim', 'ShapesAll',
+                                          'SmallKitchenAppliances', 'SmoothSubspace', 'SonyAIBORobotSurface1',
+                                          'SonyAIBORobotSurface2', 'StarLightCurves', 'Strawberry', 'SwedishLeaf',
+                                          'Symbols', 'SyntheticControl', 'ToeSegmentation1', 'ToeSegmentation2',
+                                          'Trace', 'TwoLeadECG', 'TwoPatterns', 'UMD', 'UWaveGestureLibraryAll',
+                                          'UWaveGestureLibraryX', 'UWaveGestureLibraryY', 'UWaveGestureLibraryZ',
+                                          'Wafer', 'Wine', 'WordSynonyms', 'Worms', 'WormsTwoClass', 'Yoga']
+
+    UNIVARIATE_DATASET_NAMES_2018 = UNIVARIATE_DATASET_NAMES_2018 + UNIVARIATE_DATASET_NAMES_2018_FailedEFD
+
+    ucr_dict = {"archive": ['UCR'],
+                "dataset_name": UNIVARIATE_DATASET_NAMES_2018,
                  "nb_bins": ['3', '5', '10', '20'],
-                 "method": ['sax', 'gradient', 'equal-frequency', 'equal-width'],
+                 "method": ['sax', 'equal-frequency', 'equal-width'],
                  "combination": ['False']}
 
-    keys_list = list(itertools.product(*mts_dict.values()))
+    # mts_dict = {"archive": ['MTS'],
+    #             "dataset_name": ['Libras', 'ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
+    #                               'JapaneseVowels', 'NetFlow', 'UWave', 'Wafer'],
+    #              "nb_bins": ['3', '5', '10', '20'],
+    #              "method": ['sax', 'gradient', 'equal-frequency', 'equal-width'],
+    #              "combination": ['False']}
+
+    keys_list = list(itertools.product(*ucr_dict.values()))
     # keys_list = list(itertools.product(*ucr_dict.values())) + list(itertools.product(*mts_dict.values()))
 
     combination_lst = []
@@ -256,8 +269,8 @@ if __name__ == '__main__':
 
     # create_combination_gpu()
     # create_combination_cpu()
-    create_combination_list()
-    # create_combination_per_entity()
+    # create_combination_list()
+    create_combination_per_entity()
 
     # # For step one - CPU
     # write_pickle("create_files_dict_UCR", {})
