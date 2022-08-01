@@ -26,8 +26,8 @@ warnings.filterwarnings("ignore")
 
 
 def open_pickle(name):
-    file = open(config.path + "/Project/temporal_abstraction_f/pickle_files//" + name + ".pkl", "rb")
-    data = pickle.load(file)
+    path = config.path + "/Project/temporal_abstraction_f/pickle_files//" + name + ".pkl", "rb"
+    data = wait_for_files(path, file=True)
     return data
 
 
@@ -41,13 +41,17 @@ def check_pickle_exists(name):
     return os.path.exists(config.path + "/Project/temporal_abstraction_f/pickle_files//" + name + ".pkl")
 
 
-def is_locked(filepath, cli, sep):
+def is_locked(filepath, cli, sep, file):
     locked = None
     file_object = None
     if os.path.exists(filepath):
         try:
             if cli:
                 file_object = pd.read_csv(filepath)
+
+            elif file:
+                file_data = open(filepath, "rb")
+                file_object = pickle.load(file_data)
 
             # Read all datasets
             else:
@@ -65,10 +69,10 @@ def is_locked(filepath, cli, sep):
     return locked, file_object
 
 
-def wait_for_files(filepath, cli=False, sep=','):
-    flag, data = is_locked(filepath, cli, sep)
+def wait_for_files(filepath, cli=False, sep=',', file=False):
+    flag, data = is_locked(filepath, cli, sep, file)
     while flag:
-        flag, data = is_locked(filepath, cli, sep)
+        flag, data = is_locked(filepath, cli, sep, file)
         time.sleep(random.randint(0, 20))
 
     return data

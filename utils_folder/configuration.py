@@ -26,13 +26,13 @@ class ConfigClass:
         self.path_transformation1 = ""
         self.path_transformation2 = ""
 
-        # self.nb_bin = [20]
-        self.nb_bin = [3, 5, 10, 20]
+        self.nb_bin = [20]
+        # self.nb_bin = [3, 5, 10, 20]
         self.std_coefficient = [-1]
         self.max_gap = [1, 2, 3]
-        self.max_gap = [1]
-        # self.paa_window_size = [2, 5]
+        # self.max_gap = [1]
         self.paa_window_size = [1]
+        # self.paa_window_size = [1]
         self.gradient_window_size = [10]
 
         # self.UNIVARIATE_DATASET_NAMES_2018 = ['Beef', 'ACSF1', 'Adiac', 'Computers', 'CricketX', 'CricketY',

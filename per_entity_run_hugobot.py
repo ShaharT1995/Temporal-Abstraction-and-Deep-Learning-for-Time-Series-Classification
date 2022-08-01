@@ -116,9 +116,9 @@ def run_hugobot(config, dataset_name, path, running_dict, max_gap, method, nb_bi
             print("Step 4: transformation 2")
             new_ucr_files(config, prop_path) if config.archive == "UCR" else new_mts_files(config, prop_path, nb_bin)
 
-        running_dict = open_pickle("PerEntity_Dict_" + config.archive)
-        running_dict[key] = True
-        write_pickle("PerEntity_Dict_" + config.archive, running_dict)
+        # running_dict = wait_for_files("PerEntity_Dict_" + config.archive, file=True)
+        # running_dict[key] = True
+        # write_pickle("PerEntity_Dict_" + config.archive, running_dict)
         return running_dict
 
 
@@ -128,7 +128,7 @@ if __name__ == '__main__':
     sys.path.insert(0, '/sise/robertmo-group/TA-DL-TSC/Project/')
 
     from utils_folder.configuration import ConfigClass
-    from utils_folder.utils import write_pickle, open_pickle, create_directory, check_pickle_exists
+    from utils_folder.utils import write_pickle, open_pickle, create_directory, check_pickle_exists, wait_for_files
 
     config = ConfigClass()
     config.set_archive(sys.argv[2])

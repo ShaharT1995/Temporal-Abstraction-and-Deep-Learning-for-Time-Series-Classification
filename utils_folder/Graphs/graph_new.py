@@ -352,7 +352,7 @@ def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
 
     raw_data_df_standardization, df_after_ta_standardization = merge_csv_with_and_without_normalization(type)
 
-    path_after_ta = "Reports/Without ZNorm/" + type + "/"
+    path_after_ta = "Reports/Without ZNorm/" + type + "/Per Entity/"
     path_raw_data = "Reports/With ZNorm/" + type + "/"
 
     # Open after TA data
@@ -368,10 +368,6 @@ def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
 
     raw_data_df = raw_data_df.replace({"classifier_name_raw_data": {"MCDCNN": "MC-DCNN", "ResNet": "ResNets",
                                                             "Inception": "InceptionTime"}})
-
-    df_after_ta_standardization = df_after_ta_standardization.replace({"method": {"sax": "SAX",  "Gradient": "GRAD",
-                                                                                  "Equal-Frequency": "EFD",
-                                                                                  "Equal-Width": "EWD"}})
 
     metrics = ['MCC', 'Cohen Kappa', 'F1 Score Macro', 'F1 Score Micro', 'F1 Score Weighted', 'Balanced Accuracy',
                'AUC - ROC']
@@ -477,6 +473,17 @@ def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
             classes_df = pd.DataFrame(list(classes_dict.items()), columns=['dataset_name', 'classes'])
             dataset_characteristics(df, metrics, classes_df, "classes", type=type, continuous=True,
                                     normalization=normalization)
+
+        elif num == 9:
+            order = [1, 2, 5]
+
+            melt_df = pd.melt(df_after_ta, id_vars=["nb bins", "paa", "method", "classifier_name",
+                                                    "transformation_type"], value_vars=metrics)
+
+            melt_df = melt_df.rename(columns={"variable": "Evaluation Metric", "paa": "PAA"})
+            create_fig(x="PAA", y="value", col="Evaluation Metric", data=melt_df, name="PAA",
+                       x_label="PAA Window Size", legend="Number of Symbols", type=type,
+                       colors=1, order=order, normalization=normalization)
 
 
 if __name__ == '__main__':

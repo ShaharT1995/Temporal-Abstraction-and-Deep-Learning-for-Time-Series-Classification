@@ -15,30 +15,30 @@ def new_ucr_files(config, prop_path):
     univariate_dict = open_pickle("univariate_dict")
 
     for index, dataset_name in enumerate(config.UNIVARIATE_DATASET_NAMES_2018):
-        try:
-            path = prop_path + dataset_name + "//"
-            output_path = config.path_transformation2 + dataset_name + "//"
+        # try:
+        path = prop_path + dataset_name + "//"
+        output_path = config.path_transformation2 + dataset_name + "//"
 
-            create_directory(output_path)
+        create_directory(output_path)
 
-            print("\t" + dataset_name)
+        print("\t" + dataset_name)
 
-            for file_type in files_type:
-                states_path = path + file_type.lower() + "//states.csv"
-                states_df = pd.read_csv(states_path, header=0)
+        for file_type in files_type:
+            states_path = path + file_type.lower() + "//states.csv"
+            states_df = pd.read_csv(states_path, header=0)
 
-                # Get from the read me file the number of rows, number of columns and number of
-                classes = univariate_dict[(dataset_name, file_type.lower())]["classes"]
-                number_of_rows = univariate_dict[(dataset_name, file_type.lower())]["rows"]
-                number_of_columns = univariate_dict[(dataset_name, file_type.lower())]["columns"]
+            # Get from the read me file the number of rows, number of columns and number of
+            classes = univariate_dict[(dataset_name, file_type.lower())]["classes"]
+            number_of_rows = univariate_dict[(dataset_name, file_type.lower())]["rows"]
+            number_of_columns = univariate_dict[(dataset_name, file_type.lower())]["columns"]
 
-                classification_path = config.ucr_path + '/' + dataset_name + '/y_' + file_type.lower() + '.npy'
+            classification_path = config.ucr_path + '/' + dataset_name + '/y_' + file_type.lower() + '.npy'
 
-                # Run the three transformation on the Train and Test files
-                create_transformations(config, path, output_path, file_type, number_of_rows, number_of_columns, 1, classes,
-                                       states_df, univariate=True, classification_path=classification_path)
-        except:
-            print("\t\tFAILED!!!")
+            # Run the three transformation on the Train and Test files
+            create_transformations(config, path, output_path, file_type, number_of_rows, number_of_columns, 1, classes,
+                                   states_df, univariate=True, classification_path=classification_path)
+        # except:
+        #     print("\t\tFAILED!!!")
     print("")
 
 

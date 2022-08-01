@@ -21,10 +21,9 @@ my_font_bold = fm.FontProperties(fname=font_path)
 
 
 # Creates a unified file of all results for all combinations
-def concat_results(path_ta_dir, normalization, raw_data=False, type="UCR"):
-    # classifiers = ["cnn", "mlp", "mcdcnn", "fcn", "twiesn", "encoder", "inception", "lstm_fcn", "mlstm_fcn", "rocket"]
+def concat_results(path_ta_dir, normalization=False, raw_data=False, type="UCR"):
     classifiers = ['fcn', 'resnet', 'inception', 'mcdcnn', 'mlstm_fcn', 'cnn', 'mlp']
-    methods = ['sax', 'gradient', 'equal-frequency', 'equal-width', 'RawData']
+    methods = ['sax', 'equal-frequency', 'equal-width']
     bins = ["3", "5", "10", "20"]
 
     columns_df = ['classifier_name', 'archive_name', 'dataset_name', 'Precision', 'Accuracy', 'Recall', 'MCC',
@@ -33,7 +32,7 @@ def concat_results(path_ta_dir, normalization, raw_data=False, type="UCR"):
 
     path = "Reports/"
     path += "With ZNorm/" if normalization else "Without ZNorm/"
-    path += type + "/"
+    path += type + "/Per Entity/"
 
     output_file_name = path + "RawData.csv"
     if not raw_data:
@@ -54,9 +53,8 @@ def concat_results(path_ta_dir, normalization, raw_data=False, type="UCR"):
                         if file.endswith(".csv"):
                             arguments = re.split('[_.]', file)
 
-                            if not raw_data and (arguments[8] == "True" or arguments[9] == "True" or
-                                                 arguments[2] not in bins or arguments[7] == "3" or arguments[3] != "1"
-                                                 or arguments[5] != "1"):
+                            if not raw_data and (arguments[8] == "True" or arguments[2] not in bins or
+                                                 arguments[7] == "3" or arguments[7] == "1" or arguments[9] == "False"):
                                 continue
 
                             res_ta_data = pd.read_csv(root + "//" + file, sep=',', header=0, encoding="utf-8")
@@ -107,7 +105,8 @@ def concat_results(path_ta_dir, normalization, raw_data=False, type="UCR"):
 
 
 def merge_two_df(raw_df, ta_df, metrics):
-    ta_df = ta_df.groupby(["classifier_name", "dataset_name", "method", "nb bins", "transformation_type"]
+    ta_df = ta_df.groupby(["classifier_name", "dataset_name", "method", "nb bins", "transformation_type", "PAA",
+                           "Interpolation Gap"]
                           , as_index=False).agg({k: np.mean for k in metrics})
     raw_df = raw_df.groupby(["classifier_name_raw_data", "dataset_name_raw_data"],
                             as_index=False).agg({k + "_raw_data": np.mean for k in metrics})
@@ -140,7 +139,7 @@ def get_best_df_after_ta(ta_df, metrics, lst_group_by, max_val=None):
     return df
 
 
-def create_fig(x, y, col, data, name, normalization, x_label, y_label='', legend='', hue=None, type="UCR", order=None,
+def create_fig(x, y, col, data, name, x_label, y_label='', legend='', hue=None, type="UCR", order=None,
                join=False, graph_num=1, colors=1):
     graph_aspect = 1.5
 
@@ -170,8 +169,6 @@ def create_fig(x, y, col, data, name, normalization, x_label, y_label='', legend
         sns.set_palette(sns.color_palette(["#CD37CB", "#26AA1B"]))
     elif colors == 2:
         sns.set_palette(sns.color_palette(["#D422AE", "#D422AE"]))
-    elif colors == 3:
-        sns.set_palette(sns.color_palette(["#26AA1B"]))
     else:
         sns.set_palette(sns.color_palette(["#FF0B04", "#4374B3"]))
 
@@ -186,6 +183,8 @@ def create_fig(x, y, col, data, name, normalization, x_label, y_label='', legend
             plt.rcParams["font.family"] = "Cambria"
 
             axis = g.axes[i, j]
+            # if i == 0 and j == 0:
+            #     axis.set_ylim((0.61, 0.62))
             axis.set_xlabel(x_label, fontdict={'weight': 'bold'}, fontproperties=my_font_bold, size="20")
             axis.tick_params(labelleft=True, labelbottom=True)
 
@@ -205,11 +204,7 @@ def create_fig(x, y, col, data, name, normalization, x_label, y_label='', legend
     plt.subplots_adjust(wspace=0.2, hspace=0.3)
     plt.show()
 
-    # if normalization:
-    #     output_path = "ArticleGraphs/" + type + "/With ZNorm/" + name
-    # else:
-    #     output_path = "ArticleGraphs- 27.07/" + type + "/Without ZNorm/" + name
-    output_path = "ArticleGraphs- 27.07/" + type + "/" + name
+    output_path = "ArticleGraphs - Per Entity/" + type + "/" + name
     plt.savefig(output_path, bbox_inches='tight')
 
 
@@ -227,7 +222,7 @@ def melt_RawData_TA(df, lst, metrics):
     return data
 
 
-def metrics_best_combination_VS_raw_data(df, metrics, normalization, type="UCR"):
+def metrics_best_combination_VS_raw_data(df, metrics, type="UCR"):
     order = ['Balanced Accuracy', 'AUC - ROC', 'F1 Micro', 'F1 Macro', 'F1 Weighted', 'MCC', "Cohen\'s Kappa"]
 
     df = df.rename(columns={'F1 Score Micro': 'F1 Micro', 'F1 Score Macro': 'F1 Macro',
@@ -244,10 +239,10 @@ def metrics_best_combination_VS_raw_data(df, metrics, normalization, type="UCR")
 
     create_fig(x="Evaluation Metric", y="value", col=None, data=data, name="TA vs Raw data", legend="TA vs Raw data",
                x_label='Evaluation Metric', y_label="Metric Value", hue="Data", type=type, graph_num=5, colors=3,
-               normalization=normalization, order=order)
+               order=order)
 
 
-def classifiers_best_combination_VS_raw_data(df, metrics, normalization, type="UCR"):
+def classifiers_best_combination_VS_raw_data(df, metrics, type="UCR"):
     data = melt_RawData_TA(df, ["nb bins", "method", "transformation_type", "classifier_name"], metrics)
 
     data = data.rename(columns={"variable": "Evaluation Metric", "classifier_name": "Classifier"})
@@ -256,90 +251,16 @@ def classifiers_best_combination_VS_raw_data(df, metrics, normalization, type="U
 
     create_fig(x="Classifier", y="value", col="Evaluation Metric", data=data, name="TA vs Raw data - Classifier",
                x_label='Deep Neural Network', legend="TA vs Raw data", hue="Data", type=type, colors=3, graph_num=6,
-               normalization=normalization, order=order)
+               order=order)
 
 
-def datasets_best_combination_VS_raw_data(df, metrics, normalization, type="UCR"):
+def datasets_best_combination_VS_raw_data(df, metrics, type="UCR"):
     data = melt_RawData_TA(df, ["nb bins", "method", "transformation_type", "dataset_name"], metrics)
 
     data = data.rename(columns={"variable": "Evaluation Metric", "dataset_name": "Dataset"})
 
     create_fig(x="Dataset", y="value", col="Evaluation Metric", data=data, name="TA vs Raw data - Datasets",
-               x_label='Dataset', legend="TA vs Raw data", hue="Data", type=type, graph_num=7, colors=3,
-               normalization=normalization)
-
-
-def add_characteristic(characteristic_name, df):
-    if characteristic_name == "lengths":
-        df.loc[df.lengths < 81, 'groups_lengths'] = "< 81"
-        df.loc[(df.lengths >= 81) & (df.lengths <= 250), 'groups_lengths'] = "81 - 250"
-        df.loc[(df.lengths >= 251) & (df.lengths <= 450), 'groups_lengths'] = "251 - 450"
-        df.loc[(df.lengths >= 451) & (df.lengths <= 700), 'groups_lengths'] = "451 - 700"
-        df.loc[(df.lengths >= 701) & (df.lengths <= 1000), 'groups_lengths'] = "701 - 1000"
-        df.loc[df.lengths > 1000, 'groups_lengths'] = " > 1000"
-
-    else:
-        df.loc[df.classes < 3, 'groups_classes'] = "Binary"
-        df.loc[(df.classes >= 3) & (df.classes <= 10), 'groups_classes'] = "3 - 10"
-        df.loc[(df.classes > 10), 'groups_classes'] = "> 10"
-
-    return df
-
-
-def dataset_characteristics(df, metrics, characteristics_df, characteristic_name, type, normalization,
-                            continuous=False):
-    df = pd.merge(df, characteristics_df, on="dataset_name")
-
-    fig_name = "TA vs Raw data - " + characteristic_name
-    if continuous:
-        df = df.rename(columns={characteristic_name: "groups_" + characteristic_name})
-        fig_name += " - Continuous"
-        order = None
-        join = True
-    else:
-        df = add_characteristic(characteristic_name, df)
-        join = None
-        if characteristic_name == "classes":
-            order = ["Binary", "3 - 10", "> 10"]
-        else:
-            order = ["< 81", "81 - 250", "251 - 450", "451 - 700", "701 - 1000", " > 1000"]
-
-    data = melt_RawData_TA(df, ["nb bins", "method", "transformation_type", "groups_" + characteristic_name], metrics)
-
-    data = data.rename(columns={"variable": "Evaluation Metric", "groups_" + characteristic_name: "Dataset " +
-                                                                                                  characteristic_name})
-
-    create_fig(x="Dataset " + characteristic_name, y="value", col="Evaluation Metric", data=data, name=fig_name,
-               x_label="Dataset " + characteristic_name, legend="TA vs Raw data", hue="Data", type=type,
-               order=order, join=join, colors=3, normalization=normalization)
-
-
-def merge_csv_with_and_without_normalization(type):
-    path_with = "Reports/With ZNorm/" + type + "/"
-    path_without = "Reports/Without ZNorm/" + type + "/"
-
-    # Open after TA data
-    df_after_ta_with = pd.read_csv(path_with + "TA.csv", encoding="utf-8")
-    df_after_ta_without = pd.read_csv(path_without + "TA.csv", encoding="utf-8")
-
-    # Open raw data
-    raw_data_df_with = pd.read_csv(path_with + "RawData.csv", encoding="utf-8")
-    raw_data_df_without = pd.read_csv(path_without + "RawData.csv", encoding="utf-8")
-
-    df_after_ta_with['standardization'] = "With Standardization"
-    df_after_ta_without['standardization'] = "Without Standardization"
-    raw_data_df_with['standardization_raw_data'] = "With Standardization"
-    raw_data_df_without['standardization_raw_data'] = "Without Standardization"
-
-    df_after_ta = pd.concat([df_after_ta_with, df_after_ta_without], axis=0)
-    raw_data_df = pd.concat([raw_data_df_with, raw_data_df_without], axis=0)
-
-    raw_data_df = raw_data_df.replace({"classifier_name_raw_data": {"MCDCNN": "MC-DCNN", "ResNet": "ResNets",
-                                                                    "Inception": "InceptionTime"}})
-    df_after_ta = df_after_ta.replace({"classifier_name": {"MCDCNN": "MC-DCNN", "ResNet": "ResNets",
-                                                           "Inception": "InceptionTime"}})
-
-    return raw_data_df, df_after_ta
+               x_label='Dataset', legend="TA vs Raw data", hue="Data", type=type, graph_num=7, colors=3)
 
 
 def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
@@ -348,20 +269,18 @@ def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
 
     # Run this only once
     if create_csv:
-        path_for_ta_dir = config.path + "ResultsProject/"
-        path_for_ta_dir += "RawData - With ZNorm/" + type + "/" if normalization else \
-            "RawData - Without ZNorm/" + type + "/"
-
-        concat_results(path_for_ta_dir, raw_data=True, normalization=normalization, type=type)
+        # path_for_ta_dir = config.path + "ResultsProject/"
+        # path_for_ta_dir += "RawData - With ZNorm/" + type + "/" if normalization else \
+        #     "RawData - Without ZNorm/" + type + "/"
+        #
+        # concat_results(path_for_ta_dir, raw_data=True, normalization=normalization, type=type)
 
         path_for_ta_dir = config.path + "ResultsProject/AfterTA/" + type
         path_for_ta_dir += " - With ZNorm/" if normalization else " - Without ZNorm/"
 
         concat_results(path_for_ta_dir, normalization=normalization, type=type)
 
-    raw_data_df_standardization, df_after_ta_standardization = merge_csv_with_and_without_normalization(type)
-
-    path_after_ta = "Reports/Without ZNorm/" + type + "/"
+    path_after_ta = "Reports/Without ZNorm/" + type + "/Per Entity/"
     path_raw_data = "Reports/With ZNorm/" + type + "/"
 
     # Open after TA data
@@ -378,127 +297,67 @@ def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
     raw_data_df = raw_data_df.replace({"classifier_name_raw_data": {"MCDCNN": "MC-DCNN", "ResNet": "ResNets",
                                                                     "Inception": "InceptionTime"}})
 
-    df_after_ta_standardization = df_after_ta_standardization.replace({"method": {"sax": "SAX", "Gradient": "GRAD",
-                                                                                  "Equal-Frequency": "EFD",
-                                                                                  "Equal-Width": "EWD"}})
-
     metrics = ['MCC', 'Cohen Kappa', 'F1 Score Macro', 'F1 Score Micro', 'F1 Score Weighted', 'Balanced Accuracy',
                'AUC - ROC']
+
+    df_after_ta = df_after_ta.rename(columns={"max gap": "Interpolation Gap", "paa": "PAA"})
 
     df = merge_two_df(raw_data_df, df_after_ta, metrics)
 
     for num in graph_numbers:
-        # Graphs of the methods
+        # PAA Graph
         if num == 1:
-            df_graph_1 = merge_two_df(raw_data_df_standardization, df_after_ta_standardization, metrics)
+            order = [1, 2, 5]
 
-            df_graph_1 = get_best_df_after_ta(df_graph_1, metrics, ["nb bins", "method"])
+            melt_df = pd.melt(df_after_ta, id_vars=["nb bins", "PAA", "method", "classifier_name",
+                                                    "transformation_type"], value_vars=metrics)
 
-            order = ["EWD", "EFD", "SAX", "GRAD"]
+            melt_df = melt_df.rename(columns={"variable": "Evaluation Metric"})
+            create_fig(x="PAA", y="value", col="Evaluation Metric", data=melt_df, name="PAA",
+                       x_label="PAA Window Size", type=type, colors=1, order=order, graph_num=9, join=True)
 
-            melt_df = pd.melt(df_graph_1, id_vars=["nb bins", "method", "classifier_name", "transformation_type"],
+        # Interpolation gap Graph
+        elif num == 2:
+            order = [1, 2, 3]
+
+            melt_df = pd.melt(df_after_ta, id_vars=["nb bins", "Interpolation Gap", "method", "classifier_name",
+                                                    "transformation_type"], value_vars=metrics)
+
+            melt_df = melt_df.rename(columns={"variable": "Evaluation Metric"})
+            create_fig(x="Interpolation Gap", y="value", col="Evaluation Metric", data=melt_df,
+                       name="Interpolation Gap", x_label="Interpolation Gap Window Size", type=type, colors=1,
+                       order=order, graph_num=9, join=True)
+
+        # Graphs of the methods
+        elif num == 3:
+            df = df_after_ta.loc[(df_after_ta["PAA"] == 1) & (df_after_ta["Interpolation Gap"] == 1)]
+
+            order = ["EWD", "EFD", "SAX"]
+
+            melt_df = pd.melt(df, id_vars=["nb bins", "method", "classifier_name", "transformation_type"],
                               value_vars=metrics)
 
             melt_df = melt_df.rename(columns={"variable": "Evaluation Metric", "method": "Method"})
             create_fig(x="Method", y="value", col="Evaluation Metric", data=melt_df, name="Method",
-                       x_label="Temporal Abstraction Method", hue="nb bins", legend="Number of Symbols", type=type,
-                       colors=1, order=order, normalization=normalization)
-
-        # Graphs of the top N methods
-        elif num == 2:
-            n = 5
-            df = get_best_df_after_ta(df, metrics, ["nb bins", "method"], max_val=n)
-            melt_df = pd.melt(df, id_vars=["nb bins", "method", "classifier_name", "transformation_type"],
-                              value_vars=metrics)
-            melt_df = melt_df.rename(columns={"variable": "Evaluation Metric", "method": "Method"})
-
-            graph_name = "Best " + str(n) + " Methods"
-            create_fig(x="Method", y="value", col="Evaluation Metric", data=melt_df, name=graph_name,
                        x_label='Method', hue="nb bins", legend="Number of Symbols", type=type, colors=1,
-                       normalization=normalization)
-
-        # Graph of the top transformation for the N best combination (nb bins & TA method)
-        elif num == 3:
-            df = get_best_df_after_ta(df, metrics, ["nb bins", "method"], max_val=5)
-
-            melt_df = pd.melt(df, id_vars=["nb bins", "method", "classifier_name", "transformation_type"],
-                              value_vars=metrics)
-            melt_df = melt_df.rename(columns={"variable": "Evaluation Metric",
-                                              "transformation_type": "Transformation Type"})
-
-            create_fig(x="Transformation Type", y="value", col="Evaluation Metric", data=melt_df,
-                       name="Transformation for best combination of method & bins", x_label='Transformation Type',
-                       legend="", type=type, order=["Discrete", "Symbol One-Hot"], colors=2,
-                       normalization=normalization)
-
-        # Rank the transformation
-        elif num == 4:
-            # if type == "UCR":
-            # datasets_lst = ["AllGestureWiimoteX", "AllGestureWiimoteY", "AllGestureWiimoteZ", "DodgerLoopGame",
-            #                 "DodgerLoopWeekend", "GestureMidAirD1", "GestureMidAirD2", "GestureMidAirD3",
-            #                 "GesturePebbleZ1", "GesturePebbleZ2", "PickupGestureWiimoteZ", "PLAID",
-            #                 "ShakeGestureWiimote"]
-            # df_after_ta_standardization = df_after_ta_standardization.loc[
-            #     df_after_ta_standardization["dataset_name"].isin(datasets_lst)]
-
-            df_after_ta_standardization = df_after_ta_standardization.loc[df_after_ta_standardization["standardization"]
-                                                                          == "Without Standardization"]
-            melt_df = pd.melt(df_after_ta_standardization, id_vars=["nb bins", "method", "classifier_name",
-                                                                    "transformation_type", "standardization"],
-                              value_vars=metrics)
-
-            data = melt_df.rename(columns={"variable": "Evaluation Metric",
-                                           "transformation_type": "Transformation Type"})
-
-            create_fig(x="Transformation Type", y="value", col="Evaluation Metric", data=data,
-                       name="Transformations", x_label="Tensor Representation", legend="Standardization", type=type,
-                       hue="standardization", order=["Discrete", "Symbol One-Hot"], colors=3,
-                       normalization=normalization)
+                       order=order)
 
         # All the metric - Raw Data VS. best combination
-        elif num == 5:
+        elif num == 4:
+            df = df.loc[(df["PAA"] == 1) & (df["Interpolation Gap"] == 1)]
+
             metrics_graph_5 = ['Balanced Accuracy', 'AUC - ROC']
             df = get_best_df_after_ta(df, metrics_graph_5, ["nb bins", "method", "transformation_type"],
                                       max_val=1)
-            metrics_best_combination_VS_raw_data(df, metrics, type=type, normalization=normalization)
+            metrics_best_combination_VS_raw_data(df, metrics, type=type)
 
         # Classifiers - Raw Data VS. best combination
-        elif num == 6:
+        elif num == 5:
+            df = df.loc[(df["PAA"] == 1) & (df["Interpolation Gap"] == 1)]
+
             df = get_best_df_after_ta(df, metrics, ["nb bins", "method", "transformation_type"], max_val=1)
-            classifiers_best_combination_VS_raw_data(df, metrics, type=type, normalization=normalization)
-
-        # Datasets - Raw Data VS. best combination
-        elif num == 7:
-            df = get_best_df_after_ta(df, metrics, ["nb bins", "method", "transformation_type"], max_val=1)
-            datasets_best_combination_VS_raw_data(df, metrics, type=type, normalization=normalization)
-
-        elif num == 8:
-            df = get_best_df_after_ta(df, metrics, ["nb bins", "method", "transformation_type"], max_val=1)
-
-            length_dict = open_pickle(type + "_length")
-            classes_dict = open_pickle(type + "_classes")
-
-            # for length
-            length_df = pd.DataFrame(list(length_dict.items()), columns=['dataset_name', 'lengths'])
-            dataset_characteristics(df, metrics, length_df, "lengths", type=type, continuous=False,
-                                    normalization=normalization)
-
-            # for length - continuous
-            length_df = pd.DataFrame(list(length_dict.items()), columns=['dataset_name', 'lengths'])
-            dataset_characteristics(df, metrics, length_df, "lengths", type=type, continuous=True,
-                                    normalization=normalization)
-
-            # for classes
-            classes_df = pd.DataFrame(list(classes_dict.items()), columns=['dataset_name', 'classes'])
-            dataset_characteristics(df, metrics, classes_df, "classes", type=type, continuous=False,
-                                    normalization=normalization)
-
-            # for classes - continuous
-            classes_df = pd.DataFrame(list(classes_dict.items()), columns=['dataset_name', 'classes'])
-            dataset_characteristics(df, metrics, classes_df, "classes", type=type, continuous=True,
-                                    normalization=normalization)
+            classifiers_best_combination_VS_raw_data(df, metrics, type=type)
 
 
 if __name__ == '__main__':
-    # create_all_graphs([1, 2, 3, 4, 5, 6, 7, 8], create_csv=False, normalization=True, type="UCR")
-    create_all_graphs([4], create_csv=False, type="UCR")
+    create_all_graphs([4, 5], create_csv=False, type="MTS")
