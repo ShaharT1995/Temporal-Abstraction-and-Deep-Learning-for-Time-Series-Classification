@@ -26,7 +26,7 @@ warnings.filterwarnings("ignore")
 
 
 def open_pickle(name):
-    path = config.path + "/Project/temporal_abstraction_f/pickle_files//" + name + ".pkl", "rb"
+    path = config.path + "/Project/temporal_abstraction_f/pickle_files//" + name + ".pkl"
     data = wait_for_files(path, file=True)
     return data
 
@@ -48,7 +48,6 @@ def is_locked(filepath, cli, sep, file):
         try:
             if cli:
                 file_object = pd.read_csv(filepath)
-
             elif file:
                 file_data = open(filepath, "rb")
                 file_object = pickle.load(file_data)
