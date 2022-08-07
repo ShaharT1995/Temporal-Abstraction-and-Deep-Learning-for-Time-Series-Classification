@@ -225,13 +225,6 @@ def melt_RawData_TA(df, lst, metrics):
 def metrics_best_combination_VS_raw_data(df, metrics, type="UCR"):
     order = ['Balanced Accuracy', 'AUC - ROC', 'F1 Micro', 'F1 Macro', 'F1 Weighted', 'MCC', "Cohen\'s Kappa"]
 
-    df = df.rename(columns={'F1 Score Micro': 'F1 Micro', 'F1 Score Macro': 'F1 Macro',
-                            'F1 Score Weighted': 'F1 Weighted', "Cohen Kappa": "Cohen\'s Kappa",
-                            'F1 Score Micro_raw_data': 'F1 Micro_raw_data',
-                            'F1 Score Macro_raw_data': 'F1 Macro_raw_data',
-                            'F1 Score Weighted_raw_data': 'F1 Weighted_raw_data',
-                            "Cohen Kappa_raw_data": "Cohen\'s Kappa_raw_data"})
-
     data = melt_RawData_TA(df, ["nb bins", "method", "classifier_name", "transformation_type"], order)
 
     data = data.rename(columns={"variable": "Evaluation Metric", "method": "Method",
@@ -297,7 +290,25 @@ def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
     raw_data_df = raw_data_df.replace({"classifier_name_raw_data": {"MCDCNN": "MC-DCNN", "ResNet": "ResNets",
                                                                     "Inception": "InceptionTime"}})
 
-    metrics = ['MCC', 'Cohen Kappa', 'F1 Score Macro', 'F1 Score Micro', 'F1 Score Weighted', 'Balanced Accuracy',
+    df_after_ta = df_after_ta.rename(columns={'F1 Score Micro': 'F1 Micro',
+                                              'F1 Score Macro': 'F1 Macro',
+                                              'F1 Score Weighted': 'F1 Weighted',
+                                              "Cohen Kappa": "Cohen\'s Kappa",
+                                              'F1 Score Micro': 'F1 Micro',
+                                              'F1 Score Macro': 'F1 Macro',
+                                              'F1 Score Weighted': 'F1 Weighted',
+                                              "Cohen Kappa": "Cohen\'s Kappa"})
+
+    raw_data_df = raw_data_df.rename(columns={'F1 Score Micro_raw_data': 'F1 Micro_raw_data',
+                                              'F1 Score Macro_raw_data': 'F1 Macro_raw_data',
+                                              'F1 Score Weighted_raw_data': 'F1 Weighted_raw_data',
+                                              "Cohen Kappa_raw_data": "Cohen\'s Kappa_raw_data",
+                                              'F1 Score Micro_raw_data': 'F1 Micro_raw_data',
+                                              'F1 Score Macro_raw_data': 'F1 Macro_raw_data',
+                                              'F1 Score Weighted_raw_data': 'F1 Weighted_raw_data',
+                                              "Cohen Kappa_raw_data": "Cohen\'s Kappa_raw_data"})
+
+    metrics = ['MCC', "Cohen\'s Kappa", 'F1 Macro', 'F1 Micro', 'F1 Weighted', 'Balanced Accuracy',
                'AUC - ROC']
 
     df_after_ta = df_after_ta.rename(columns={"max gap": "Interpolation Gap", "paa": "PAA"})
@@ -346,18 +357,18 @@ def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
         elif num == 4:
             df = df.loc[(df["PAA"] == 1) & (df["Interpolation Gap"] == 1)]
 
-            metrics_graph_5 = ['Balanced Accuracy', 'AUC - ROC']
-            df = get_best_df_after_ta(df, metrics_graph_5, ["nb bins", "method", "transformation_type"],
+            # metrics_graph_5 = ['Balanced Accuracy', 'AUC - ROC']
+            df = get_best_df_after_ta(df, metrics, ["nb bins", "method", "transformation_type"],
                                       max_val=1)
             metrics_best_combination_VS_raw_data(df, metrics, type=type)
 
         # Classifiers - Raw Data VS. best combination
         elif num == 5:
-            df = df.loc[(df["PAA"] == 1) & (df["Interpolation Gap"] == 1)]
+            df = df.loc[(df_after_ta["PAA"] == 1) & (df_after_ta["Interpolation Gap"] == 1)]
 
             df = get_best_df_after_ta(df, metrics, ["nb bins", "method", "transformation_type"], max_val=1)
             classifiers_best_combination_VS_raw_data(df, metrics, type=type)
 
 
 if __name__ == '__main__':
-    create_all_graphs([4, 5], create_csv=False, type="MTS")
+    create_all_graphs([4], create_csv=False, type="MTS")

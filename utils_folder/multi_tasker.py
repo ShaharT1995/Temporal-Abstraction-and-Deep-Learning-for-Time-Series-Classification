@@ -135,8 +135,8 @@ def create_combination_list():
 def create_combination_gpu():
     # ['fcn', 'resnet', 'inception', 'mcdcnn', 'mlstm_fcn', 'cnn', 'mlp']
     # Need to run inception and mlstm_fcn
-    dict_name = {"archive": ['MTS'],
-                 "classifier": ['resnet', 'inception', 'mcdcnn', 'mlstm_fcn'],
+    dict_name = {"archive": ['UCR'],
+                 "classifier": ['fcn', 'resnet', 'inception', 'mcdcnn', 'mlstm_fcn', 'cnn', 'mlp'],
                  "afterTA": ['True'],
                  "method": ['sax', 'equal-frequency', 'equal-width'],
                  "combination": ['False'],
@@ -267,10 +267,10 @@ if __name__ == '__main__':
     # current_file_path = "/sise/home/" + current_user + "/run_multi_tasker_gpu"
     temp_file = open("/sise/home/" + current_user + "/tmp.txt", 'w')
 
-    # create_combination_gpu()
+    create_combination_gpu()
     # create_combination_cpu()
     # create_combination_list()
-    create_combination_per_entity()
+    # create_combination_per_entity()
 
     # # For step one - CPU
     # write_pickle("create_files_dict_UCR", {})

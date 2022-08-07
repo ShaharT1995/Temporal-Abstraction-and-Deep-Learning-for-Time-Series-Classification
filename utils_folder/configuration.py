@@ -26,12 +26,12 @@ class ConfigClass:
         self.path_transformation1 = ""
         self.path_transformation2 = ""
 
-        self.nb_bin = [20]
-        # self.nb_bin = [3, 5, 10, 20]
+        # self.nb_bin = [20]
+        self.nb_bin = [3, 5, 10, 20]
         self.std_coefficient = [-1]
         self.max_gap = [1, 2, 3]
         # self.max_gap = [1]
-        self.paa_window_size = [1]
+        self.paa_window_size = [1, 2, 5]
         # self.paa_window_size = [1]
         self.gradient_window_size = [10]
 
@@ -81,12 +81,15 @@ class ConfigClass:
                                               'SonyAIBORobotSurface2', 'StarLightCurves', 'Strawberry', 'SwedishLeaf',
                                               'Symbols', 'SyntheticControl', 'ToeSegmentation1', 'ToeSegmentation2',
                                               'Trace', 'TwoLeadECG', 'TwoPatterns', 'UMD', 'UWaveGestureLibraryAll',
-                                              'UWaveGestureLibraryX', 'UWaveGestureLibraryY', 'UWaveGestureLibraryZ',
+                                              'UWaveGestureLibraryX', 'UWaveGestureLibraryY',
                                               'Wafer', 'Wine', 'WordSynonyms', 'Worms', 'WormsTwoClass', 'Yoga']
+
+        # 'UWaveGestureLibraryZ' - We deleted this data set from the list because the hugobot put all the time series in
+        # one bin
 
         self.UNIVARIATE_DATASET_NAMES_2018 = self.UNIVARIATE_DATASET_NAMES_2018 + self.UNIVARIATE_DATASET_NAMES_2018_FailedEFD
 
-        # self.UNIVARIATE_DATASET_NAMES_2018 = ['ArrowHead']
+        # self.UNIVARIATE_DATASET_NAMES_2018 = ['UWaveGestureLibraryZ']
 
         self.MTS_DATASET_NAMES = ['Libras', 'ArabicDigits', 'AUSLAN', 'CharacterTrajectories', 'CMUsubject16', 'ECG',
                                   'JapaneseVowels', 'NetFlow', 'UWave', 'Wafer']

@@ -209,7 +209,8 @@ def create_fig(x, y, col, data, name, normalization, x_label, y_label='', legend
     #     output_path = "ArticleGraphs/" + type + "/With ZNorm/" + name
     # else:
     #     output_path = "ArticleGraphs- 27.07/" + type + "/Without ZNorm/" + name
-    output_path = "ArticleGraphs- 27.07/" + type + "/" + name
+    # output_path = "ArticleGraphs- 27.07/" + type + "/" + name
+    output_path = "ArticleGraphs- 27.07/" + type + "/First Article Without/" + name
     plt.savefig(output_path, bbox_inches='tight')
 
 
@@ -390,9 +391,23 @@ def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
     for num in graph_numbers:
         # Graphs of the methods
         if num == 1:
-            df_graph_1 = merge_two_df(raw_data_df_standardization, df_after_ta_standardization, metrics)
+            # df_graph_1 = merge_two_df(raw_data_df_standardization, df_after_ta_standardization, metrics)
+            #
+            # df_graph_1 = get_best_df_after_ta(df_graph_1, metrics, ["nb bins", "method"])
+            #
+            # order = ["EWD", "EFD", "SAX", "GRAD"]
+            #
+            # melt_df = pd.melt(df_graph_1, id_vars=["nb bins", "method", "classifier_name", "transformation_type"],
+            #                   value_vars=metrics)
+            #
+            # melt_df = melt_df.rename(columns={"variable": "Evaluation Metric", "method": "Method"})
+            # create_fig(x="Method", y="value", col="Evaluation Metric", data=melt_df, name="Method",
+            #            x_label="Temporal Abstraction Method", hue="nb bins", legend="Number of Symbols", type=type,
+            #            colors=1, order=order, normalization=normalization)
 
-            df_graph_1 = get_best_df_after_ta(df_graph_1, metrics, ["nb bins", "method"])
+            # df_graph_1 = merge_two_df(raw_data_df_standardization, df_after_ta_standardization, metrics)
+
+            df_graph_1 = get_best_df_after_ta(df, metrics, ["nb bins", "method"])
 
             order = ["EWD", "EFD", "SAX", "GRAD"]
 
@@ -501,4 +516,4 @@ def create_all_graphs(graph_numbers, create_csv=False, type="UCR"):
 
 if __name__ == '__main__':
     # create_all_graphs([1, 2, 3, 4, 5, 6, 7, 8], create_csv=False, normalization=True, type="UCR")
-    create_all_graphs([4], create_csv=False, type="UCR")
+    create_all_graphs([1], create_csv=False, type="MTS")
