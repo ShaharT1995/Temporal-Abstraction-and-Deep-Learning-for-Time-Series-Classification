@@ -7,7 +7,7 @@ The system contains code for:
 * Implement different kinds of sequential neural networks
  * Adjusting the representation of the raw data to the HugoBot system, which is the system where the TA process happens.
  * Different transformations of the abstract data to tensor representation.
- * *Results plots
+ * Results plots
 ## Data 
 The data used in this project comes from two sources: 
 * The [UCR archive](https://www.cs.ucr.edu/~eamonn/time_series_data_2018), which contains the 128 univariate time series datasets. 
