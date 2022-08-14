@@ -130,9 +130,9 @@ For the 'tensorflow-gpu' package, please do not use pip install to install. Inst
 * **Combination** – Boolean  - Combining two STI representations  – gradient + state abstraction
 
 * **Transformation_number –**
-* Discrete Transformation Transformation
-* Symbol One-Hot Transformation
-* Endpoint One-Hot Transformation
+	* Discrete Transformation Transformation
+	* Symbol One-Hot Transformation
+	* Endpoint One-Hot Transformation
 
 * **per_entity** – Boolean - Learning the cutoff per-entity, which means each entity has different cutoffs
 
