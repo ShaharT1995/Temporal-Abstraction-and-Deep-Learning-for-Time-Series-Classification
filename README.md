@@ -117,11 +117,11 @@ For the 'tensorflow-gpu' package, please do not use pip install to install. Inst
 
 ## Parameters
 
-* **archive_name** string, one of: UCR, MTS.\
+* **archive_name** string, one of: UCR, MTS.
 
-* **classifier** string - one of: fcn, mlp, resnet, mcnn, tlenet, twiesn, encoder, cnn, inception, lstm_fcn, mlstm_fcn.
+* **classifier** string, one of: fcn, mlp, resnet, mcnn, tlenet, twiesn, encoder, cnn, inception, lstm_fcn, mlstm_fcn.
 
-* **after_TA** boolean - whether to perform temporal abstraction on the data.
+* **after_TA** boolean, whether to perform temporal abstraction on the data.
 
 * **TA_method** string, the options listed in the Hugobot system.
 
